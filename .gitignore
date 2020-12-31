@@ -1,0 +1,13 @@
+# IntelliJ IDEA specific files
+*.iml
+.idea
+
+# Contains all project specific tools
+.tools
+
+# Output of Maven
+target
+.flattened-pom.xml
+
+# Generated profile from Project-Env
+.project-env
