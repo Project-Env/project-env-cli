@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>code</artifactId>
+        <groupId>ch.repolevedavaj.projectenv</groupId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>cli</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>ch.repolevedavaj.projectenv</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>4.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.graalvm.sdk</groupId>
+            <artifactId>graal-sdk</artifactId>
+            <version>${graalvm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli-codegen</artifactId>
+            <version>4.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <includeEmptyDirs>true</includeEmptyDirs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>execute-project-env-with-graalvm</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>-agentlib:native-image-agent=config-output-dir=${project.build.outputDirectory}/META-INF/native-image</argument>
+                                <argument>ch.repolevedavaj.projectenv.cli.ProjectEnvCli</argument>
+                                <argument>--config-file=${project.basedir}/src/native-image/project-env.xml</argument>
+                                <argument>--output-mode=INTERACTIVE_SHELL</argument>
+                                <argument>--output-file=${project.build.directory}/.project-env</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>${graalvm.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <buildArgs>--enable-url-protocols=https --no-fallback</buildArgs>
+                    <mainClass>ch.repolevedavaj.projectenv.cli.ProjectEnvCli</mainClass>
+                    <imageName>project-env-cli</imageName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

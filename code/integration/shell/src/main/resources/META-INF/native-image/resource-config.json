@@ -1,5 +1,0 @@
-{
-  "resources":{
-  "includes":[{"pattern":"\\QMETA-INF/services/jakarta.xml.bind.JAXBContextFactory\\E"}]},
-  "bundles":[]
-}

@@ -73,6 +73,12 @@
         </xs:complexContent>
     </xs:complexType>
 
+    <xs:complexType name="gradleInstallationConfiguration">
+        <xs:complexContent>
+            <xs:extension base="baseInstallationConfiguration"/>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:complexType name="nodeInstallationConfiguration">
         <xs:complexContent>
             <xs:extension base="baseInstallationConfiguration"/>
@@ -98,6 +104,8 @@
                                         <xs:element type="jdkInstallationConfiguration" name="jdk"
                                                     minOccurs="0"/>
                                         <xs:element type="mavenInstallationConfiguration" name="maven"
+                                                    minOccurs="0"/>
+                                        <xs:element type="gradleInstallationConfiguration" name="gradle"
                                                     minOccurs="0"/>
                                         <xs:element type="nodeInstallationConfiguration" name="node"
                                                     minOccurs="0"/>

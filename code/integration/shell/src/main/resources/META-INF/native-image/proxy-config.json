@@ -1,4 +1,0 @@
-[
-  ["jakarta.xml.bind.annotation.XmlAccessorType","org.glassfish.jaxb.core.v2.model.annotation.Locatable"],
-  ["jakarta.xml.bind.annotation.XmlSeeAlso","org.glassfish.jaxb.core.v2.model.annotation.Locatable"]
-]
