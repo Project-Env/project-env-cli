@@ -19,10 +19,9 @@ jobs:
           ~/.m2/repository
         key: m2Repo
 
-    - run: ./project-env-cli \
-        --config-file=project-env.xml \
-        --output-mode=GITHUB_ACTIONS \
-        --output-file=github-actions-env.sh && \
+    - run: |
+        ./project-env-cli --config-file=project-env.xml --output-mode=GITHUB_ACTIONS --output-file=github-actions-env.sh
+        chmod +x ./github-actions-env.sh
         ./github-actions-env.sh
 
     - run: mvn -B package
