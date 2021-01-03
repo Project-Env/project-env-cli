@@ -196,11 +196,10 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
 
     protected File resolveExecutable(String executable, List<File> locations) {
         List<String> possibleExtensions = new ArrayList<>();
-
-        possibleExtensions.add(StringUtils.EMPTY);
         if (OS_EXECUTABLE_EXTENSIONS.containsKey(OS.getCurrentOS())) {
             possibleExtensions.addAll(OS_EXECUTABLE_EXTENSIONS.get(OS.getCurrentOS()));
         }
+        possibleExtensions.add(StringUtils.EMPTY);
 
         for (String possibleExtension : possibleExtensions) {
             String executableWithExtension = executable + possibleExtension;
