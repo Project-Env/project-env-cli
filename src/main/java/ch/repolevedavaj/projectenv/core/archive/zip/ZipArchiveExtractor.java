@@ -3,7 +3,6 @@ package ch.repolevedavaj.projectenv.core.archive.zip;
 import ch.repolevedavaj.projectenv.core.archive.AbstractArchiveExtractor;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -12,6 +11,9 @@ import java.net.URI;
 import java.util.List;
 
 public class ZipArchiveExtractor extends AbstractArchiveExtractor<ZipArchiveInputStream, ZipArchiveEntry> {
+
+    private static final String DEFAULT_SHELL_SCRIPT_EXTENSION = ".sh";
+    private static final int DEFAULT_SHELL_SCRIPT_MODE = 493;
 
     @Override
     protected List<String> getSupportedArchiveExtensions() {
@@ -37,13 +39,18 @@ public class ZipArchiveExtractor extends AbstractArchiveExtractor<ZipArchiveInpu
 
     @Override
     protected Integer getMode(ZipArchiveEntry archiveEntry) {
-        int unixMode = archiveEntry.getUnixMode();
+        Integer unixMode = archiveEntry.getUnixMode() != 0 ? archiveEntry.getUnixMode() : null;
+
         // Zip files do not contain any permission information. Therefore, we need to make scripts executable.
-        if (unixMode == 0 && archiveEntry.getName().endsWith(".sh") && SystemUtils.IS_OS_UNIX) {
-            return 493;
+        if (unixMode == null && isShellScript(archiveEntry)) {
+            return DEFAULT_SHELL_SCRIPT_MODE;
         }
 
-        return unixMode != 0 ? unixMode : null;
+        return unixMode;
+    }
+
+    private boolean isShellScript(ZipArchiveEntry archiveEntry) {
+        return archiveEntry.getName().endsWith(DEFAULT_SHELL_SCRIPT_EXTENSION);
     }
 
 }

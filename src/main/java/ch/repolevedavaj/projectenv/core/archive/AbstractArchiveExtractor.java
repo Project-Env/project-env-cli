@@ -1,5 +1,6 @@
 package ch.repolevedavaj.projectenv.core.archive;
 
+import ch.repolevedavaj.projectenv.core.os.OS;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.io.FileUtils;
@@ -90,6 +91,11 @@ public abstract class AbstractArchiveExtractor<ArchiveInputStreamType extends Ar
     }
 
     protected void setPermissions(ArchiveEntryType archiveEntry, File target) throws Exception {
+        // we do not set any permissions on Windows
+        if (OS.getCurrentOS() == OS.WINDOWS) {
+            return;
+        }
+
         if (isSymbolicLink(archiveEntry)) {
             return;
         }
@@ -103,7 +109,10 @@ public abstract class AbstractArchiveExtractor<ArchiveInputStreamType extends Ar
     protected abstract Integer getMode(ArchiveEntryType archiveEntry);
 
     private static Set<PosixFilePermission> posixFilePermissionsFromMode(int decimalMode) {
-        char[] permissionFlags = Integer.toOctalString(decimalMode & 07777).toCharArray();
+        // to determine the Posix permission flags, we only need the last 12 bits
+        int relevantPermissionBits = decimalMode & 0b111111111111;
+
+        char[] permissionFlags = Integer.toOctalString(relevantPermissionBits).toCharArray();
 
         StringBuilder posixPermissions = new StringBuilder();
         for (char permissionFlag : permissionFlags) {
