@@ -2,6 +2,8 @@ package ch.repolevedavaj.projectenv.core.installer;
 
 import ch.repolevedavaj.projectenv.core.ProjectToolType;
 import ch.repolevedavaj.projectenv.core.configuration.NodeInstallationConfiguration;
+import ch.repolevedavaj.projectenv.core.os.OS;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -14,6 +16,10 @@ public class NodeInstaller extends AbstractProjectToolInstaller<NodeInstallation
 
     @Override
     protected List<String> getAdditionalPathElements() {
+        if (OS.getCurrentOS() == OS.WINDOWS) {
+            return List.of(StringUtils.EMPTY);
+        }
+
         return List.of("/bin");
     }
 

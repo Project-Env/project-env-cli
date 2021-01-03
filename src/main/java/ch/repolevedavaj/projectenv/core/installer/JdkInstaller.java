@@ -2,6 +2,7 @@ package ch.repolevedavaj.projectenv.core.installer;
 
 import ch.repolevedavaj.projectenv.core.ProjectToolType;
 import ch.repolevedavaj.projectenv.core.configuration.JdkInstallationConfiguration;
+import ch.repolevedavaj.projectenv.core.os.OS;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -14,7 +15,7 @@ public class JdkInstaller extends AbstractProjectToolInstaller<JdkInstallationCo
     @Override
     protected File getRelevantProjectToolRoot(File toolInstallationDirectory) {
         File relevantProjectToolRoot = super.getRelevantProjectToolRoot(toolInstallationDirectory);
-        if (SystemUtils.IS_OS_MAC) {
+        if (OS.getCurrentOS() == OS.MACOS) {
             return new File(relevantProjectToolRoot, "Contents/Home");
         }
 
