@@ -1,6 +1,7 @@
 package ch.repolevedavaj.projectenv.core.archive;
 
 import ch.repolevedavaj.projectenv.core.archive.targz.TarGzArchiveExtractor;
+import ch.repolevedavaj.projectenv.core.archive.tarxz.TarXzArchiveExtractor;
 import ch.repolevedavaj.projectenv.core.archive.zip.ZipArchiveExtractor;
 
 import java.net.URI;
@@ -10,6 +11,7 @@ public final class ArchiveExtractorFactory {
 
     private static final List<ArchiveExtractor> ARCHIVE_EXTRACTORS = List.of(
             new TarGzArchiveExtractor(),
+            new TarXzArchiveExtractor(),
             new ZipArchiveExtractor()
     );
 
