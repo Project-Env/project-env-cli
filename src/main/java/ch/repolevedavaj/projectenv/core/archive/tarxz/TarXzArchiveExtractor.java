@@ -3,6 +3,7 @@ package ch.repolevedavaj.projectenv.core.archive.tarxz;
 import ch.repolevedavaj.projectenv.core.archive.AbstractArchiveExtractor;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedInputStream;
@@ -11,9 +12,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.List;
-
-import static org.apache.commons.compress.compressors.CompressorStreamFactory.XZ;
-import static org.apache.commons.compress.compressors.CompressorStreamFactory.getSingleton;
 
 public class TarXzArchiveExtractor extends AbstractArchiveExtractor<TarArchiveInputStream, TarArchiveEntry> {
 
@@ -25,7 +23,7 @@ public class TarXzArchiveExtractor extends AbstractArchiveExtractor<TarArchiveIn
     @Override
     protected TarArchiveInputStream createArchiveInputStream(URI archiveUri) throws Exception {
         InputStream tarGzArchiveInputStream = new BufferedInputStream(archiveUri.toURL().openStream());
-        InputStream tarArchiveInputStream = new BufferedInputStream(getSingleton().createCompressorInputStream(XZ, tarGzArchiveInputStream));
+        InputStream tarArchiveInputStream = new BufferedInputStream(new XZCompressorInputStream(tarGzArchiveInputStream));
 
         return new TarArchiveInputStream(tarArchiveInputStream);
     }
