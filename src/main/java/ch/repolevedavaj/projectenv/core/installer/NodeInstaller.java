@@ -17,4 +17,9 @@ public class NodeInstaller extends AbstractProjectToolInstaller<NodeInstallation
         return List.of("/bin");
     }
 
+    @Override
+    protected String getPrimaryExecutableName() {
+        return "node";
+    }
+
 }

@@ -36,4 +36,9 @@ public class JdkInstaller extends AbstractProjectToolInstaller<JdkInstallationCo
         return List.of("/bin");
     }
 
+    @Override
+    protected String getPrimaryExecutableName() {
+        return "java";
+    }
+
 }

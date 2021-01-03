@@ -17,4 +17,9 @@ public class GradleInstaller extends AbstractProjectToolInstaller<MavenInstallat
         return List.of("/bin");
     }
 
+    @Override
+    protected String getPrimaryExecutableName() {
+        return "gradle";
+    }
+
 }

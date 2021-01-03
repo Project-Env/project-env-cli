@@ -39,7 +39,6 @@ public class ZipArchiveExtractor extends AbstractArchiveExtractor<ZipArchiveInpu
     protected Integer getMode(ZipArchiveEntry archiveEntry) {
         int unixMode = archiveEntry.getUnixMode();
         // Zip files do not contain any permission information. Therefore, we need to make scripts executable.
-        // TODO: How to handle other executables?
         if (unixMode == 0 && archiveEntry.getName().endsWith(".sh") && SystemUtils.IS_OS_UNIX) {
             return 493;
         }

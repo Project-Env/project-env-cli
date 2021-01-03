@@ -17,4 +17,9 @@ public class MavenInstaller extends AbstractProjectToolInstaller<MavenInstallati
         return List.of("/bin");
     }
 
+    @Override
+    protected String getPrimaryExecutableName() {
+        return "mvn";
+    }
+
 }

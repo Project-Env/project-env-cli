@@ -10,6 +10,7 @@ import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfigurat
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.Exports.Export;
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.PostInstallationCommands;
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.PostInstallationCommands.PostInstallationCommand;
+import ch.repolevedavaj.projectenv.core.os.OS;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -18,13 +19,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration extends BaseInstallationConfiguration> implements ProjectToolInstaller<ToolInstallationConfiguration> {
+
+    private static final Map<OS, List<String>> OS_EXECUTABLE_EXTENSIONS = Map.of(
+            OS.WINDOWS, List.of(".exe", ".cmd")
+    );
 
     private static final String TOOL_INSTALLATION_VERSION_MARKER = "project-env-tool-version.txt";
 
@@ -83,47 +85,54 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
             return URI.create(downloadUris.getSystemIndependent());
         }
 
-        if (SystemUtils.IS_OS_MAC) {
-            return URI.create(downloadUris.getMacos());
+        switch (OS.getCurrentOS()) {
+            case MACOS:
+                return URI.create(downloadUris.getMacos());
+            case WINDOWS:
+                return URI.create(downloadUris.getWindows());
+            case LINUX:
+                return URI.create(downloadUris.getLinux());
+            default:
+                throw new IllegalStateException("unsupported OS " + SystemUtils.OS_NAME);
         }
-
-        if (SystemUtils.IS_OS_LINUX) {
-            return URI.create(downloadUris.getLinux());
-        }
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            return URI.create(downloadUris.getWindows());
-        }
-
-        throw new IllegalStateException("unsupported OS " + SystemUtils.OS_NAME);
     }
 
     protected ProjectToolDetails createProjectToolInstallationDetails(ToolInstallationConfiguration toolInstallationConfiguration, File toolInstallationDirectory) {
         File relevantProjectToolRoot = getRelevantProjectToolRoot(toolInstallationDirectory);
 
+        Map<String, File> exports = new HashMap<>();
+        exports.putAll(Optional.ofNullable(toolInstallationConfiguration.getExports())
+                .map(Exports::getExport)
+                .orElse(List.of())
+                .stream()
+                .collect(Collectors.toMap(Export::getName, export -> new File(relevantProjectToolRoot, export.getValue()))));
+        exports.putAll(getAdditionalExports()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, export -> new File(relevantProjectToolRoot, export.getValue()))));
+
+        List<File> pathElements = new ArrayList<>();
+        pathElements.addAll(Optional.ofNullable(toolInstallationConfiguration.getPathElements())
+                .map(BaseInstallationConfiguration.PathElements::getPathElement)
+                .orElse(List.of())
+                .stream()
+                .map(pathElement -> new File(relevantProjectToolRoot, pathElement))
+                .collect(Collectors.toList()));
+        pathElements.addAll(getAdditionalPathElements()
+                .stream()
+                .map(pathElement -> new File(relevantProjectToolRoot, pathElement))
+                .collect(Collectors.toList()));
+
+        Optional<File> primaryExecutable = Optional.ofNullable(getPrimaryExecutableName())
+                .map(primaryExecutableName -> resolveExecutable(primaryExecutableName, pathElements));
+
         return ImmutableProjectToolDetails
                 .builder()
                 .type(getProjectToolType())
                 .location(relevantProjectToolRoot)
-                .putAllExports(Optional.ofNullable(toolInstallationConfiguration.getExports())
-                        .map(Exports::getExport)
-                        .orElse(List.of())
-                        .stream()
-                        .collect(Collectors.toMap(Export::getName, export -> new File(relevantProjectToolRoot, export.getValue()))))
-                .putAllExports(getAdditionalExports()
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, export -> new File(relevantProjectToolRoot, export.getValue()))))
-                .addAllPathElements(Optional.ofNullable(toolInstallationConfiguration.getPathElements())
-                        .map(BaseInstallationConfiguration.PathElements::getPathElement)
-                        .orElse(List.of())
-                        .stream()
-                        .map(pathElement -> new File(relevantProjectToolRoot, pathElement))
-                        .collect(Collectors.toList()))
-                .addAllPathElements(getAdditionalPathElements()
-                        .stream()
-                        .map(pathElement -> new File(relevantProjectToolRoot, pathElement))
-                        .collect(Collectors.toList()))
+                .putAllExports(exports)
+                .addAllPathElements(pathElements)
+                .primaryExecutable(primaryExecutable)
                 .build();
     }
 
@@ -158,7 +167,7 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
                 .stream()
                 .map(this::toCanonicalPath)
                 .collect(Collectors.joining(":"));
-        processEnvironment.put("PATH", pathExtension + ":" + System.getenv("PATH"));
+        processEnvironment.put("PATH", pathExtension + File.pathSeparator + System.getenv("PATH"));
 
         for (PostInstallationCommand postInstallationCommand : postInstallationCommands) {
             File executable = resolveExecutable(postInstallationCommand.getExecutable(), projectToolDetails);
@@ -182,10 +191,25 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
     }
 
     private File resolveExecutable(String executable, ProjectToolDetails projectToolDetails) {
-        for (File pathElement : projectToolDetails.getPathElements()) {
-            File executableCandidate = new File(pathElement, executable);
-            if (executableCandidate.exists()) {
-                return executableCandidate;
+        return resolveExecutable(executable, projectToolDetails.getPathElements());
+    }
+
+    protected File resolveExecutable(String executable, List<File> locations) {
+        List<String> possibleExtensions = new ArrayList<>();
+
+        possibleExtensions.add(StringUtils.EMPTY);
+        if (OS_EXECUTABLE_EXTENSIONS.containsKey(OS.getCurrentOS())) {
+            possibleExtensions.addAll(OS_EXECUTABLE_EXTENSIONS.get(OS.getCurrentOS()));
+        }
+
+        for (String possibleExtension : possibleExtensions) {
+            String executableWithExtension = executable + possibleExtension;
+
+            for (File pathElement : locations) {
+                File executableCandidate = new File(pathElement, executableWithExtension);
+                if (executableCandidate.exists()) {
+                    return executableCandidate;
+                }
             }
         }
 
@@ -213,5 +237,9 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
     }
 
     protected abstract ProjectToolType getProjectToolType();
+
+    protected String getPrimaryExecutableName() {
+        return null;
+    }
 
 }
