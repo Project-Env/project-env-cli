@@ -26,27 +26,28 @@ public class ArchiveExtractor {
     );
 
     public void extractArchive(File archive, File targetDirectory) throws Exception {
-        ArchiveAccessor archiveAccessor = ArchiveAccessorFactoryCollection.createArchiveAccessor(archive);
+        try (ArchiveAccessor archiveAccessor = ArchiveAccessorFactoryCollection.createArchiveAccessor(archive)) {
 
-        ArchiveEntry entry;
+            ArchiveEntry entry;
 
-        while ((entry = archiveAccessor.getNextEntry()) != null) {
-            if (!shouldExtractEntry(entry)) {
-                continue;
+            while ((entry = archiveAccessor.getNextEntry()) != null) {
+                if (!shouldExtractEntry(entry)) {
+                    continue;
+                }
+
+                File target = new File(targetDirectory, entry.getName());
+                checkThatPathIsInsideBasePath(target, targetDirectory);
+
+                if (entry.isDirectory()) {
+                    createDirectory(target);
+                } else if (entry.isSymbolicLink()) {
+                    createSymbolicLink(entry, target, targetDirectory);
+                } else {
+                    createFile(entry, target);
+                }
+
+                setPermissions(entry, target);
             }
-
-            File target = new File(targetDirectory, entry.getName());
-            checkThatPathIsInsideBasePath(target, targetDirectory);
-
-            if (entry.isDirectory()) {
-                createDirectory(target);
-            } else if (entry.isSymbolicLink()) {
-                createSymbolicLink(entry, target, targetDirectory);
-            } else {
-                createFile(entry, target);
-            }
-
-            setPermissions(entry, target);
         }
     }
 

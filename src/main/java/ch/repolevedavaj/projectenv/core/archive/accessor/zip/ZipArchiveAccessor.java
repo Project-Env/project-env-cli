@@ -24,7 +24,7 @@ public class ZipArchiveAccessor implements ArchiveAccessor {
         while (entries.hasMoreElements()) {
             org.apache.commons.compress.archivers.zip.ZipArchiveEntry entry = entries.nextElement();
             if (zipFile.canReadEntryData(entry)) {
-                return new ZipArchiveEntry(entries.nextElement());
+                return new ZipArchiveEntry(entry);
             }
         }
 
@@ -33,7 +33,7 @@ public class ZipArchiveAccessor implements ArchiveAccessor {
 
     @Override
     public void close() throws Exception {
-        // noop
+        zipFile.close();
     }
 
     private class ZipArchiveEntry implements ArchiveEntry {
