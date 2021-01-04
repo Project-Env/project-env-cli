@@ -16,8 +16,14 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public abstract class AbstractArchiveExtractor<ArchiveInputStreamType extends ArchiveInputStream, ArchiveEntryType extends ArchiveEntry> implements ArchiveExtractor {
+
+    private static final List<Pattern> IGNORED_ARCHIVE_ENTRIES = List.of(
+            // dot underscore files which are created on macOS systems and hold metadata
+            Pattern.compile(".*/\\._.+")
+    );
 
     @Override
     public boolean supportsArchive(URI archiveUri) {
@@ -45,6 +51,10 @@ public abstract class AbstractArchiveExtractor<ArchiveInputStreamType extends Ar
                 continue;
             }
 
+            if(!shouldExtractEntry(entry)) {
+                continue;
+            }
+
             File target = new File(targetDirectory, entry.getName());
             checkThatPathIsInsideBasePath(target, targetDirectory);
 
@@ -58,6 +68,10 @@ public abstract class AbstractArchiveExtractor<ArchiveInputStreamType extends Ar
 
             setPermissions(entry, target);
         }
+    }
+
+    protected boolean shouldExtractEntry(ArchiveEntryType archiveEntry) {
+        return IGNORED_ARCHIVE_ENTRIES.stream().noneMatch(pattern -> pattern.matcher(archiveEntry.getName()).matches());
     }
 
     protected void checkThatPathIsInsideBasePath(File file, File baseDirectory) throws Exception {
