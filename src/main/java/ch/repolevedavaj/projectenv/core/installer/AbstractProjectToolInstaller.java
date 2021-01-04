@@ -3,7 +3,7 @@ package ch.repolevedavaj.projectenv.core.installer;
 import ch.repolevedavaj.projectenv.core.ImmutableProjectToolDetails;
 import ch.repolevedavaj.projectenv.core.ProjectToolDetails;
 import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.archive.ArchiveExtractorFactory;
+import ch.repolevedavaj.projectenv.core.archive.ArchiveExtractor;
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration;
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.DownloadUris;
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.Exports;
@@ -12,13 +12,15 @@ import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfigurat
 import ch.repolevedavaj.projectenv.core.configuration.BaseInstallationConfiguration.PostInstallationCommands.PostInstallationCommand;
 import ch.repolevedavaj.projectenv.core.os.OS;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +31,8 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
     );
 
     private static final String TOOL_INSTALLATION_VERSION_MARKER = "project-env-tool-version.txt";
+
+    private final ArchiveExtractor archiveExtractor = new ArchiveExtractor();
 
     @Override
     public ProjectToolDetails installTool(ToolInstallationConfiguration toolInstallationConfiguration, File toolsDirectory) throws Exception {
@@ -147,9 +151,17 @@ public abstract class AbstractProjectToolInstaller<ToolInstallationConfiguration
     private void extractToolInstallation(ToolInstallationConfiguration toolInstallationConfiguration, File toolInstallationDirectory) throws Exception {
         URI systemSpecificDownloadUri = getSystemSpecificDownloadUri(toolInstallationConfiguration);
 
-        ArchiveExtractorFactory
-                .getArchiveExtractor(systemSpecificDownloadUri)
-                .extractArchive(systemSpecificDownloadUri, toolInstallationDirectory);
+        String archiveName = FilenameUtils.getName(systemSpecificDownloadUri.getPath());
+        File tempArchive = Files.createTempFile(toolInstallationConfiguration.getName(), archiveName).toFile();
+
+        try (InputStream inputStream = new BufferedInputStream(systemSpecificDownloadUri.toURL().openStream());
+             OutputStream outputStream = new FileOutputStream(tempArchive)) {
+            IOUtils.copy(inputStream, outputStream);
+        }
+
+        archiveExtractor.extractArchive(tempArchive, toolInstallationDirectory);
+
+        FileUtils.forceDelete(tempArchive);
     }
 
     private void executePostInstallationCommands(ToolInstallationConfiguration toolInstallationConfiguration, ProjectToolDetails projectToolDetails) throws Exception {
