@@ -3,6 +3,9 @@ name: Build
 on:
   push:
     branches: [ master ]
+  release:
+    types:
+      - created
   workflow_dispatch:
 
 jobs:
@@ -20,4 +23,11 @@ jobs:
         chmod +x ./github-actions-env.sh
         ./github-actions-env.sh
 
-    - run: mvn -B package
+    - if: ${{ github.event_name != 'release'}}
+      run: mvn -B package
+
+    - if: ${{ github.event_name == 'release'}}
+      env:
+        BINTRAY_MAVEN_REPO_USER: ${{ secrets.BINTRAY_MAVEN_REPO_USER }}
+        BINTRAY_MAVEN_REPO_PASS: ${{ secrets.BINTRAY_MAVEN_REPO_PASS }}
+      run: mvn -B -s etc/m2/settings-ci.xml -Drevision=${{ github.event.release.tag_name }} deploy
