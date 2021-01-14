@@ -19,21 +19,6 @@
                     <system-independent>https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz</system-independent>
                 </download-uris>
             </maven>
-            <generic>
-                <name>jaxb-ri</name>
-                <download-uris>
-                    <system-independent>https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-ri/3.0.0/jaxb-ri-3.0.0.zip</system-independent>
-                </download-uris>
-                <exports>
-                    <export>
-                        <name>JAXB_HOME</name>
-                        <value/>
-                    </export>
-                </exports>
-                <path-elements>
-                    <path-element>bin</path-element>
-                </path-elements>
-            </generic>
         </installers>
     </tools>
 </project-env>
