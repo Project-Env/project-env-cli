@@ -1,4 +1,4 @@
-package ch.repolevedavaj.projectenv.core;
+package ch.repolevedavaj.projectenv.core.toolinfo;
 
 import org.immutables.value.Value;
 
@@ -8,16 +8,16 @@ import java.util.Map;
 import java.util.Optional;
 
 @Value.Immutable
-public interface ProjectToolDetails {
+public interface ToolInfo {
 
-    ProjectToolType getType();
+    String getToolName();
 
     File getLocation();
 
     Optional<File> getPrimaryExecutable();
 
-    List<File> getPathElements();
+    Map<String, File> getEnvironmentVariables();
 
-    Map<String, File> getExports();
+    List<File> getPathElements();
 
 }

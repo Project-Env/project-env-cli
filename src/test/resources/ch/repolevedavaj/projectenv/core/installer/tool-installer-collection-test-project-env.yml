@@ -1,0 +1,53 @@
+tools:
+
+  toolsDirectory: ".tools"
+
+  jdk:
+    toolName: "jdk"
+    downloadUris:
+      - targetOs: "MACOS"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-darwin-amd64-20.3.0.tar.gz"
+      - targetOs: "WINDOWS"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-windows-amd64-20.3.0.zip"
+      - targetOs: "LINUX"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-linux-amd64-20.3.0.tar.gz"
+    postExtractionCommands:
+      - executableName: "gu"
+        arguments:
+          - "install"
+          - "native-image"
+
+  maven:
+    toolName: "maven"
+    downloadUris:
+      - downloadUri: "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"
+
+  gradle:
+    toolName: "gradle"
+    downloadUris:
+      - downloadUri: "https://downloads.gradle-dn.com/distributions/gradle-6.7.1-bin.zip"
+
+  node:
+    toolName: "node"
+    downloadUris:
+      - targetOs: "MACOS"
+        downloadUri: "https://nodejs.org/dist/v14.15.3/node-v14.15.3-darwin-x64.tar.gz"
+      - targetOs: "WINDOWS"
+        downloadUri: "https://nodejs.org/dist/v14.15.3/node-v14.15.3-win-x64.zip"
+      - targetOs: "LINUX"
+        downloadUri: "https://nodejs.org/dist/v14.15.3/node-v14.15.3-linux-x64.tar.xz"
+    postExtractionCommands:
+      - executableName: "npm"
+        arguments:
+          - "install"
+          - "-g"
+          - "yarn"
+
+  genericTools:
+    - toolName: "jaxb-ri"
+      downloadUris:
+        - downloadUri: "https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-ri/3.0.0/jaxb-ri-3.0.0.zip"
+      environmentVariables:
+        JAXB_HOME: ""
+      pathElements:
+        - "bin"

@@ -1,31 +1,13 @@
 package ch.repolevedavaj.projectenv.core.installer;
 
-import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.configuration.NodeInstallationConfiguration;
-import ch.repolevedavaj.projectenv.core.os.OS;
-import org.apache.commons.lang3.StringUtils;
+import ch.repolevedavaj.projectenv.core.configuration.NodeConfiguration;
+import ch.repolevedavaj.projectenv.core.toolinfo.NodeInfo;
 
-import java.util.List;
-
-public class NodeInstaller extends AbstractProjectToolInstaller<NodeInstallationConfiguration> {
+public class NodeInstaller extends AbstractProjectToolInstaller<NodeConfiguration, NodeInfo> {
 
     @Override
-    protected ProjectToolType getProjectToolType() {
-        return ProjectToolType.NODE;
-    }
-
-    @Override
-    protected List<String> getAdditionalPathElements() {
-        if (OS.getCurrentOS() == OS.WINDOWS) {
-            return List.of(StringUtils.EMPTY);
-        }
-
-        return List.of("/bin");
-    }
-
-    @Override
-    protected String getPrimaryExecutableName() {
-        return "node";
+    protected Class<NodeConfiguration> getToolConfigurationClass() {
+        return NodeConfiguration.class;
     }
 
 }

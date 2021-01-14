@@ -1,45 +1,13 @@
 package ch.repolevedavaj.projectenv.core.installer;
 
-import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.configuration.JdkInstallationConfiguration;
-import ch.repolevedavaj.projectenv.core.os.OS;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
+import ch.repolevedavaj.projectenv.core.configuration.JdkConfiguration;
+import ch.repolevedavaj.projectenv.core.toolinfo.JdkInfo;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
-public class JdkInstaller extends AbstractProjectToolInstaller<JdkInstallationConfiguration> {
+public class JdkInstaller extends AbstractProjectToolInstaller<JdkConfiguration, JdkInfo> {
 
     @Override
-    protected File getRelevantProjectToolRoot(File toolInstallationDirectory) {
-        File relevantProjectToolRoot = super.getRelevantProjectToolRoot(toolInstallationDirectory);
-        if (OS.getCurrentOS() == OS.MACOS) {
-            return new File(relevantProjectToolRoot, "Contents/Home");
-        }
-
-        return relevantProjectToolRoot;
-    }
-
-    @Override
-    protected ProjectToolType getProjectToolType() {
-        return ProjectToolType.JDK;
-    }
-
-    @Override
-    protected Map<String, String> getAdditionalExports() {
-        return Map.of("JAVA_HOME", StringUtils.EMPTY);
-    }
-
-    @Override
-    protected List<String> getAdditionalPathElements() {
-        return List.of("/bin");
-    }
-
-    @Override
-    protected String getPrimaryExecutableName() {
-        return "java";
+    protected Class<JdkConfiguration> getToolConfigurationClass() {
+        return JdkConfiguration.class;
     }
 
 }

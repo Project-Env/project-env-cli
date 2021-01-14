@@ -1,12 +1,12 @@
-package ch.repolevedavaj.projectenv.core.os;
+package ch.repolevedavaj.projectenv.core.common;
 
 import org.apache.commons.lang3.SystemUtils;
 
-public enum OS {
+public enum OperatingSystem {
 
-    MACOS, WINDOWS, LINUX, UNKNOWN;
+    ALL, MACOS, WINDOWS, LINUX;
 
-    public static OS getCurrentOS() {
+    public static OperatingSystem getCurrentOS() {
         if (SystemUtils.IS_OS_MAC) {
             return MACOS;
         }
@@ -19,7 +19,7 @@ public enum OS {
             return WINDOWS;
         }
 
-        return UNKNOWN;
+        return null;
     }
 
 }

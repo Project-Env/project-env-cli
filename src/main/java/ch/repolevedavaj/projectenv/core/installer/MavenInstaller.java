@@ -1,25 +1,13 @@
 package ch.repolevedavaj.projectenv.core.installer;
 
-import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.configuration.MavenInstallationConfiguration;
+import ch.repolevedavaj.projectenv.core.configuration.MavenConfiguration;
+import ch.repolevedavaj.projectenv.core.toolinfo.MavenInfo;
 
-import java.util.List;
-
-public class MavenInstaller extends AbstractProjectToolInstaller<MavenInstallationConfiguration> {
+public class MavenInstaller extends AbstractProjectToolInstaller<MavenConfiguration, MavenInfo> {
 
     @Override
-    protected ProjectToolType getProjectToolType() {
-        return ProjectToolType.MAVEN;
-    }
-
-    @Override
-    protected List<String> getAdditionalPathElements() {
-        return List.of("/bin");
-    }
-
-    @Override
-    protected String getPrimaryExecutableName() {
-        return "mvn";
+    protected Class<MavenConfiguration> getToolConfigurationClass() {
+        return MavenConfiguration.class;
     }
 
 }

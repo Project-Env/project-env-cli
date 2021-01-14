@@ -1,13 +1,13 @@
 package ch.repolevedavaj.projectenv.core.installer;
 
-import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.configuration.GenericToolInstallationConfiguration;
+import ch.repolevedavaj.projectenv.core.configuration.GenericToolConfiguration;
+import ch.repolevedavaj.projectenv.core.toolinfo.GenericToolInfo;
 
-public class GenericToolInstaller extends AbstractProjectToolInstaller<GenericToolInstallationConfiguration> {
+public class GenericToolInstaller extends AbstractProjectToolInstaller<GenericToolConfiguration, GenericToolInfo> {
 
     @Override
-    protected ProjectToolType getProjectToolType() {
-        return ProjectToolType.OTHER;
+    protected Class<GenericToolConfiguration> getToolConfigurationClass() {
+        return GenericToolConfiguration.class;
     }
 
 }

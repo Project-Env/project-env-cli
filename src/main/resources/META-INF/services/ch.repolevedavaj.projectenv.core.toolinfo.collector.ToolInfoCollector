@@ -1,0 +1,5 @@
+ch.repolevedavaj.projectenv.core.toolinfo.collector.GenericToolInfoCollector
+ch.repolevedavaj.projectenv.core.toolinfo.collector.GradleInfoCollector
+ch.repolevedavaj.projectenv.core.toolinfo.collector.JdkInfoCollector
+ch.repolevedavaj.projectenv.core.toolinfo.collector.MavenInfoCollector
+ch.repolevedavaj.projectenv.core.toolinfo.collector.NodeInfoCollector

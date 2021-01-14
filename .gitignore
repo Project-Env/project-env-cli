@@ -2,8 +2,8 @@
 *.iml
 .idea
 
-# Contains all project specific tools
-.tools
+# Contains all project specific toolsConfiguration
+.toolsConfiguration
 
 # Output of Maven
 target
@@ -11,3 +11,6 @@ target
 
 # Generated profile from Project-Env
 .project-env
+
+# Tools store from Project-Env
+.tools

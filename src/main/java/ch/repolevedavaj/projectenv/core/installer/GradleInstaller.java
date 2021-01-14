@@ -1,25 +1,13 @@
 package ch.repolevedavaj.projectenv.core.installer;
 
-import ch.repolevedavaj.projectenv.core.ProjectToolType;
-import ch.repolevedavaj.projectenv.core.configuration.MavenInstallationConfiguration;
+import ch.repolevedavaj.projectenv.core.configuration.GradleConfiguration;
+import ch.repolevedavaj.projectenv.core.toolinfo.GradleInfo;
 
-import java.util.List;
-
-public class GradleInstaller extends AbstractProjectToolInstaller<MavenInstallationConfiguration> {
+public class GradleInstaller extends AbstractProjectToolInstaller<GradleConfiguration, GradleInfo> {
 
     @Override
-    protected ProjectToolType getProjectToolType() {
-        return ProjectToolType.GRADLE;
-    }
-
-    @Override
-    protected List<String> getAdditionalPathElements() {
-        return List.of("/bin");
-    }
-
-    @Override
-    protected String getPrimaryExecutableName() {
-        return "gradle";
+    protected Class<GradleConfiguration> getToolConfigurationClass() {
+        return GradleConfiguration.class;
     }
 
 }

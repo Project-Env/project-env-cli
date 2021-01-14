@@ -13,17 +13,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Map;
 
-public class ArchiveAccessorFactoryCollection {
+public class ArchiveAccessorFactory {
 
-    private static final Map<String, ArchiveAccessorFactory> FACTORIES = Map.of(
-            ".tar.gz", ArchiveAccessorFactoryCollection::createTarGzArchiveAccessor,
-            ".tar.xz", ArchiveAccessorFactoryCollection::createTarXzArchiveAccessor,
-            ".tar", ArchiveAccessorFactoryCollection::createTarArchiveAccessor,
-            ".zip", ArchiveAccessorFactoryCollection::createZipArchiveAccessor
+    private static final Map<String, ArchiveSpecificAccessorFactory> FACTORIES = Map.of(
+            ".tar.gz", ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactory::createTarGzArchiveAccessor,
+            ".tar.xz", ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactory::createTarXzArchiveAccessor,
+            ".tar", ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactory::createTarArchiveAccessor,
+            ".zip", ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactory::createZipArchiveAccessor
     );
 
     public static ArchiveAccessor createArchiveAccessor(File archive) throws Exception {
-        for (Map.Entry<String, ArchiveAccessorFactory> factoryEntry : FACTORIES.entrySet()) {
+        for (Map.Entry<String, ArchiveSpecificAccessorFactory> factoryEntry : FACTORIES.entrySet()) {
             if (archive.getName().toLowerCase().endsWith(factoryEntry.getKey())) {
                 return factoryEntry.getValue().createArchiveAccessor(archive);
             }
@@ -58,13 +58,13 @@ public class ArchiveAccessorFactoryCollection {
         return createTarArchiveAccessor(originalInputStream);
     }
 
-    private static ArchiveAccessor createTarArchiveAccessor(InputStream tarInputStream) throws Exception {
+    private static ArchiveAccessor createTarArchiveAccessor(InputStream tarInputStream) {
         TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(tarInputStream);
 
         return new TarArchiveAccessor(tarArchiveInputStream);
     }
 
-    private interface ArchiveAccessorFactory {
+    private interface ArchiveSpecificAccessorFactory {
 
         ArchiveAccessor createArchiveAccessor(File archive) throws Exception;
 

@@ -1,9 +1,9 @@
 package ch.repolevedavaj.projectenv.core.archive;
 
 import ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessor;
-import ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactoryCollection;
+import ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveAccessorFactory;
 import ch.repolevedavaj.projectenv.core.archive.accessor.ArchiveEntry;
-import ch.repolevedavaj.projectenv.core.os.OS;
+import ch.repolevedavaj.projectenv.core.common.OperatingSystem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -26,7 +26,7 @@ public class ArchiveExtractor {
     );
 
     public void extractArchive(File archive, File targetDirectory) throws Exception {
-        try (ArchiveAccessor archiveAccessor = ArchiveAccessorFactoryCollection.createArchiveAccessor(archive)) {
+        try (ArchiveAccessor archiveAccessor = ArchiveAccessorFactory.createArchiveAccessor(archive)) {
 
             ArchiveEntry entry;
 
@@ -85,7 +85,7 @@ public class ArchiveExtractor {
 
     private void setPermissions(ArchiveEntry archiveEntry, File target) throws Exception {
         // we do not set any permissions on Windows
-        if (OS.getCurrentOS() == OS.WINDOWS) {
+        if (OperatingSystem.getCurrentOS() == OperatingSystem.WINDOWS) {
             return;
         }
 
