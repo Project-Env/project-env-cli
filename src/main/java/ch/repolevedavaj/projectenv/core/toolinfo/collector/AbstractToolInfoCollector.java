@@ -4,6 +4,7 @@ import ch.repolevedavaj.projectenv.core.common.ProcessEnvironmentHelper;
 import ch.repolevedavaj.projectenv.core.configuration.ToolConfiguration;
 import ch.repolevedavaj.projectenv.core.toolinfo.ImmutableToolInfo;
 import ch.repolevedavaj.projectenv.core.toolinfo.ToolInfo;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.*;
@@ -42,24 +43,12 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
 
     private ToolInfo collectBaseToolInfo(ToolConfigurationType toolConfiguration, File relevantToolBinariesDirectory) {
         Map<String, File> environmentVariables = new HashMap<>();
-        environmentVariables.putAll(toolConfiguration.getEnvironmentVariables()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new File(relevantToolBinariesDirectory, entry.getValue()))));
-        environmentVariables.putAll(getAdditionalExports()
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, export -> new File(relevantToolBinariesDirectory, export.getValue()))));
+        environmentVariables.putAll(createFileMap(toolConfiguration.getEnvironmentVariables(), relevantToolBinariesDirectory));
+        environmentVariables.putAll(createFileMap(getAdditionalExports(), relevantToolBinariesDirectory));
 
         List<File> pathElements = new ArrayList<>();
-        pathElements.addAll(toolConfiguration.getPathElements()
-                .stream()
-                .map(pathElement -> new File(relevantToolBinariesDirectory, pathElement))
-                .collect(Collectors.toList()));
-        pathElements.addAll(getAdditionalPathElements()
-                .stream()
-                .map(pathElement -> new File(relevantToolBinariesDirectory, pathElement))
-                .collect(Collectors.toList()));
+        pathElements.addAll(createFileList(toolConfiguration.getPathElements(), relevantToolBinariesDirectory));
+        pathElements.addAll(createFileList(getAdditionalPathElements(), relevantToolBinariesDirectory));
 
         Optional<File> primaryExecutable = Optional.ofNullable(getPrimaryExecutableName())
                 .map(primaryExecutableName -> {
@@ -79,6 +68,23 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
                 .addAllPathElements(pathElements)
                 .primaryExecutable(primaryExecutable)
                 .build();
+    }
+
+
+    private Map<String, File> createFileMap(Map<String, String> rawMap, File parent) {
+        return rawMap
+                .entrySet()
+                .stream()
+                .map(entry -> Pair.of(entry.getKey(), entry.getValue()))
+                .map(pair -> Pair.of(pair.getLeft(), new File(parent, pair.getRight())))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+    }
+
+    private List<File> createFileList(List<String> rawList, File parent) {
+        return rawList
+                .stream()
+                .map(value -> new File(parent, value))
+                .collect(Collectors.toList());
     }
 
     protected Map<String, String> getAdditionalExports() {

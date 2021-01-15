@@ -21,6 +21,8 @@ tools:
     toolName: "maven"
     downloadUris:
       - downloadUri: "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"
+    globalSettingsFile: "global-settings.xml"
+    userSettingsFile: "user-settings-${USER}.xml"
 
   gradle:
     toolName: "gradle"

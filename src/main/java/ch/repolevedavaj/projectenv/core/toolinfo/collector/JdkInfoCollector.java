@@ -5,7 +5,6 @@ import ch.repolevedavaj.projectenv.core.configuration.JdkConfiguration;
 import ch.repolevedavaj.projectenv.core.toolinfo.ImmutableJdkInfo;
 import ch.repolevedavaj.projectenv.core.toolinfo.JdkInfo;
 import ch.repolevedavaj.projectenv.core.toolinfo.ToolInfo;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -38,7 +37,7 @@ public class JdkInfoCollector extends AbstractToolInfoCollector<JdkConfiguration
 
     @Override
     protected Map<String, String> getAdditionalExports() {
-        return Map.of("JAVA_HOME", StringUtils.EMPTY);
+        return Map.of("JAVA_HOME", "/");
     }
 
     @Override

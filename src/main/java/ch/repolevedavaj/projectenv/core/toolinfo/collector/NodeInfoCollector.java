@@ -5,7 +5,6 @@ import ch.repolevedavaj.projectenv.core.configuration.NodeConfiguration;
 import ch.repolevedavaj.projectenv.core.toolinfo.ImmutableNodeInfo;
 import ch.repolevedavaj.projectenv.core.toolinfo.NodeInfo;
 import ch.repolevedavaj.projectenv.core.toolinfo.ToolInfo;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class NodeInfoCollector extends AbstractToolInfoCollector<NodeConfigurati
     @Override
     protected List<String> getAdditionalPathElements() {
         if (OperatingSystem.getCurrentOS() == OperatingSystem.WINDOWS) {
-            return List.of(StringUtils.EMPTY);
+            return List.of("/");
         }
 
         return List.of("/bin");
