@@ -1,5 +1,0 @@
-ch.repolevedavaj.projectenv.core.installer.GenericToolInstaller
-ch.repolevedavaj.projectenv.core.installer.GradleInstaller
-ch.repolevedavaj.projectenv.core.installer.JdkInstaller
-ch.repolevedavaj.projectenv.core.installer.MavenInstaller
-ch.repolevedavaj.projectenv.core.installer.NodeInstaller
