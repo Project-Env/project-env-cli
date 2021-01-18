@@ -1,0 +1,18 @@
+tools:
+
+  toolsDirectory: ".tools"
+
+  jdk:
+    toolName: "jdk"
+    downloadUris:
+      - targetOs: "MACOS"
+        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x64_mac_hotspot_11.0.9.1_1.tar.gz"
+      - targetOs: "WINDOWS"
+        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x86-32_windows_hotspot_11.0.9.1_1.zip"
+      - targetOs: "LINUX"
+        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x64_linux_hotspot_11.0.9.1_1.tar.gz"
+
+  maven:
+    toolName: "maven"
+    downloadUris:
+      - downloadUri: "https://downloads.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"

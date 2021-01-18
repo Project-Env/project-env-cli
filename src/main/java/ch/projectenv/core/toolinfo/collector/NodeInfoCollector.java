@@ -11,7 +11,7 @@ import java.util.List;
 public class NodeInfoCollector extends AbstractToolInfoCollector<NodeConfiguration, NodeInfo> {
 
     @Override
-    protected NodeInfo collectToolSpecificInfo(ToolInfo baseToolInfo, NodeConfiguration toolConfiguration) {
+    protected NodeInfo collectToolSpecificInfo(ToolInfo baseToolInfo, NodeConfiguration toolConfiguration, ToolInfoCollectorContext context) {
         return ImmutableNodeInfo
                 .builder()
                 .from(baseToolInfo)

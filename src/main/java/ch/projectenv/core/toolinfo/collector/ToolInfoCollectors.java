@@ -11,10 +11,10 @@ public class ToolInfoCollectors {
     @SuppressWarnings("rawtypes")
     private static final ServiceLoader<ToolInfoCollector> SERVICE_LOADER = ServiceLoader.load(ToolInfoCollector.class);
 
-    public static <ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, File toolBinariesDirectory) throws Exception {
+    public static <ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) throws Exception {
         ToolInfoCollector<ToolConfigurationType, ToolInfoType> collector = getToolInfoCollectorForConfiguration(toolConfiguration);
 
-        return collector.collectToolInfo(toolConfiguration, toolBinariesDirectory);
+        return collector.collectToolInfo(toolConfiguration, context);
     }
 
     @SuppressWarnings("unchecked")

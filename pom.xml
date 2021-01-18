@@ -26,6 +26,7 @@
         <assertj-core.version>3.18.1</assertj-core.version>
         <jackson-databind.version>2.12.1</jackson-databind.version>
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
+        <system-lambda.version>1.2.0</system-lambda.version>
 
         <flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -115,6 +116,12 @@
             <groupId>com.kjetland</groupId>
             <artifactId>mbknor-jackson-jsonschema_2.13</artifactId>
             <version>${mbknor-jackson-jsonschema_2.13.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <version>${system-lambda.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

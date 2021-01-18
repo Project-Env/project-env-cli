@@ -1,9 +1,9 @@
 package ch.projectenv.core.toolinfo.collector;
 
-import ch.projectenv.core.toolinfo.MavenInfo;
-import ch.projectenv.core.toolinfo.ToolInfo;
 import ch.projectenv.core.configuration.MavenConfiguration;
 import ch.projectenv.core.toolinfo.ImmutableMavenInfo;
+import ch.projectenv.core.toolinfo.MavenInfo;
+import ch.projectenv.core.toolinfo.ToolInfo;
 
 import java.io.File;
 import java.util.List;
@@ -11,16 +11,16 @@ import java.util.List;
 public class MavenInfoCollector extends AbstractToolInfoCollector<MavenConfiguration, MavenInfo> {
 
     @Override
-    protected MavenInfo collectToolSpecificInfo(ToolInfo baseToolInfo, MavenConfiguration toolConfiguration) {
+    protected MavenInfo collectToolSpecificInfo(ToolInfo baseToolInfo, MavenConfiguration toolConfiguration, ToolInfoCollectorContext context) {
         return ImmutableMavenInfo
                 .builder()
                 .from(baseToolInfo)
                 .globalSettingsFile(toolConfiguration
                         .getGlobalSettingsFile()
-                        .map(File::new))
+                        .map(value -> new File(context.getProjectRoot(), value)))
                 .userSettingsFile(toolConfiguration
                         .getUserSettingsFile()
-                        .map(File::new))
+                        .map(value -> new File(context.getProjectRoot(), value)))
                 .build();
     }
 

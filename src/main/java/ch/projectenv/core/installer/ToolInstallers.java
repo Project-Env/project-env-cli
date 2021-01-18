@@ -1,9 +1,9 @@
 package ch.projectenv.core.installer;
 
-import ch.projectenv.core.toolinfo.ToolInfo;
 import ch.projectenv.core.configuration.ProjectEnvConfiguration;
 import ch.projectenv.core.configuration.ToolConfiguration;
 import ch.projectenv.core.configuration.ToolsConfiguration;
+import ch.projectenv.core.toolinfo.ToolInfo;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -16,23 +16,28 @@ public final class ToolInstallers {
     @SuppressWarnings("rawtypes")
     private static final ServiceLoader<ProjectToolInstaller> SERVICE_LOADER = ServiceLoader.load(ProjectToolInstaller.class);
 
-    public static List<ToolInfo> installAllTools(ProjectEnvConfiguration projectEnvConfiguration, File toolsDirectory) throws Exception {
-        FileUtils.forceMkdir(toolsDirectory);
-
+    public static List<ToolInfo> installAllTools(ProjectEnvConfiguration projectEnvConfiguration, File projectRoot) throws Exception {
         ToolsConfiguration toolsConfiguration = projectEnvConfiguration.getToolsConfiguration();
+
+        File toolsDirectory = new File(projectRoot, toolsConfiguration.getToolsDirectory());
+        FileUtils.forceMkdir(toolsDirectory);
 
         List<ToolInfo> toolDetails = new ArrayList<>();
         for (ToolConfiguration toolConfiguration : toolsConfiguration.getAllToolConfigurations()) {
-            toolDetails.add(ToolInstallers.installTool(toolConfiguration, toolsDirectory));
+            ProjectToolInstallerContext context = ImmutableProjectToolInstallerContext
+                    .builder()
+                    .projectRoot(projectRoot)
+                    .toolRoot(new File(toolsDirectory, toolConfiguration.getToolName()))
+                    .build();
+
+            toolDetails.add(installTool(toolConfiguration, context));
         }
 
         return toolDetails;
     }
 
-    public static ToolInfo installTool(ToolConfiguration configuration, File toolsDirectory) throws Exception {
-        File toolDirectory = new File(toolsDirectory, configuration.getToolName());
-
-        return getInstaller(configuration).installTool(configuration, toolDirectory);
+    private static ToolInfo installTool(ToolConfiguration configuration, ProjectToolInstallerContext context) throws Exception {
+        return getInstaller(configuration).installTool(configuration, context);
     }
 
     @SuppressWarnings("unchecked")

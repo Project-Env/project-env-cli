@@ -1,11 +1,13 @@
 package ch.projectenv.core.installer;
 
-import ch.projectenv.core.toolinfo.ToolInfo;
 import ch.projectenv.core.archive.ArchiveExtractor;
 import ch.projectenv.core.common.OperatingSystem;
 import ch.projectenv.core.common.ProcessEnvironmentHelper;
 import ch.projectenv.core.configuration.PostExtractionCommand;
 import ch.projectenv.core.configuration.ToolConfiguration;
+import ch.projectenv.core.toolinfo.ToolInfo;
+import ch.projectenv.core.toolinfo.collector.ImmutableToolInfoCollectorContext;
+import ch.projectenv.core.toolinfo.collector.ToolInfoCollectorContext;
 import ch.projectenv.core.toolinfo.collector.ToolInfoCollectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -27,19 +29,20 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
     private final ArchiveExtractor archiveExtractor = new ArchiveExtractor();
 
     @Override
-    public ToolInfoType installTool(ToolConfigurationType toolConfiguration, File toolDirectory) throws Exception {
-        File toolBinariesDirectory = getToolBinariesDirectory(toolDirectory);
+    public ToolInfoType installTool(ToolConfigurationType toolConfiguration, ProjectToolInstallerContext context) throws Exception {
+        File toolBinariesDirectory = getToolBinariesDirectory(context.getToolRoot());
 
-        if (isCurrentToolUpToDate(toolConfiguration, toolDirectory)) {
-            return ToolInfoCollectors.collectToolInfo(toolConfiguration, toolBinariesDirectory);
+        if (isCurrentToolUpToDate(toolConfiguration, context.getToolRoot())) {
+            return collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
         }
 
         cleanToolInstallationDirectory(toolBinariesDirectory);
         extractToolInstallation(toolConfiguration, toolBinariesDirectory);
 
-        ToolInfoType toolInfo = ToolInfoCollectors.collectToolInfo(toolConfiguration, toolBinariesDirectory);
-        executePostInstallationCommands(toolConfiguration, toolInfo);
-        storeToolVersion(toolConfiguration, toolDirectory);
+        ToolInfoType toolInfo = collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
+        executePostInstallationCommands(toolConfiguration, toolInfo, context);
+        executePostInstallationSteps(toolConfiguration, toolInfo, context);
+        storeToolVersion(toolConfiguration, context.getToolRoot());
 
         return toolInfo;
     }
@@ -122,7 +125,17 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
         FileUtils.forceDelete(tempArchive);
     }
 
-    private void executePostInstallationCommands(ToolConfigurationType toolInstallationConfiguration, ToolInfoType toolInfo) throws Exception {
+    private ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, File toolBinariesDirectory, ProjectToolInstallerContext context) throws Exception {
+        ToolInfoCollectorContext collectorContext = ImmutableToolInfoCollectorContext
+                .builder()
+                .projectRoot(context.getProjectRoot())
+                .toolBinariesRoot(toolBinariesDirectory)
+                .build();
+
+        return ToolInfoCollectors.collectToolInfo(toolConfiguration, collectorContext);
+    }
+
+    private void executePostInstallationCommands(ToolConfigurationType toolInstallationConfiguration, ToolInfoType toolInfo, ProjectToolInstallerContext context) throws Exception {
         Map<String, String> processEnvironment = ProcessEnvironmentHelper.createProcessEnvironmentFromToolInfo(toolInfo);
 
         for (PostExtractionCommand postInstallationCommand : toolInstallationConfiguration.getPostExtractionCommands()) {
@@ -136,9 +149,14 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
             processBuilder.inheritIO();
             processBuilder.command().add(executable.getAbsolutePath());
             processBuilder.command().addAll(postInstallationCommand.getArguments());
+            processBuilder.directory(context.getProjectRoot());
             Process process = processBuilder.start();
             process.waitFor();
         }
+    }
+
+    protected void executePostInstallationSteps(ToolConfigurationType toolInstallationConfiguration, ToolInfoType toolInfo, ProjectToolInstallerContext context) throws Exception {
+        // noop
     }
 
 }

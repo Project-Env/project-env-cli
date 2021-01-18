@@ -7,7 +7,7 @@ import java.io.File;
 
 public interface ToolInfoCollector<ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> {
 
-    ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, File toolBinariesDirectory) throws Exception;
+    ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) throws Exception;
 
     boolean supportsTool(ToolConfiguration toolConfiguration);
 

@@ -28,7 +28,7 @@ public class JdkInfoCollector extends AbstractToolInfoCollector<JdkConfiguration
     }
 
     @Override
-    protected JdkInfo collectToolSpecificInfo(ToolInfo baseToolInfo, JdkConfiguration toolConfiguration) {
+    protected JdkInfo collectToolSpecificInfo(ToolInfo baseToolInfo, JdkConfiguration toolConfiguration, ToolInfoCollectorContext context) {
         return ImmutableJdkInfo
                 .builder()
                 .from(baseToolInfo)

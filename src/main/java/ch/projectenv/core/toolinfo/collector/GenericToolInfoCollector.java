@@ -13,7 +13,7 @@ public class GenericToolInfoCollector extends AbstractToolInfoCollector<GenericT
     }
 
     @Override
-    protected GenericToolInfo collectToolSpecificInfo(ToolInfo baseToolInfo, GenericToolConfiguration toolConfiguration) {
+    protected GenericToolInfo collectToolSpecificInfo(ToolInfo baseToolInfo, GenericToolConfiguration toolConfiguration, ToolInfoCollectorContext context) {
         return ImmutableGenericToolInfo
                 .builder()
                 .from(baseToolInfo)

@@ -14,12 +14,12 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
         implements ToolInfoCollector<ToolConfigurationType, ToolInfoType> {
 
     @Override
-    public ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, File toolBinariesDirectory) {
-        File relevantToolBinariesDirectory = getRelevantToolBinariesDirectory(toolBinariesDirectory);
+    public ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) {
+        File relevantToolBinariesDirectory = getRelevantToolBinariesDirectory(context.getToolBinariesRoot());
 
         ToolInfo baseToolInfo = collectBaseToolInfo(toolConfiguration, relevantToolBinariesDirectory);
 
-        return collectToolSpecificInfo(baseToolInfo, toolConfiguration);
+        return collectToolSpecificInfo(baseToolInfo, toolConfiguration, context);
     }
 
     @Override
@@ -99,6 +99,6 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
         return null;
     }
 
-    protected abstract ToolInfoType collectToolSpecificInfo(ToolInfo baseToolInfo, ToolConfigurationType toolConfiguration);
+    protected abstract ToolInfoType collectToolSpecificInfo(ToolInfo baseToolInfo, ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context);
 
 }

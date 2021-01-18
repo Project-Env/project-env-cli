@@ -15,7 +15,7 @@ public class GradleInfoCollector extends AbstractToolInfoCollector<GradleConfigu
     }
 
     @Override
-    protected GradleInfo collectToolSpecificInfo(ToolInfo baseToolInfo, GradleConfiguration toolConfiguration) {
+    protected GradleInfo collectToolSpecificInfo(ToolInfo baseToolInfo, GradleConfiguration toolConfiguration, ToolInfoCollectorContext context) {
         return ImmutableGradleInfo
                 .builder()
                 .from(baseToolInfo)
