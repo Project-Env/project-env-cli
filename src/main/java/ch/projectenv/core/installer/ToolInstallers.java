@@ -1,5 +1,6 @@
 package ch.projectenv.core.installer;
 
+import ch.projectenv.core.common.ServiceLoaderHelper;
 import ch.projectenv.core.configuration.ProjectEnvConfiguration;
 import ch.projectenv.core.configuration.ToolConfiguration;
 import ch.projectenv.core.configuration.ToolsConfiguration;
@@ -13,8 +14,7 @@ import java.util.ServiceLoader;
 
 public final class ToolInstallers {
 
-    @SuppressWarnings("rawtypes")
-    private static final ServiceLoader<ProjectToolInstaller> SERVICE_LOADER = ServiceLoader.load(ProjectToolInstaller.class);
+    private static final ServiceLoader<ProjectToolInstaller> SERVICE_LOADER = ServiceLoaderHelper.loadService(ProjectToolInstaller.class);
 
     public static List<ToolInfo> installAllTools(ProjectEnvConfiguration projectEnvConfiguration, File projectRoot) throws Exception {
         ToolsConfiguration toolsConfiguration = projectEnvConfiguration.getToolsConfiguration();

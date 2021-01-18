@@ -1,15 +1,14 @@
 package ch.projectenv.core.toolinfo.collector;
 
-import ch.projectenv.core.toolinfo.ToolInfo;
+import ch.projectenv.core.common.ServiceLoaderHelper;
 import ch.projectenv.core.configuration.ToolConfiguration;
+import ch.projectenv.core.toolinfo.ToolInfo;
 
-import java.io.File;
 import java.util.ServiceLoader;
 
 public class ToolInfoCollectors {
 
-    @SuppressWarnings("rawtypes")
-    private static final ServiceLoader<ToolInfoCollector> SERVICE_LOADER = ServiceLoader.load(ToolInfoCollector.class);
+    private static final ServiceLoader<ToolInfoCollector> SERVICE_LOADER = ServiceLoaderHelper.loadService(ToolInfoCollector.class);
 
     public static <ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) throws Exception {
         ToolInfoCollector<ToolConfigurationType, ToolInfoType> collector = getToolInfoCollectorForConfiguration(toolConfiguration);
