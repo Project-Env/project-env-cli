@@ -3,10 +3,8 @@ package ch.projectenv.core.archive.accessor.tar;
 import ch.projectenv.core.archive.accessor.ArchiveAccessor;
 import ch.projectenv.core.archive.accessor.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.concurrent.LazyInitializer;
+import org.apache.commons.io.input.CloseShieldInputStream;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,21 +36,9 @@ public class TarArchiveAccessor implements ArchiveAccessor {
     private class TarArchiveEntry implements ArchiveEntry {
 
         private final org.apache.commons.compress.archivers.tar.TarArchiveEntry entry;
-        private final LazyInitializer<byte[]> content;
 
         public TarArchiveEntry(org.apache.commons.compress.archivers.tar.TarArchiveEntry entry) {
             this.entry = entry;
-
-            content = new LazyInitializer<>() {
-                @Override
-                protected byte[] initialize() {
-                    try {
-                        return IOUtils.toByteArray(inputStream);
-                    } catch (IOException e) {
-                        throw new RuntimeException("failed to read entry content", e);
-                    }
-                }
-            };
         }
 
         @Override
@@ -72,7 +58,7 @@ public class TarArchiveAccessor implements ArchiveAccessor {
 
         @Override
         public InputStream createInputStream() throws Exception {
-            return new ByteArrayInputStream(content.get());
+            return new CloseShieldInputStream(inputStream);
         }
 
         @Override
