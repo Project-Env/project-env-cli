@@ -1,5 +1,0 @@
-ch.projectenv.core.toolinfo.collector.GenericToolInfoCollector
-ch.projectenv.core.toolinfo.collector.GradleInfoCollector
-ch.projectenv.core.toolinfo.collector.JdkInfoCollector
-ch.projectenv.core.toolinfo.collector.MavenInfoCollector
-ch.projectenv.core.toolinfo.collector.NodeInfoCollector

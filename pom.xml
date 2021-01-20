@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ch.projectenv</groupId>
+    <groupId>io.projectenv</groupId>
     <artifactId>core</artifactId>
     <version>${revision}</version>
 

@@ -1,5 +1,0 @@
-ch.projectenv.core.installer.GenericToolInstaller
-ch.projectenv.core.installer.GradleInstaller
-ch.projectenv.core.installer.JdkInstaller
-ch.projectenv.core.installer.MavenInstaller
-ch.projectenv.core.installer.NodeInstaller
