@@ -1,8 +1,12 @@
 package io.projectenv.core.installer;
 
 import io.projectenv.core.archive.ArchiveExtractor;
+import io.projectenv.core.common.LockFileHelper;
+import io.projectenv.core.common.LockFileHelper.LockFile;
 import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.common.ProcessEnvironmentHelper;
+import io.projectenv.core.common.YamlHelper;
+import io.projectenv.core.configuration.DownloadUri;
 import io.projectenv.core.configuration.PostExtractionCommand;
 import io.projectenv.core.configuration.ToolConfiguration;
 import io.projectenv.core.toolinfo.ToolInfo;
@@ -18,33 +22,41 @@ import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo>
         implements ProjectToolInstaller<ToolConfigurationType, ToolInfoType> {
 
-    private static final String TOOL_INSTALLATION_VERSION_MARKER = "project-env-tool-version.txt";
-    public static final String TOOL_BINARIES_DIRECTORY_NAME = "binary";
+    private static final String TOOL_INSTALLATION_VERSION_FILE = "version.yml";
+    private static final String TOOL_INSTALLATION_LOCK_FILE = ".lock";
+    private static final String TOOL_BINARIES_DIRECTORY_NAME = "binary";
 
     private final ArchiveExtractor archiveExtractor = new ArchiveExtractor();
 
     @Override
     public ToolInfoType installTool(ToolConfigurationType toolConfiguration, ProjectToolInstallerContext context) throws Exception {
-        File toolBinariesDirectory = getToolBinariesDirectory(context.getToolRoot());
+        File systemSpecificToolDirectory = getSystemSpecificToolDirectory(toolConfiguration, context);
+        FileUtils.forceMkdir(systemSpecificToolDirectory);
 
-        if (isCurrentToolUpToDate(toolConfiguration, context.getToolRoot())) {
-            return collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
+        try (LockFile lockFile = LockFileHelper.tryAcquireLockFile(getLockFile(systemSpecificToolDirectory), Duration.ofMinutes(5))) {
+            File toolBinariesDirectory = getToolBinariesDirectory(systemSpecificToolDirectory);
+
+            if (isCurrentToolUpToDate(toolConfiguration, systemSpecificToolDirectory)) {
+                return collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
+            }
+
+            cleanToolInstallationDirectory(toolBinariesDirectory);
+            extractToolInstallation(toolConfiguration, toolBinariesDirectory);
+
+            ToolInfoType toolInfo = collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
+            executePostInstallationCommands(toolConfiguration, toolInfo, context);
+            executePostInstallationSteps(toolConfiguration, toolInfo, context);
+            storeToolVersion(toolConfiguration, systemSpecificToolDirectory);
+
+            return toolInfo;
         }
-
-        cleanToolInstallationDirectory(toolBinariesDirectory);
-        extractToolInstallation(toolConfiguration, toolBinariesDirectory);
-
-        ToolInfoType toolInfo = collectToolInfo(toolConfiguration, toolBinariesDirectory, context);
-        executePostInstallationCommands(toolConfiguration, toolInfo, context);
-        executePostInstallationSteps(toolConfiguration, toolInfo, context);
-        storeToolVersion(toolConfiguration, context.getToolRoot());
-
-        return toolInfo;
     }
 
     @Override
@@ -53,6 +65,16 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
     }
 
     protected abstract Class<ToolConfigurationType> getToolConfigurationClass();
+
+    private File getSystemSpecificToolDirectory(ToolConfigurationType toolConfiguration, ProjectToolInstallerContext context) {
+        OperatingSystem targetOs = getSystemSpecificDownloadUri(toolConfiguration).getTargetOs();
+
+        return new File(context.getToolRoot(), targetOs.name().toLowerCase(Locale.ROOT));
+    }
+
+    private File getLockFile(File systemSpecificToolDirectory) {
+        return new File(systemSpecificToolDirectory, TOOL_INSTALLATION_LOCK_FILE);
+    }
 
     private File getToolBinariesDirectory(File toolInstallationDirectory) {
         return new File(toolInstallationDirectory, TOOL_BINARIES_DIRECTORY_NAME);
@@ -74,18 +96,18 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
     }
 
     private File getToolVersionFile(File toolInstallationDirectory) {
-        return new File(toolInstallationDirectory, TOOL_INSTALLATION_VERSION_MARKER);
+        return new File(toolInstallationDirectory, TOOL_INSTALLATION_VERSION_FILE);
     }
 
-    private String getRequestedToolVersion(ToolConfigurationType configuration) {
-        return getSystemSpecificDownloadUri(configuration).toString();
+    private String getRequestedToolVersion(ToolConfigurationType configuration) throws IOException {
+        return YamlHelper.writeValueAsString(configuration);
     }
 
     private void storeToolVersion(ToolConfigurationType configuration, File toolDirectory) throws Exception {
-        FileUtils.write(getToolVersionFile(toolDirectory), getRequestedToolVersion(configuration), StandardCharsets.UTF_8);
+        YamlHelper.writeValue(configuration, getToolVersionFile(toolDirectory));
     }
 
-    private URI getSystemSpecificDownloadUri(ToolConfigurationType configuration) {
+    private DownloadUri getSystemSpecificDownloadUri(ToolConfigurationType configuration) {
         OperatingSystem currentOS = OperatingSystem.getCurrentOS();
 
         return configuration
@@ -97,7 +119,6 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
                     return targetOperatingSystem == OperatingSystem.ALL || targetOperatingSystem == currentOS;
                 })
                 .findFirst()
-                .map((downloadUriConfiguration) -> URI.create(downloadUriConfiguration.getDownloadUri()))
                 .orElseThrow(() -> new IllegalStateException("no download URI for OS " + currentOS + " available"));
     }
 
@@ -105,12 +126,10 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
         if (toolInstallationDirectory.exists()) {
             FileUtils.forceDelete(toolInstallationDirectory);
         }
-
-        FileUtils.forceMkdirParent(toolInstallationDirectory);
     }
 
     private void extractToolInstallation(ToolConfigurationType toolInstallationConfiguration, File toolInstallationDirectory) throws Exception {
-        URI systemSpecificDownloadUri = getSystemSpecificDownloadUri(toolInstallationConfiguration);
+        URI systemSpecificDownloadUri = URI.create(getSystemSpecificDownloadUri(toolInstallationConfiguration).getDownloadUri());
 
         String archiveName = FilenameUtils.getName(systemSpecificDownloadUri.getPath());
         File tempArchive = Files.createTempFile(toolInstallationConfiguration.getToolName(), archiveName).toFile();

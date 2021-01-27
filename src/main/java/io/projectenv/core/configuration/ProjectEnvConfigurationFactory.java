@@ -1,8 +1,6 @@
 package io.projectenv.core.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.projectenv.core.common.YamlHelper;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.IOUtils;
@@ -29,9 +27,7 @@ public final class ProjectEnvConfigurationFactory {
         String rawConfiguration = IOUtils.toString(projectEnvConfigurationFile, StandardCharsets.UTF_8);
         String interpolatedString = createStringSubstitutor().replace(rawConfiguration);
 
-        return new ObjectMapper(new YAMLFactory())
-                .registerModule(new Jdk8Module())
-                .readValue(interpolatedString, ProjectEnvConfiguration.class);
+        return YamlHelper.readValue(interpolatedString, ProjectEnvConfiguration.class);
     }
 
     private static StringSubstitutor createStringSubstitutor() {
