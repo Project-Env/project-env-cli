@@ -17,7 +17,7 @@
 
         <immutable.version>2.8.8</immutable.version>
         <commons-compress.version>1.20</commons-compress.version>
-        <commons-lang3.version>3.9</commons-lang3.version>
+        <commons-lang3.version>3.11</commons-lang3.version>
         <commons-io.version>2.8.0</commons-io.version>
         <commons-text.version>1.9</commons-text.version>
         <commons-collections4.version>4.4</commons-collections4.version>
