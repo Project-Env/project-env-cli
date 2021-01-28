@@ -27,6 +27,7 @@
         <jackson-databind.version>2.12.1</jackson-databind.version>
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
         <system-lambda.version>1.2.0</system-lambda.version>
+        <slf4j-api.version>1.7.30</slf4j-api.version>
 
         <flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -87,6 +88,12 @@
             <version>${xz.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.immutables</groupId>
             <artifactId>value</artifactId>

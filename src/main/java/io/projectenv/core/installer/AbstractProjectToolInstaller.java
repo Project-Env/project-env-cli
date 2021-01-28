@@ -37,7 +37,7 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
 
     @Override
     public ToolInfoType installTool(ToolConfigurationType toolConfiguration, ProjectToolInstallerContext context) throws Exception {
-        File systemSpecificToolDirectory = getSystemSpecificToolDirectory(toolConfiguration, context);
+        File systemSpecificToolDirectory = getSystemSpecificToolDirectory(context);
         FileUtils.forceMkdir(systemSpecificToolDirectory);
 
         try (LockFile lockFile = LockFileHelper.tryAcquireLockFile(getLockFile(systemSpecificToolDirectory), Duration.ofMinutes(5))) {
@@ -66,10 +66,8 @@ public abstract class AbstractProjectToolInstaller<ToolConfigurationType extends
 
     protected abstract Class<ToolConfigurationType> getToolConfigurationClass();
 
-    private File getSystemSpecificToolDirectory(ToolConfigurationType toolConfiguration, ProjectToolInstallerContext context) {
-        OperatingSystem targetOs = getSystemSpecificDownloadUri(toolConfiguration).getTargetOs();
-
-        return new File(context.getToolRoot(), targetOs.name().toLowerCase(Locale.ROOT));
+    private File getSystemSpecificToolDirectory(ProjectToolInstallerContext context) {
+        return new File(context.getToolRoot(), OperatingSystem.getCurrentOS().name().toLowerCase(Locale.ROOT));
     }
 
     private File getLockFile(File systemSpecificToolDirectory) {
