@@ -3,30 +3,16 @@ name: Build
 on:
   push:
   pull_request:
-  release:
-    types:
-      - created
   workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-
     - run: |
         curl -L https://github.com/Project-Env/project-env-shell/releases/download/0.0.7/project-env-shell-linux-amd64 -o project-env-cli
         chmod +x ./project-env-cli
         ./project-env-cli --config-file=project-env.yml --output-template=github-actions.peb --output-file=github-actions-env.sh
         ./github-actions-env.sh
-
-    - if: ${{ github.event_name != 'release'}}
-      run: mvn -B package
-
-    - if: ${{ github.event_name == 'release'}}
-      env:
-        BINTRAY_MAVEN_REPO_USER: ${{ secrets.BINTRAY_MAVEN_REPO_USER }}
-        BINTRAY_MAVEN_REPO_PASS: ${{ secrets.BINTRAY_MAVEN_REPO_PASS }}
-      run: mvn -B -s etc/m2/settings-ci.xml -Drevision=${{ github.event.release.tag_name }} deploy
+    - run: mvn -B package

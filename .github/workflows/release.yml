@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'The name of the version which should be released'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        curl -L https://github.com/Project-Env/project-env-shell/releases/download/0.0.7/project-env-shell-linux-amd64 -o project-env-cli
+        chmod +x ./project-env-cli
+        ./project-env-cli --config-file=project-env.yml --output-template=github-actions.peb --output-file=github-actions-env.sh
+        ./github-actions-env.sh
+    - run: mvn -B -s etc/m2/settings-ci.xml -Drevision=${{ github.event.inputs.version }} deploy
+      env:
+        BINTRAY_MAVEN_REPO_USER: ${{ secrets.BINTRAY_MAVEN_REPO_USER }}
+        BINTRAY_MAVEN_REPO_PASS: ${{ secrets.BINTRAY_MAVEN_REPO_PASS }}
+    - uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.event.inputs.version }}
+        release_name: v${{ github.event.inputs.version }}
