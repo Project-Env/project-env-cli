@@ -1,8 +1,8 @@
 package io.projectenv.core.installer;
 
 import io.projectenv.core.archive.ArchiveExtractor;
-import io.projectenv.core.common.LockFileHelper;
-import io.projectenv.core.common.LockFileHelper.LockFile;
+import io.projectenv.core.common.lock.LockFileHelper;
+import io.projectenv.core.common.lock.LockFile;
 import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.common.ProcessEnvironmentHelper;
 import io.projectenv.core.common.YamlHelper;

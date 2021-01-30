@@ -1,6 +1,4 @@
-package io.projectenv.core.common;
-
-import org.apache.commons.io.FileUtils;
+package io.projectenv.core.common.lock;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +17,7 @@ public final class LockFileHelper {
         while (lockFile.exists()) {
             long passedMillis = System.currentTimeMillis() - waitingSinceMillis;
             if (timout.minus(passedMillis, ChronoUnit.MILLIS).isNegative()) {
-                throw new TimeoutException("failed to acquire lock file " + lockFile.getCanonicalPath());
+                throw new TimeoutException("timeout while trying to acquire lock file " + lockFile.getCanonicalPath());
             }
 
             try {
@@ -36,21 +34,6 @@ public final class LockFileHelper {
         }
 
         return new LockFile(lockFile);
-    }
-
-    public static class LockFile implements AutoCloseable {
-
-        private final File file;
-
-        public LockFile(File file) {
-            this.file = file;
-        }
-
-        @Override
-        public void close() throws Exception {
-            FileUtils.forceDelete(file);
-        }
-
     }
 
 }
