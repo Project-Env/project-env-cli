@@ -1,11 +1,11 @@
 package io.projectenv.core.toolinfo.collector;
 
-import io.projectenv.core.toolinfo.ToolInfo;
 import io.projectenv.core.configuration.ToolConfiguration;
+import io.projectenv.core.toolinfo.ToolInfo;
 
-public interface ToolInfoCollector<ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> {
+public interface ToolInfoCollector<T extends ToolConfiguration, S extends ToolInfo> {
 
-    ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) throws Exception;
+    S collectToolInfo(T toolConfiguration, ToolInfoCollectorContext context);
 
     boolean supportsTool(ToolConfiguration toolConfiguration);
 

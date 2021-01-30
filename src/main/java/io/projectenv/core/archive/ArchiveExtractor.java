@@ -7,10 +7,7 @@ import io.projectenv.core.common.OperatingSystem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -25,7 +22,7 @@ public class ArchiveExtractor {
             Pattern.compile(".*/\\._.+")
     );
 
-    public void extractArchive(File archive, File targetDirectory) throws Exception {
+    public void extractArchive(File archive, File targetDirectory) throws IOException {
         try (ArchiveAccessor archiveAccessor = ArchiveAccessorFactory.createArchiveAccessor(archive)) {
 
             ArchiveEntry entry;
@@ -55,17 +52,17 @@ public class ArchiveExtractor {
         return IGNORED_ARCHIVE_ENTRIES.stream().noneMatch(pattern -> pattern.matcher(archiveEntry.getName()).matches());
     }
 
-    private void checkThatPathIsInsideBasePath(File file, File baseDirectory) throws Exception {
+    private void checkThatPathIsInsideBasePath(File file, File baseDirectory) throws IOException {
         if (!file.getCanonicalPath().startsWith(baseDirectory.getCanonicalPath())) {
             throw new IllegalStateException("path " + file.getPath() + " is pointing to a location outside " + baseDirectory.getCanonicalPath());
         }
     }
 
-    protected void createDirectory(File target) throws Exception {
+    protected void createDirectory(File target) throws IOException {
         FileUtils.forceMkdir(target.getCanonicalFile());
     }
 
-    protected void createSymbolicLink(ArchiveEntry archiveEntry, File target, File targetDirectory) throws Exception {
+    protected void createSymbolicLink(ArchiveEntry archiveEntry, File target, File targetDirectory) throws IOException {
         File linkDestination = new File(archiveEntry.getLinkName());
         checkThatPathIsInsideBasePath(new File(target.isDirectory() ? target : target.getParentFile(), archiveEntry.getLinkName()), targetDirectory);
 
@@ -74,7 +71,7 @@ public class ArchiveExtractor {
         Files.createSymbolicLink(target.toPath(), linkDestination.toPath());
     }
 
-    private void createFile(ArchiveEntry archiveEntry, File target) throws Exception {
+    private void createFile(ArchiveEntry archiveEntry, File target) throws IOException {
         FileUtils.forceMkdirParent(target.getCanonicalFile());
 
         try (InputStream inputStream = archiveEntry.createInputStream();
@@ -83,7 +80,7 @@ public class ArchiveExtractor {
         }
     }
 
-    private void setPermissions(ArchiveEntry archiveEntry, File target) throws Exception {
+    private void setPermissions(ArchiveEntry archiveEntry, File target) throws IOException {
         // we do not set any permissions on Windows
         if (OperatingSystem.getCurrentOS() == OperatingSystem.WINDOWS) {
             return;

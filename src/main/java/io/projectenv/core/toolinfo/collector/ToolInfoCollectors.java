@@ -8,17 +8,22 @@ import java.util.ServiceLoader;
 
 public class ToolInfoCollectors {
 
+    private ToolInfoCollectors() {
+        // noop
+    }
+
+    @SuppressWarnings("rawtypes")
     private static final ServiceLoader<ToolInfoCollector> SERVICE_LOADER = ServiceLoaderHelper.loadService(ToolInfoCollector.class);
 
-    public static <ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) throws Exception {
-        ToolInfoCollector<ToolConfigurationType, ToolInfoType> collector = getToolInfoCollectorForConfiguration(toolConfiguration);
+    public static <T extends ToolConfiguration, S extends ToolInfo> S collectToolInfo(T toolConfiguration, ToolInfoCollectorContext context) {
+        ToolInfoCollector<T, S> collector = getToolInfoCollectorForConfiguration(toolConfiguration);
 
         return collector.collectToolInfo(toolConfiguration, context);
     }
 
     @SuppressWarnings("unchecked")
-    private static <ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo> ToolInfoCollector<ToolConfigurationType, ToolInfoType> getToolInfoCollectorForConfiguration(ToolConfigurationType toolConfiguration) {
-        return (ToolInfoCollector<ToolConfigurationType, ToolInfoType>) SERVICE_LOADER
+    private static <T extends ToolConfiguration, S extends ToolInfo> ToolInfoCollector<T, S> getToolInfoCollectorForConfiguration(T toolConfiguration) {
+        return SERVICE_LOADER
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .filter(toolInfoCollector -> toolInfoCollector.supportsTool(toolConfiguration))

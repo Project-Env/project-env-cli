@@ -32,7 +32,7 @@ public class ZipArchiveAccessor implements ArchiveAccessor {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         zipFile.close();
     }
 
@@ -60,12 +60,12 @@ public class ZipArchiveAccessor implements ArchiveAccessor {
         }
 
         @Override
-        public InputStream createInputStream() throws Exception {
+        public InputStream createInputStream() throws IOException {
             return zipFile.getInputStream(entry);
         }
 
         @Override
-        public String getLinkName() throws Exception {
+        public String getLinkName() throws IOException {
             return IOUtils.toString(createInputStream(), zipFile.getEncoding());
         }
 

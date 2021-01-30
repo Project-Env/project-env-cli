@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class JsonSchemaGenerator {
+class JsonSchemaGeneratorTest {
 
     @Test
-    public void generateJsonSchema() throws Exception {
+    void generateJsonSchema() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonSchemaConfig config = JsonSchemaConfig.vanillaJsonSchemaDraft4().withJsonSchemaDraft(JsonSchemaDraft.DRAFT_2019_09);

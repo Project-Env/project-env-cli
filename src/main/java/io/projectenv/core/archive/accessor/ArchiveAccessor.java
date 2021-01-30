@@ -6,4 +6,6 @@ public interface ArchiveAccessor extends AutoCloseable {
 
     ArchiveEntry getNextEntry() throws IOException;
 
+    @Override
+    void close() throws IOException;
 }

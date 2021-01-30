@@ -29,7 +29,7 @@ public class TarArchiveAccessor implements ArchiveAccessor {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         inputStream.close();
     }
 
@@ -57,7 +57,7 @@ public class TarArchiveAccessor implements ArchiveAccessor {
         }
 
         @Override
-        public InputStream createInputStream() throws Exception {
+        public InputStream createInputStream() {
             return new CloseShieldInputStream(inputStream);
         }
 

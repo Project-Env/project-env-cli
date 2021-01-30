@@ -9,6 +9,7 @@ import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -19,11 +20,11 @@ public final class ProjectEnvConfigurationFactory {
 
     }
 
-    public static ProjectEnvConfiguration createFromFile(File projectEnvConfigurationFile) throws Exception {
+    public static ProjectEnvConfiguration createFromFile(File projectEnvConfigurationFile) throws IOException {
         return createFromUrl(projectEnvConfigurationFile.toURI().toURL());
     }
 
-    public static ProjectEnvConfiguration createFromUrl(URL projectEnvConfigurationFile) throws Exception {
+    public static ProjectEnvConfiguration createFromUrl(URL projectEnvConfigurationFile) throws IOException {
         String rawConfiguration = IOUtils.toString(projectEnvConfigurationFile, StandardCharsets.UTF_8);
         String interpolatedString = createStringSubstitutor().replace(rawConfiguration);
 
@@ -37,7 +38,7 @@ public final class ProjectEnvConfigurationFactory {
 
     private static class FallbackEnvironmentVariableStringLookup implements StringLookup {
 
-        private final BidiMap<String, String> FALLBACK_MAPPING = new DualHashBidiMap<>(Map.of(
+        private static final BidiMap<String, String> FALLBACK_MAPPING = new DualHashBidiMap<>(Map.of(
                 "USER", "USERNAME"
         ));
 

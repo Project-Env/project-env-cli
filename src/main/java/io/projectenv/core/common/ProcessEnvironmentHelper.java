@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public final class ProcessEnvironmentHelper {
@@ -18,17 +19,22 @@ public final class ProcessEnvironmentHelper {
             OperatingSystem.WINDOWS, List.of(".exe", ".cmd")
     );
 
-    public static Map<String, String> createProcessEnvironmentFromToolInfo(ToolInfo toolInfo) {
+    private ProcessEnvironmentHelper() {
+        // noop
+    }
+
+    public static Map<String, String> createProcessEnvironmentFromToolInfo(ToolInfo toolInfo) throws IOException {
         Map<String, String> processEnvironment = toolInfo.getEnvironmentVariables()
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getAbsolutePath()));
 
-        String pathExtension = toolInfo.getPathElements()
-                .stream()
-                .map(ProcessEnvironmentHelper::toCanonicalPath)
-                .collect(Collectors.joining(":"));
-        processEnvironment.put(PATH_ENVIRONMENT_VARIABLE, pathExtension + File.pathSeparator + System.getenv(PATH_ENVIRONMENT_VARIABLE));
+        StringJoiner pathExtension = new StringJoiner(":");
+        for (File file : toolInfo.getPathElements()) {
+            pathExtension.add(file.getCanonicalPath());
+        }
+
+        processEnvironment.put(PATH_ENVIRONMENT_VARIABLE, pathExtension.toString() + File.pathSeparator + System.getenv(PATH_ENVIRONMENT_VARIABLE));
 
         return processEnvironment;
     }
@@ -57,14 +63,6 @@ public final class ProcessEnvironmentHelper {
         }
 
         return null;
-    }
-
-    private static String toCanonicalPath(File file) {
-        try {
-            return file.getCanonicalPath();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

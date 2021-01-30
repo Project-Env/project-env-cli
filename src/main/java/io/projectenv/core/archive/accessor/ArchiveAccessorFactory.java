@@ -1,16 +1,13 @@
 package io.projectenv.core.archive.accessor;
 
-import io.projectenv.core.archive.accessor.zip.ZipArchiveAccessor;
 import io.projectenv.core.archive.accessor.tar.TarArchiveAccessor;
+import io.projectenv.core.archive.accessor.zip.ZipArchiveAccessor;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 
 public class ArchiveAccessorFactory {
@@ -22,7 +19,7 @@ public class ArchiveAccessorFactory {
             ".zip", ArchiveAccessorFactory::createZipArchiveAccessor
     );
 
-    public static ArchiveAccessor createArchiveAccessor(File archive) throws Exception {
+    public static ArchiveAccessor createArchiveAccessor(File archive) throws IOException {
         for (Map.Entry<String, ArchiveSpecificAccessorFactory> factoryEntry : FACTORIES.entrySet()) {
             if (archive.getName().toLowerCase().endsWith(factoryEntry.getKey())) {
                 return factoryEntry.getValue().createArchiveAccessor(archive);
@@ -32,27 +29,27 @@ public class ArchiveAccessorFactory {
         throw new IllegalArgumentException("unsupported archive " + archive.getName());
     }
 
-    private static ArchiveAccessor createZipArchiveAccessor(File archive) throws Exception {
+    private static ArchiveAccessor createZipArchiveAccessor(File archive) throws IOException {
         ZipFile zipFile = new ZipFile(archive);
 
         return new ZipArchiveAccessor(zipFile);
     }
 
-    private static ArchiveAccessor createTarXzArchiveAccessor(File archive) throws Exception {
+    private static ArchiveAccessor createTarXzArchiveAccessor(File archive) throws IOException {
         InputStream originalInputStream = new BufferedInputStream(new FileInputStream(archive));
         InputStream tarInputStream = new BufferedInputStream(new XZCompressorInputStream(originalInputStream));
 
         return createTarArchiveAccessor(tarInputStream);
     }
 
-    private static ArchiveAccessor createTarGzArchiveAccessor(File archive) throws Exception {
+    private static ArchiveAccessor createTarGzArchiveAccessor(File archive) throws IOException {
         InputStream originalInputStream = new BufferedInputStream(new FileInputStream(archive));
         InputStream tarInputStream = new BufferedInputStream(new GzipCompressorInputStream(originalInputStream));
 
         return createTarArchiveAccessor(tarInputStream);
     }
 
-    private static ArchiveAccessor createTarArchiveAccessor(File archive) throws Exception {
+    private static ArchiveAccessor createTarArchiveAccessor(File archive) throws IOException {
         InputStream originalInputStream = new BufferedInputStream(new FileInputStream(archive));
 
         return createTarArchiveAccessor(originalInputStream);
@@ -66,7 +63,7 @@ public class ArchiveAccessorFactory {
 
     private interface ArchiveSpecificAccessorFactory {
 
-        ArchiveAccessor createArchiveAccessor(File archive) throws Exception;
+        ArchiveAccessor createArchiveAccessor(File archive) throws IOException;
 
     }
 

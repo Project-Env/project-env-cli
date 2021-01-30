@@ -10,11 +10,11 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractToolInfoCollector<ToolConfigurationType extends ToolConfiguration, ToolInfoType extends ToolInfo>
-        implements ToolInfoCollector<ToolConfigurationType, ToolInfoType> {
+public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S extends ToolInfo>
+        implements ToolInfoCollector<T, S> {
 
     @Override
-    public ToolInfoType collectToolInfo(ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context) {
+    public S collectToolInfo(T toolConfiguration, ToolInfoCollectorContext context) {
         File relevantToolBinariesDirectory = getRelevantToolBinariesDirectory(context.getToolBinariesRoot());
 
         ToolInfo baseToolInfo = collectBaseToolInfo(toolConfiguration, relevantToolBinariesDirectory);
@@ -27,7 +27,7 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
         return getToolConfigurationClass().isAssignableFrom(toolConfiguration.getClass());
     }
 
-    protected abstract Class<ToolConfigurationType> getToolConfigurationClass();
+    protected abstract Class<T> getToolConfigurationClass();
 
     protected File getRelevantToolBinariesDirectory(File toolBinariesDirectory) {
         List<File> files = Optional.ofNullable(toolBinariesDirectory.listFiles())
@@ -41,7 +41,7 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
         }
     }
 
-    private ToolInfo collectBaseToolInfo(ToolConfigurationType toolConfiguration, File relevantToolBinariesDirectory) {
+    private ToolInfo collectBaseToolInfo(T toolConfiguration, File relevantToolBinariesDirectory) {
         Map<String, File> environmentVariables = new HashMap<>();
         environmentVariables.putAll(createFileMap(toolConfiguration.getEnvironmentVariables(), relevantToolBinariesDirectory));
         environmentVariables.putAll(createFileMap(getAdditionalExports(), relevantToolBinariesDirectory));
@@ -99,6 +99,6 @@ public abstract class AbstractToolInfoCollector<ToolConfigurationType extends To
         return null;
     }
 
-    protected abstract ToolInfoType collectToolSpecificInfo(ToolInfo baseToolInfo, ToolConfigurationType toolConfiguration, ToolInfoCollectorContext context);
+    protected abstract S collectToolSpecificInfo(ToolInfo baseToolInfo, T toolConfiguration, ToolInfoCollectorContext context);
 
 }

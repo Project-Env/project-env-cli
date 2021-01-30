@@ -8,7 +8,11 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeoutException;
 
-public class LockFileHelper {
+public final class LockFileHelper {
+
+    private LockFileHelper() {
+        // noop
+    }
 
     public static LockFile tryAcquireLockFile(File lockFile, Duration timout) throws TimeoutException, IOException {
         long waitingSinceMillis = System.currentTimeMillis();
@@ -21,7 +25,9 @@ public class LockFileHelper {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-                // ignore
+                // re-set interrupt flag on thread
+                Thread.currentThread().interrupt();
+                throw new IOException("tried to acquire lock files, but was interrupted", e);
             }
         }
 
@@ -34,15 +40,15 @@ public class LockFileHelper {
 
     public static class LockFile implements AutoCloseable {
 
-        private final File lockFile;
+        private final File file;
 
-        public LockFile(File lockFile) {
-            this.lockFile = lockFile;
+        public LockFile(File file) {
+            this.file = file;
         }
 
         @Override
         public void close() throws Exception {
-            FileUtils.forceDelete(lockFile);
+            FileUtils.forceDelete(file);
         }
 
     }

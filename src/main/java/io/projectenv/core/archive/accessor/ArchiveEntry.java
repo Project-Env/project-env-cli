@@ -1,7 +1,5 @@
 package io.projectenv.core.archive.accessor;
 
-import org.apache.commons.lang3.concurrent.ConcurrentException;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,9 +11,9 @@ public interface ArchiveEntry {
 
     boolean isSymbolicLink();
 
-    InputStream createInputStream() throws Exception;
+    InputStream createInputStream() throws IOException;
 
-    String getLinkName() throws Exception;
+    String getLinkName() throws IOException;
 
     Integer getMode();
 

@@ -16,10 +16,10 @@ import java.util.List;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ToolInstallersTest {
+class ToolInstallersTest {
 
     @Test
-    public void testInstallAllTools(@TempDir File projectRoot) throws Exception {
+    void testInstallAllTools(@TempDir File projectRoot) throws Exception {
         withEnvironmentVariable("USER", "user").execute(() -> {
             File settings = copyResourceToTarget("project-env.yml", projectRoot);
             copyResourceToTarget("settings.xml", projectRoot);

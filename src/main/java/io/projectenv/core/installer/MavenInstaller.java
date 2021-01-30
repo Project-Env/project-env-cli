@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 
 public class MavenInstaller extends AbstractProjectToolInstaller<MavenConfiguration, MavenInfo> {
@@ -21,11 +22,11 @@ public class MavenInstaller extends AbstractProjectToolInstaller<MavenConfigurat
     }
 
     @Override
-    protected void executePostInstallationSteps(MavenConfiguration configuration, MavenInfo toolInfo, ProjectToolInstallerContext context) throws Exception {
+    protected void executePostInstallationSteps(MavenConfiguration configuration, MavenInfo toolInfo, ProjectToolInstallerContext context) throws IOException {
         linkGlobalSettingsFile(toolInfo);
     }
 
-    private void linkGlobalSettingsFile(MavenInfo toolInfo) throws Exception {
+    private void linkGlobalSettingsFile(MavenInfo toolInfo) throws IOException {
         if (toolInfo.getGlobalSettingsFile().isEmpty()) {
             return;
         }
