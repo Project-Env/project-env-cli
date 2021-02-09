@@ -13,7 +13,12 @@ public final class YamlHelper {
         // noop
     }
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory()).registerModule(new Jdk8Module());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory())
+            .registerModule(new Jdk8Module());
+
+    public static <T> T readValue(File source, Class<T> clazz) throws IOException {
+        return OBJECT_MAPPER.readValue(source, clazz);
+    }
 
     public static <T> T readValue(String source, Class<T> clazz) throws IOException {
         return OBJECT_MAPPER.readValue(source, clazz);
@@ -25,6 +30,10 @@ public final class YamlHelper {
 
     public static <T> String writeValueAsString(T value) throws IOException {
         return OBJECT_MAPPER.writeValueAsString(value);
+    }
+
+    public static ObjectMapper getBaseObjectMapper() {
+        return OBJECT_MAPPER.copy();
     }
 
 }

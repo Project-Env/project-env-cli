@@ -1,5 +1,7 @@
 package io.projectenv.core.common.lock;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -29,6 +31,7 @@ public final class LockFileHelper {
             }
         }
 
+        FileUtils.forceMkdirParent(lockFile);
         if (!lockFile.createNewFile()) {
             throw new IOException("failed to create lock file " + lockFile.getCanonicalPath());
         }

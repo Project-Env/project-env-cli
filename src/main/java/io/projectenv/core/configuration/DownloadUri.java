@@ -1,9 +1,9 @@
 package io.projectenv.core.configuration;
 
-import io.projectenv.core.common.OperatingSystem;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.projectenv.core.common.OperatingSystem;
 import org.immutables.value.Value;
 
 @Value.Immutable

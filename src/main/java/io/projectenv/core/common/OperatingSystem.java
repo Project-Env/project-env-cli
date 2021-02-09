@@ -19,7 +19,7 @@ public enum OperatingSystem {
             return WINDOWS;
         }
 
-        throw new IllegalStateException("unsupported operating system "+SystemUtils.OS_NAME);
+        throw new IllegalStateException("unsupported operating system " + SystemUtils.OS_NAME);
     }
 
 }

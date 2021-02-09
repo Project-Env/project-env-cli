@@ -1,6 +1,6 @@
 package io.projectenv.core.common;
 
-import io.projectenv.core.toolinfo.ToolInfo;
+import io.projectenv.core.tools.info.ToolInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
