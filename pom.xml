@@ -22,7 +22,7 @@
         <commons-text.version>1.9</commons-text.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <xz.version>1.8</xz.version>
-        <junit-jupiter.version>5.7.0</junit-jupiter.version>
+        <junit-jupiter.version>5.7.1</junit-jupiter.version>
         <assertj-core.version>3.19.0</assertj-core.version>
         <jackson-databind.version>2.12.1</jackson-databind.version>
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
