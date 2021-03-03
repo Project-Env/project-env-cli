@@ -4,6 +4,7 @@ import io.projectenv.core.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.configuration.ProjectEnvConfigurationFactory;
 import io.projectenv.core.configuration.ToolConfiguration;
 import io.projectenv.core.tools.info.ToolInfo;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,6 +26,7 @@ class DefaultToolsRepositoryTest {
             File settings = copyResourceToTarget("project-env.yml", projectRoot);
             copyResourceToTarget("settings.xml", projectRoot);
             copyResourceToTarget("settings-user.xml", projectRoot);
+            copyResourceToTarget("git-hook", new File(projectRoot, "hooks"));
 
             ProjectEnvConfiguration projectEnvConfiguration = ProjectEnvConfigurationFactory.createFromFile(settings);
 
@@ -32,14 +34,22 @@ class DefaultToolsRepositoryTest {
             ToolsRepository toolRepository = ToolsRepositoryFactory.createToolRepository(repositoryRoot);
 
             List<ToolConfiguration> toolConfigurations = projectEnvConfiguration.getToolsConfiguration().getAllToolConfigurations();
-            List<ToolInfo> toolDetails = toolRepository.requestTools(toolConfigurations, projectRoot);
 
-            assertThat(toolDetails).hasSize(5);
+            List<ToolInfo> firstToolDetails = toolRepository.requestTools(toolConfigurations, projectRoot);
+            assertThat(firstToolDetails).hasSize(6);
+
+            List<ToolInfo> secondToolInfos = toolRepository.requestTools(toolConfigurations, projectRoot);
+            assertThat(secondToolInfos).containsAnyElementsOf(firstToolDetails);
+
+            toolRepository.cleanAllToolsOfCurrentOSExcluding(toolConfigurations);
+            List<ToolInfo> thirdToolInfos = toolRepository.requestTools(toolConfigurations, projectRoot);
+            assertThat(thirdToolInfos).containsAnyElementsOf(firstToolDetails);
         });
     }
 
     private File copyResourceToTarget(String resource, File target) throws Exception {
         File resultingFile = new File(target, resource);
+        FileUtils.forceMkdirParent(resultingFile);
 
         try (InputStream inputStream = getClass().getResourceAsStream(resource);
              OutputStream outputStream = new FileOutputStream(resultingFile)) {

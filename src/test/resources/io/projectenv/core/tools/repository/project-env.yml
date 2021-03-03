@@ -2,6 +2,9 @@ tools:
 
   toolsDirectory: ".tools"
 
+  gitHooks:
+    directory: "hooks"
+
   jdk:
     downloadUris:
       - targetOs: "MACOS"
