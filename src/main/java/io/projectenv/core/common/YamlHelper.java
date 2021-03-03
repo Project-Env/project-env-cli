@@ -1,5 +1,6 @@
 package io.projectenv.core.common;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -14,7 +15,8 @@ public final class YamlHelper {
     }
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory())
-            .registerModule(new Jdk8Module());
+            .registerModule(new Jdk8Module())
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     public static <T> T readValue(File source, Class<T> clazz) throws IOException {
         return OBJECT_MAPPER.readValue(source, clazz);

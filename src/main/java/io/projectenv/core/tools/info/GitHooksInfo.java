@@ -4,8 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.io.File;
+
 @Value.Immutable
-@JsonSerialize(as = ImmutableNodeInfo.class)
-@JsonDeserialize(as = ImmutableNodeInfo.class)
-public interface NodeInfo extends SimpleToolInfo {
+@JsonSerialize(as = ImmutableGitHooksInfo.class)
+@JsonDeserialize(as = ImmutableGitHooksInfo.class)
+public interface GitHooksInfo extends ToolInfo {
+
+    File getDirectory();
+
 }

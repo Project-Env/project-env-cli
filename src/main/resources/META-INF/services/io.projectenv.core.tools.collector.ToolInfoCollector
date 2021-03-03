@@ -1,5 +1,0 @@
-io.projectenv.core.tools.collector.impl.GenericToolInfoCollector
-io.projectenv.core.tools.collector.impl.GradleInfoCollector
-io.projectenv.core.tools.collector.impl.JdkInfoCollector
-io.projectenv.core.tools.collector.impl.MavenInfoCollector
-io.projectenv.core.tools.collector.impl.NodeInfoCollector

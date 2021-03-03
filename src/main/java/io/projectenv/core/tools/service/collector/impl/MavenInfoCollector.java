@@ -1,18 +1,18 @@
-package io.projectenv.core.tools.collector.impl;
+package io.projectenv.core.tools.service.collector.impl;
 
 import io.projectenv.core.configuration.MavenConfiguration;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
 import io.projectenv.core.tools.info.ImmutableMavenInfo;
 import io.projectenv.core.tools.info.MavenInfo;
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
 
 import java.io.File;
 import java.util.List;
 
-public class MavenInfoCollector extends AbstractToolInfoCollector<MavenConfiguration, MavenInfo> {
+public class MavenInfoCollector extends AbstractSimpleToolInfoCollector<MavenConfiguration, MavenInfo> {
 
     @Override
-    protected MavenInfo collectToolSpecificInfo(ToolInfo baseToolInfo, MavenConfiguration toolConfiguration, ToolInfoCollectorContext context) {
+    protected MavenInfo collectToolSpecificInfo(SimpleToolInfo baseToolInfo, MavenConfiguration toolConfiguration, ToolSpecificServiceContext context) {
         return ImmutableMavenInfo
                 .builder()
                 .from(baseToolInfo)

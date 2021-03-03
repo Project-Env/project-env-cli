@@ -30,6 +30,9 @@ public interface ToolsConfiguration {
     @JsonProperty("node")
     Optional<NodeConfiguration> getNodeConfiguration();
 
+    @JsonProperty("gitHooks")
+    Optional<GitHooksConfiguration> getGitHooksConfiguration();
+
     @JsonProperty("genericTools")
     List<GenericToolConfiguration> getGenericToolConfigurations();
 
@@ -41,6 +44,7 @@ public interface ToolsConfiguration {
         getMavenConfiguration().ifPresent(toolConfigurations::add);
         getGradleConfiguration().ifPresent(toolConfigurations::add);
         getNodeConfiguration().ifPresent(toolConfigurations::add);
+        getGitHooksConfiguration().ifPresent(toolConfigurations::add);
         toolConfigurations.addAll(getGenericToolConfigurations());
 
         return toolConfigurations;

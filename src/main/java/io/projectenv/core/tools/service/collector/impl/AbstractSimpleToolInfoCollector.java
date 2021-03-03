@@ -1,25 +1,26 @@
-package io.projectenv.core.tools.collector.impl;
+package io.projectenv.core.tools.service.collector.impl;
 
 import io.projectenv.core.common.ProcessEnvironmentHelper;
+import io.projectenv.core.configuration.SimpleToolConfiguration;
 import io.projectenv.core.configuration.ToolConfiguration;
-import io.projectenv.core.tools.collector.ToolInfoCollector;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
-import io.projectenv.core.tools.info.ImmutableToolInfo;
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.ImmutableSimpleToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
+import io.projectenv.core.tools.service.collector.ToolInfoCollector;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S extends ToolInfo>
+public abstract class AbstractSimpleToolInfoCollector<T extends SimpleToolConfiguration, S extends SimpleToolInfo>
         implements ToolInfoCollector<T, S> {
 
     @Override
-    public S collectToolInfo(T toolConfiguration, ToolInfoCollectorContext context) {
+    public S collectToolInfo(T toolConfiguration, ToolSpecificServiceContext context) {
         File relevantToolBinariesDirectory = getRelevantToolBinariesDirectory(context);
 
-        ToolInfo baseToolInfo = collectBaseToolInfo(toolConfiguration, relevantToolBinariesDirectory);
+        SimpleToolInfo baseToolInfo = collectBaseToolInfo(toolConfiguration, relevantToolBinariesDirectory);
 
         return collectToolSpecificInfo(baseToolInfo, toolConfiguration, context);
     }
@@ -31,7 +32,7 @@ public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S e
 
     protected abstract Class<T> getToolConfigurationClass();
 
-    protected File getRelevantToolBinariesDirectory(ToolInfoCollectorContext context) {
+    protected File getRelevantToolBinariesDirectory(ToolSpecificServiceContext context) {
         File toolBinariesRoot = context.getToolRoot();
 
         List<File> files = Optional.ofNullable(toolBinariesRoot.listFiles())
@@ -45,7 +46,7 @@ public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S e
         }
     }
 
-    private ToolInfo collectBaseToolInfo(T toolConfiguration, File relevantToolBinariesDirectory) {
+    private SimpleToolInfo collectBaseToolInfo(T toolConfiguration, File relevantToolBinariesDirectory) {
         Map<String, File> environmentVariables = new HashMap<>();
         environmentVariables.putAll(createFileMap(toolConfiguration.getEnvironmentVariables(), relevantToolBinariesDirectory));
         environmentVariables.putAll(createFileMap(getAdditionalExports(), relevantToolBinariesDirectory));
@@ -64,9 +65,8 @@ public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S e
                     return executable;
                 });
 
-        return ImmutableToolInfo
+        return ImmutableSimpleToolInfo
                 .builder()
-                .toolName(toolConfiguration.getToolName())
                 .location(relevantToolBinariesDirectory)
                 .putAllEnvironmentVariables(environmentVariables)
                 .addAllPathElements(pathElements)
@@ -103,6 +103,6 @@ public abstract class AbstractToolInfoCollector<T extends ToolConfiguration, S e
         return null;
     }
 
-    protected abstract S collectToolSpecificInfo(ToolInfo baseToolInfo, T toolConfiguration, ToolInfoCollectorContext context);
+    protected abstract S collectToolSpecificInfo(SimpleToolInfo baseToolInfo, T toolConfiguration, ToolSpecificServiceContext context);
 
 }

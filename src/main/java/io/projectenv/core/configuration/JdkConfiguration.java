@@ -7,5 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableJdkConfiguration.class)
 @JsonDeserialize(as = ImmutableJdkConfiguration.class)
-public interface JdkConfiguration extends ToolConfiguration {
+public interface JdkConfiguration extends SimpleToolConfiguration {
 }

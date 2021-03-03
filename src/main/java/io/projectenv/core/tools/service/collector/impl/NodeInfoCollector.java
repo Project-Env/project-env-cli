@@ -1,18 +1,18 @@
-package io.projectenv.core.tools.collector.impl;
+package io.projectenv.core.tools.service.collector.impl;
 
 import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.configuration.NodeConfiguration;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
 import io.projectenv.core.tools.info.ImmutableNodeInfo;
 import io.projectenv.core.tools.info.NodeInfo;
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
 
 import java.util.List;
 
-public class NodeInfoCollector extends AbstractToolInfoCollector<NodeConfiguration, NodeInfo> {
+public class NodeInfoCollector extends AbstractSimpleToolInfoCollector<NodeConfiguration, NodeInfo> {
 
     @Override
-    protected NodeInfo collectToolSpecificInfo(ToolInfo baseToolInfo, NodeConfiguration toolConfiguration, ToolInfoCollectorContext context) {
+    protected NodeInfo collectToolSpecificInfo(SimpleToolInfo baseToolInfo, NodeConfiguration toolConfiguration, ToolSpecificServiceContext context) {
         return ImmutableNodeInfo
                 .builder()
                 .from(baseToolInfo)

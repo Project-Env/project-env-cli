@@ -5,20 +5,15 @@ import io.projectenv.core.common.YamlHelper;
 import io.projectenv.core.common.lock.LockFile;
 import io.projectenv.core.common.lock.LockFileHelper;
 import io.projectenv.core.configuration.ToolConfiguration;
-import io.projectenv.core.tools.collector.ImmutableToolInfoCollectorContext;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
-import io.projectenv.core.tools.collector.ToolInfoCollectors;
 import io.projectenv.core.tools.info.ToolInfo;
-import io.projectenv.core.tools.installer.ImmutableProjectToolInstallerContext;
-import io.projectenv.core.tools.installer.ProjectToolInstallerContext;
-import io.projectenv.core.tools.installer.ProjectToolInstallerException;
-import io.projectenv.core.tools.installer.ToolInstallers;
 import io.projectenv.core.tools.repository.ToolsRepository;
 import io.projectenv.core.tools.repository.ToolsRepositoryException;
-import io.projectenv.core.tools.repository.impl.catalogue.ImmutableToolCatalogue;
-import io.projectenv.core.tools.repository.impl.catalogue.ToolCatalogue;
-import io.projectenv.core.tools.repository.impl.catalogue.ToolEntry;
-import io.projectenv.core.tools.repository.impl.catalogue.ToolEntryFactory;
+import io.projectenv.core.tools.repository.impl.catalogue.*;
+import io.projectenv.core.tools.service.ImmutableToolSpecificServiceContext;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
+import io.projectenv.core.tools.service.ToolSpecificServices;
+import io.projectenv.core.tools.service.installer.ToolInstallerException;
+import io.projectenv.core.tools.service.resources.LocalToolResourcesProcessorException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -53,15 +48,35 @@ public class DefaultToolsRepository implements ToolsRepository {
             for (ToolConfiguration toolConfiguration : requestedTools) {
                 ToolEntry entry = resolveExistingEntry(toolConfiguration, catalogue);
                 if (entry != null) {
+                    ToolSpecificServiceContext context = ImmutableToolSpecificServiceContext
+                            .builder()
+                            .projectRoot(projectRoot)
+                            .toolRoot(resolveToolRoot(entry.getId()))
+                            .build();
+
+                    ToolSpecificServices.processLocalToolResources(entry.getToolInstallationInfo(), context);
                     toolDetails.add(entry.getToolInstallationInfo());
                 } else {
                     String toolId = generateToolId();
-                    File toolRoot = resolveToolRoot(toolId);
 
-                    installTool(toolConfiguration, toolRoot, projectRoot);
-                    ToolInfo toolInfo = collectToolInfo(toolConfiguration, toolRoot, projectRoot);
+                    ToolSpecificServiceContext context = ImmutableToolSpecificServiceContext
+                            .builder()
+                            .projectRoot(projectRoot)
+                            .toolRoot(resolveToolRoot(toolId))
+                            .build();
 
-                    newEntries.add(ToolEntryFactory.createToolEntry(toolId, toolConfiguration, toolInfo));
+                    ToolSpecificServices.installTool(toolConfiguration, context);
+                    ToolInfo toolInfo = ToolSpecificServices.collectToolInfo(toolConfiguration, context);
+                    ToolSpecificServices.processLocalToolResources(toolInfo, context);
+
+                    ToolEntry baseEntry = ImmutableToolEntry
+                            .builder()
+                            .id(toolId)
+                            .toolConfiguration(toolConfiguration)
+                            .toolInstallationInfo(toolInfo)
+                            .targetOS(OperatingSystem.getCurrentOS())
+                            .build();
+                    newEntries.add(ToolEntryFactory.createFromBaseToolEntry(baseEntry));
 
                     toolDetails.add(toolInfo);
                 }
@@ -70,7 +85,7 @@ public class DefaultToolsRepository implements ToolsRepository {
             mergeAndWriteCatalogue(catalogue, newEntries);
 
             return toolDetails;
-        } catch (IOException | TimeoutException | ProjectToolInstallerException e) {
+        } catch (IOException | TimeoutException | ToolInstallerException | LocalToolResourcesProcessorException e) {
             throw new ToolsRepositoryException("failed to request tools", e);
         }
     }
@@ -97,26 +112,6 @@ public class DefaultToolsRepository implements ToolsRepository {
         }
     }
 
-    private void installTool(ToolConfiguration toolConfiguration, File toolRoot, File projectRoot) throws ProjectToolInstallerException {
-        ProjectToolInstallerContext installerContext = ImmutableProjectToolInstallerContext
-                .builder()
-                .projectRoot(projectRoot)
-                .toolRoot(toolRoot)
-                .build();
-
-        ToolInstallers.installTool(toolConfiguration, installerContext);
-    }
-
-    private ToolInfo collectToolInfo(ToolConfiguration toolConfiguration, File toolRoot, File projectRoot) {
-        ToolInfoCollectorContext collectorContext = ImmutableToolInfoCollectorContext
-                .builder()
-                .projectRoot(projectRoot)
-                .toolRoot(toolRoot)
-                .build();
-
-        return ToolInfoCollectors.collectToolInfo(toolConfiguration, collectorContext);
-    }
-
     private ToolEntry resolveExistingEntry(ToolConfiguration toolConfiguration, ToolCatalogue catalogue) {
         return catalogue
                 .getEntries()
@@ -139,7 +134,7 @@ public class DefaultToolsRepository implements ToolsRepository {
     }
 
     private void mergeAndWriteCatalogue(ToolCatalogue catalogue, List<ToolEntry> entriesToAdd) throws IOException {
-        ImmutableToolCatalogue mergedCatalogue = ImmutableToolCatalogue
+        ToolCatalogue mergedCatalogue = ImmutableToolCatalogue
                 .builder()
                 .from(catalogue)
                 .addAllEntries(entriesToAdd)
@@ -149,7 +144,7 @@ public class DefaultToolsRepository implements ToolsRepository {
     }
 
     private void overwriteCatalogue(List<ToolEntry> newEntries) throws IOException {
-        ImmutableToolCatalogue mergedCatalogue = ImmutableToolCatalogue
+        ToolCatalogue mergedCatalogue = ImmutableToolCatalogue
                 .builder()
                 .addAllEntries(newEntries)
                 .build();

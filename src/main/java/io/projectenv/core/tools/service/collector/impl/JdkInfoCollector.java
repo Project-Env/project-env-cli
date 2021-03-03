@@ -1,17 +1,17 @@
-package io.projectenv.core.tools.collector.impl;
+package io.projectenv.core.tools.service.collector.impl;
 
 import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.configuration.JdkConfiguration;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
 import io.projectenv.core.tools.info.ImmutableJdkInfo;
 import io.projectenv.core.tools.info.JdkInfo;
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-public class JdkInfoCollector extends AbstractToolInfoCollector<JdkConfiguration, JdkInfo> {
+public class JdkInfoCollector extends AbstractSimpleToolInfoCollector<JdkConfiguration, JdkInfo> {
 
     @Override
     protected Class<JdkConfiguration> getToolConfigurationClass() {
@@ -19,7 +19,7 @@ public class JdkInfoCollector extends AbstractToolInfoCollector<JdkConfiguration
     }
 
     @Override
-    protected File getRelevantToolBinariesDirectory(ToolInfoCollectorContext context) {
+    protected File getRelevantToolBinariesDirectory(ToolSpecificServiceContext context) {
         File relevantProjectToolRoot = super.getRelevantToolBinariesDirectory(context);
         if (OperatingSystem.getCurrentOS() == OperatingSystem.MACOS) {
             return new File(relevantProjectToolRoot, "Contents/Home");
@@ -29,7 +29,7 @@ public class JdkInfoCollector extends AbstractToolInfoCollector<JdkConfiguration
     }
 
     @Override
-    protected JdkInfo collectToolSpecificInfo(ToolInfo baseToolInfo, JdkConfiguration toolConfiguration, ToolInfoCollectorContext context) {
+    protected JdkInfo collectToolSpecificInfo(SimpleToolInfo baseToolInfo, JdkConfiguration toolConfiguration, ToolSpecificServiceContext context) {
         return ImmutableJdkInfo
                 .builder()
                 .from(baseToolInfo)

@@ -1,18 +1,17 @@
-package io.projectenv.core.tools.installer.impl;
+package io.projectenv.core.tools.service.installer.impl;
 
 import io.projectenv.core.archive.ArchiveExtractor;
 import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.common.ProcessEnvironmentHelper;
 import io.projectenv.core.configuration.DownloadUri;
 import io.projectenv.core.configuration.PostExtractionCommand;
+import io.projectenv.core.configuration.SimpleToolConfiguration;
 import io.projectenv.core.configuration.ToolConfiguration;
-import io.projectenv.core.tools.collector.ImmutableToolInfoCollectorContext;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
-import io.projectenv.core.tools.collector.ToolInfoCollectors;
-import io.projectenv.core.tools.info.ToolInfo;
-import io.projectenv.core.tools.installer.ProjectToolInstaller;
-import io.projectenv.core.tools.installer.ProjectToolInstallerContext;
-import io.projectenv.core.tools.installer.ProjectToolInstallerException;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
+import io.projectenv.core.tools.service.ToolSpecificServices;
+import io.projectenv.core.tools.service.installer.ToolInstaller;
+import io.projectenv.core.tools.service.installer.ToolInstallerException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -22,31 +21,25 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.Map;
 
-public abstract class AbstractProjectToolInstaller<T extends ToolConfiguration, S extends ToolInfo>
-        implements ProjectToolInstaller<T> {
+public class SimpleToolInstaller<T extends SimpleToolConfiguration> implements ToolInstaller<T> {
 
     private final ArchiveExtractor archiveExtractor = new ArchiveExtractor();
 
     @Override
-    public void installTool(T toolConfiguration, ProjectToolInstallerContext context) throws ProjectToolInstallerException {
+    public void installTool(T toolConfiguration, ToolSpecificServiceContext context) throws ToolInstallerException {
         try {
             cleanToolInstallationDirectory(context);
             extractToolInstallation(toolConfiguration, context);
-
-            S toolInfo = collectToolInfo(toolConfiguration, context);
-            executePostInstallationCommands(toolConfiguration, toolInfo, context);
-            executePostInstallationSteps(toolConfiguration, toolInfo, context);
+            executePostInstallationCommands(toolConfiguration, context);
         } catch (Exception e) {
-            throw new ProjectToolInstallerException("failed to install tool", e);
+            throw new ToolInstallerException("failed to install tool", e);
         }
     }
 
     @Override
     public boolean supportsTool(ToolConfiguration toolConfiguration) {
-        return getToolConfigurationClass().isAssignableFrom(toolConfiguration.getClass());
+        return toolConfiguration instanceof SimpleToolConfiguration;
     }
-
-    protected abstract Class<T> getToolConfigurationClass();
 
     private DownloadUri getSystemSpecificDownloadUri(T configuration) {
         return configuration
@@ -61,7 +54,7 @@ public abstract class AbstractProjectToolInstaller<T extends ToolConfiguration, 
                 .orElseThrow(() -> new IllegalStateException("no download URI for OS " + OperatingSystem.getCurrentOS() + " available"));
     }
 
-    private void cleanToolInstallationDirectory(ProjectToolInstallerContext context) throws IOException {
+    private void cleanToolInstallationDirectory(ToolSpecificServiceContext context) throws IOException {
         File projectRoot = context.getToolRoot();
 
         if (projectRoot.exists()) {
@@ -70,11 +63,11 @@ public abstract class AbstractProjectToolInstaller<T extends ToolConfiguration, 
         FileUtils.forceMkdir(projectRoot);
     }
 
-    private void extractToolInstallation(T toolInstallationConfiguration, ProjectToolInstallerContext context) throws IOException {
+    private void extractToolInstallation(T toolInstallationConfiguration, ToolSpecificServiceContext context) throws IOException {
         URI systemSpecificDownloadUri = URI.create(getSystemSpecificDownloadUri(toolInstallationConfiguration).getDownloadUri());
 
         String archiveName = FilenameUtils.getName(systemSpecificDownloadUri.getPath());
-        File tempArchive = Files.createTempFile(toolInstallationConfiguration.getToolName(), archiveName).toFile();
+        File tempArchive = Files.createTempFile(null, archiveName).toFile();
 
         try (InputStream inputStream = new BufferedInputStream(systemSpecificDownloadUri.toURL().openStream());
              OutputStream outputStream = new FileOutputStream(tempArchive)) {
@@ -86,20 +79,12 @@ public abstract class AbstractProjectToolInstaller<T extends ToolConfiguration, 
         FileUtils.forceDelete(tempArchive);
     }
 
-    private S collectToolInfo(T toolConfiguration, ProjectToolInstallerContext context) {
-        ToolInfoCollectorContext collectorContext = ImmutableToolInfoCollectorContext
-                .builder()
-                .projectRoot(context.getProjectRoot())
-                .toolRoot(context.getToolRoot())
-                .build();
+    private void executePostInstallationCommands(T toolConfiguration, ToolSpecificServiceContext context) throws IOException, InterruptedException {
+        SimpleToolInfo toolInfo = ToolSpecificServices.collectToolInfo(toolConfiguration, context);
 
-        return ToolInfoCollectors.collectToolInfo(toolConfiguration, collectorContext);
-    }
-
-    private void executePostInstallationCommands(T toolInstallationConfiguration, S toolInfo, ProjectToolInstallerContext context) throws IOException, InterruptedException {
         Map<String, String> processEnvironment = ProcessEnvironmentHelper.createProcessEnvironmentFromToolInfo(toolInfo);
 
-        for (PostExtractionCommand postInstallationCommand : toolInstallationConfiguration.getPostExtractionCommands()) {
+        for (PostExtractionCommand postInstallationCommand : toolConfiguration.getPostExtractionCommands()) {
             File executable = ProcessEnvironmentHelper.resolveExecutableFromToolInfo(postInstallationCommand.getExecutableName(), toolInfo);
             if (executable == null) {
                 throw new IllegalStateException("failed to resolve executable with name " + postInstallationCommand.getExecutableName());
@@ -114,10 +99,6 @@ public abstract class AbstractProjectToolInstaller<T extends ToolConfiguration, 
             Process process = processBuilder.start();
             process.waitFor();
         }
-    }
-
-    protected void executePostInstallationSteps(T toolInstallationConfiguration, S toolInfo, ProjectToolInstallerContext context) throws IOException {
-        // noop
     }
 
 }

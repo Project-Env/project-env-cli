@@ -7,5 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableGradleInfo.class)
 @JsonDeserialize(as = ImmutableGradleInfo.class)
-public interface GradleInfo extends ToolInfo {
+public interface GradleInfo extends SimpleToolInfo {
 }

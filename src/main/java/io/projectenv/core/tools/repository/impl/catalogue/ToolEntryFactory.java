@@ -1,6 +1,5 @@
 package io.projectenv.core.tools.repository.impl.catalogue;
 
-import io.projectenv.core.common.OperatingSystem;
 import io.projectenv.core.configuration.*;
 import io.projectenv.core.tools.info.*;
 
@@ -10,78 +9,53 @@ public final class ToolEntryFactory {
 
     }
 
-    public static ToolEntry createToolEntry(String toolId, ToolConfiguration toolConfiguration, ToolInfo toolInfo) {
+    public static ToolEntry createFromBaseToolEntry(ToolEntry baseToolEntry) {
+        ToolConfiguration toolConfiguration = baseToolEntry.getToolConfiguration();
+        ToolInfo toolInfo = baseToolEntry.getToolInstallationInfo();
+
         if (toolConfiguration instanceof JdkConfiguration && toolInfo instanceof JdkInfo) {
-            return createJdkEntry(toolId, (JdkConfiguration) toolConfiguration, (JdkInfo) toolInfo);
+            return ImmutableJdkEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((JdkConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((JdkInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
         }
 
         if (toolConfiguration instanceof MavenConfiguration && toolInfo instanceof MavenInfo) {
-            return createMavenEntry(toolId, (MavenConfiguration) toolConfiguration, (MavenInfo) toolInfo);
+            return ImmutableMavenEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((MavenConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((MavenInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
         }
 
         if (toolConfiguration instanceof GradleConfiguration && toolInfo instanceof GradleInfo) {
-            return createGradleEntry(toolId, (GradleConfiguration) toolConfiguration, (GradleInfo) toolInfo);
+            return ImmutableGradleEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((GradleConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((GradleInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
         }
 
         if (toolConfiguration instanceof NodeConfiguration && toolInfo instanceof NodeInfo) {
-            return createNodeEntry(toolId, (NodeConfiguration) toolConfiguration, (NodeInfo) toolInfo);
+            return ImmutableNodeEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((NodeConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((NodeInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
         }
 
         if (toolConfiguration instanceof GenericToolConfiguration && toolInfo instanceof GenericToolInfo) {
-            return createGenericToolEntry(toolId, (GenericToolConfiguration) toolConfiguration, (GenericToolInfo) toolInfo);
+            return ImmutableGenericToolEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((GenericToolConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((GenericToolInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
         }
 
-        throw new IllegalArgumentException("illegal combination of paramaters");
-    }
+        if (toolConfiguration instanceof GitHooksConfiguration && toolInfo instanceof GitHooksInfo) {
+            return ImmutableGitHooksEntry.builder().from(baseToolEntry)
+                    .toolConfiguration((GitHooksConfiguration) baseToolEntry.getToolConfiguration())
+                    .toolInstallationInfo((GitHooksInfo) baseToolEntry.getToolInstallationInfo())
+                    .build();
+        }
 
-    private static JdkEntry createJdkEntry(String toolId, JdkConfiguration toolConfiguration, JdkInfo toolInfo) {
-        return ImmutableJdkEntry
-                .builder()
-                .id(toolId)
-                .targetOS(OperatingSystem.getCurrentOS())
-                .toolConfiguration(toolConfiguration)
-                .toolInstallationInfo(toolInfo)
-                .build();
-    }
-
-    private static MavenEntry createMavenEntry(String toolId, MavenConfiguration toolConfiguration, MavenInfo toolInfo) {
-        return ImmutableMavenEntry
-                .builder()
-                .id(toolId)
-                .targetOS(OperatingSystem.getCurrentOS())
-                .toolConfiguration(toolConfiguration)
-                .toolInstallationInfo(toolInfo)
-                .build();
-    }
-
-    private static GradleEntry createGradleEntry(String toolId, GradleConfiguration toolConfiguration, GradleInfo toolInfo) {
-        return ImmutableGradleEntry
-                .builder()
-                .id(toolId)
-                .targetOS(OperatingSystem.getCurrentOS())
-                .toolConfiguration(toolConfiguration)
-                .toolInstallationInfo(toolInfo)
-                .build();
-    }
-
-    private static NodeEntry createNodeEntry(String toolId, NodeConfiguration toolConfiguration, NodeInfo toolInfo) {
-        return ImmutableNodeEntry
-                .builder()
-                .id(toolId)
-                .targetOS(OperatingSystem.getCurrentOS())
-                .toolConfiguration(toolConfiguration)
-                .toolInstallationInfo(toolInfo)
-                .build();
-    }
-
-    private static GenericToolEntry createGenericToolEntry(String toolId, GenericToolConfiguration toolConfiguration, GenericToolInfo toolInfo) {
-        return ImmutableGenericToolEntry
-                .builder()
-                .id(toolId)
-                .targetOS(OperatingSystem.getCurrentOS())
-                .toolConfiguration(toolConfiguration)
-                .toolInstallationInfo(toolInfo)
-                .build();
+        throw new IllegalArgumentException("illegal combination of parameters");
     }
 
 }

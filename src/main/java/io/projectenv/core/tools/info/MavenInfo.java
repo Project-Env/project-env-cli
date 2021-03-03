@@ -10,7 +10,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableMavenInfo.class)
 @JsonDeserialize(as = ImmutableMavenInfo.class)
-public interface MavenInfo extends ToolInfo {
+public interface MavenInfo extends SimpleToolInfo {
 
     Optional<File> getGlobalSettingsFile();
 

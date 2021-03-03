@@ -1,12 +1,12 @@
-package io.projectenv.core.tools.collector.impl;
+package io.projectenv.core.tools.service.collector.impl;
 
 import io.projectenv.core.configuration.GenericToolConfiguration;
-import io.projectenv.core.tools.collector.ToolInfoCollectorContext;
 import io.projectenv.core.tools.info.GenericToolInfo;
 import io.projectenv.core.tools.info.ImmutableGenericToolInfo;
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
+import io.projectenv.core.tools.service.ToolSpecificServiceContext;
 
-public class GenericToolInfoCollector extends AbstractToolInfoCollector<GenericToolConfiguration, GenericToolInfo> {
+public class GenericToolInfoCollector extends AbstractSimpleToolInfoCollector<GenericToolConfiguration, GenericToolInfo> {
 
     @Override
     protected Class<GenericToolConfiguration> getToolConfigurationClass() {
@@ -14,7 +14,7 @@ public class GenericToolInfoCollector extends AbstractToolInfoCollector<GenericT
     }
 
     @Override
-    protected GenericToolInfo collectToolSpecificInfo(ToolInfo baseToolInfo, GenericToolConfiguration toolConfiguration, ToolInfoCollectorContext context) {
+    protected GenericToolInfo collectToolSpecificInfo(SimpleToolInfo baseToolInfo, GenericToolConfiguration toolConfiguration, ToolSpecificServiceContext context) {
         return ImmutableGenericToolInfo
                 .builder()
                 .from(baseToolInfo)

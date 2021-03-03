@@ -17,7 +17,7 @@ import java.util.Map;
 public final class ProjectEnvConfigurationFactory {
 
     private ProjectEnvConfigurationFactory() {
-
+        // noop
     }
 
     public static ProjectEnvConfiguration createFromFile(File projectEnvConfigurationFile) throws IOException {

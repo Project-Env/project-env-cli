@@ -7,5 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableNodeConfiguration.class)
 @JsonDeserialize(as = ImmutableNodeConfiguration.class)
-public interface NodeConfiguration extends ToolConfiguration {
+public interface NodeConfiguration extends SimpleToolConfiguration {
 }

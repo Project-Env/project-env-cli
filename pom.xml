@@ -28,6 +28,7 @@
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
         <system-lambda.version>1.2.0</system-lambda.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
+        <reflections.version>0.9.12</reflections.version>
 
         <flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -131,6 +132,12 @@
             <groupId>com.github.stefanbirkner</groupId>
             <artifactId>system-lambda</artifactId>
             <version>${system-lambda.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

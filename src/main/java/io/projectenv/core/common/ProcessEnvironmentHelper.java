@@ -1,6 +1,6 @@
 package io.projectenv.core.common;
 
-import io.projectenv.core.tools.info.ToolInfo;
+import io.projectenv.core.tools.info.SimpleToolInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -23,7 +23,7 @@ public final class ProcessEnvironmentHelper {
         // noop
     }
 
-    public static Map<String, String> createProcessEnvironmentFromToolInfo(ToolInfo toolInfo) throws IOException {
+    public static Map<String, String> createProcessEnvironmentFromToolInfo(SimpleToolInfo toolInfo) throws IOException {
         Map<String, String> processEnvironment = toolInfo.getEnvironmentVariables()
                 .entrySet()
                 .stream()
@@ -39,7 +39,7 @@ public final class ProcessEnvironmentHelper {
         return processEnvironment;
     }
 
-    public static File resolveExecutableFromToolInfo(String executable, ToolInfo toolInfo) {
+    public static File resolveExecutableFromToolInfo(String executable, SimpleToolInfo toolInfo) {
         return resolveExecutableFromPathElements(executable, toolInfo.getPathElements());
     }
 

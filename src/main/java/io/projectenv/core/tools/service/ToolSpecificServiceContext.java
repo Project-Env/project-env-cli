@@ -1,11 +1,11 @@
-package io.projectenv.core.tools.installer;
+package io.projectenv.core.tools.service;
 
 import org.immutables.value.Value;
 
 import java.io.File;
 
 @Value.Immutable
-public interface ProjectToolInstallerContext {
+public interface ToolSpecificServiceContext {
 
     File getProjectRoot();
 

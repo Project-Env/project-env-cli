@@ -7,5 +7,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableGenericToolInfo.class)
 @JsonDeserialize(as = ImmutableGenericToolInfo.class)
-public interface GenericToolInfo extends ToolInfo {
+public interface GenericToolInfo extends SimpleToolInfo {
 }
