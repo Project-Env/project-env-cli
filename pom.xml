@@ -24,7 +24,7 @@
         <xz.version>1.8</xz.version>
         <junit-jupiter.version>5.7.1</junit-jupiter.version>
         <assertj-core.version>3.19.0</assertj-core.version>
-        <jackson-databind.version>2.12.1</jackson-databind.version>
+        <jackson-databind.version>2.12.2</jackson-databind.version>
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
         <system-lambda.version>1.2.0</system-lambda.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
