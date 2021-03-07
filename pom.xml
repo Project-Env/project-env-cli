@@ -267,8 +267,8 @@
 
     <distributionManagement>
         <repository>
-            <id>bintray-project-env-maven-repo</id>
-            <url>https://api.bintray.com/maven/project-env/maven-repo/project-env-core/;publish=1</url>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/Project-Env/project-env-core</url>
         </repository>
     </distributionManagement>
 
