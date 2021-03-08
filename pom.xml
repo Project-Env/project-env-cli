@@ -30,7 +30,7 @@
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <reflections.version>0.9.12</reflections.version>
 
-        <flatten-maven-plugin.version>1.2.5</flatten-maven-plugin.version>
+        <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
