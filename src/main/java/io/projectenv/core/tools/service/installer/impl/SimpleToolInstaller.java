@@ -85,19 +85,25 @@ public class SimpleToolInstaller<T extends SimpleToolConfiguration> implements T
         Map<String, String> processEnvironment = ProcessEnvironmentHelper.createProcessEnvironmentFromToolInfo(toolInfo);
 
         for (PostExtractionCommand postInstallationCommand : toolConfiguration.getPostExtractionCommands()) {
-            File executable = ProcessEnvironmentHelper.resolveExecutableFromToolInfo(postInstallationCommand.getExecutableName(), toolInfo);
-            if (executable == null) {
-                throw new IllegalStateException("failed to resolve executable with name " + postInstallationCommand.getExecutableName());
-            }
+            String executable = resolveExecutable(postInstallationCommand.getExecutableName(), toolInfo);
 
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.environment().putAll(processEnvironment);
             processBuilder.inheritIO();
-            processBuilder.command().add(executable.getAbsolutePath());
+            processBuilder.command().add(executable);
             processBuilder.command().addAll(postInstallationCommand.getArguments());
             processBuilder.directory(context.getProjectRoot());
             Process process = processBuilder.start();
             process.waitFor();
+        }
+    }
+
+    private String resolveExecutable(String executableName, SimpleToolInfo toolInfo) {
+        File executable = ProcessEnvironmentHelper.resolveExecutableFromToolInfo(executableName, toolInfo);
+        if (executable != null) {
+            return executable.getAbsolutePath();
+        } else {
+            return executableName;
         }
     }
 
