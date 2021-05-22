@@ -39,7 +39,7 @@
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <sonar-maven-plugin.version>3.8.0.2131</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     </properties>
 
