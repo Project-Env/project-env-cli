@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.projectenv.core</groupId>
+        <artifactId>code</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <groupId>io.projectenv.core.toolsupport</groupId>
+    <artifactId>tool-support-root</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>tool-support-spi</module>
+        <module>tool-support-commons</module>
+        <module>maven-support</module>
+        <module>jdk-support</module>
+        <module>nodejs-support</module>
+        <module>git-support</module>
+        <module>gradle-support</module>
+        <module>generic-tool-support</module>
+    </modules>
+
+</project>

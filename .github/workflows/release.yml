@@ -8,27 +8,66 @@ on:
         required: true
 
 jobs:
-  release:
+  create-release:
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.release.outputs.upload_url }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-    - run: |
-        curl -L https://github.com/Project-Env/project-env-shell/releases/download/0.0.7/project-env-shell-linux-amd64 -o project-env-cli
-        chmod +x ./project-env-cli
-        ./project-env-cli --config-file=project-env.yml --output-template=github-actions.peb --output-file=github-actions-env.sh
-        ./github-actions-env.sh
-    - run: mvn -B -s etc/m2/settings-ci.xml -Drevision=${{ github.event.inputs.version }} deploy
-      env:
-        GITHUB_USER: ${{ github.actor }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ github.event.inputs.version }}
-        release_name: v${{ github.event.inputs.version }}
+      - id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          release_name: v${{ github.event.inputs.version }}
+          draft: true
+  build:
+    runs-on: ${{ matrix.os }}
+    needs: create-release
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            cli_assembly_id: linux-amd64
+            cli_assembly_format: tar.gz
+            maven_phase: deploy
+          - os: windows-latest
+            cli_assembly_id: windows-amd64
+            cli_assembly_format: zip
+            maven_phase: package
+            gu_executable_ext: .cmd
+          - os: macos-latest
+            cli_assembly_id: macos-amd64
+            cli_assembly_format: tar.gz
+            maven_phase: package
+    steps:
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ matrix.os == 'windows-latest'}}
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - uses: DeLaGuardo/setup-graalvm@3.1
+        with:
+          graalvm-version: '21.1.0.java11'
+      - run: gu${{ matrix.gu_executable_ext }} install native-image
+      - uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+      - run: |
+          mvn -B -s etc/m2/settings-ci.xml ${{ matrix.maven_phase }} -Pnative-image "-Drevision=${{ github.event.inputs.version }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+        env:
+          GITHUB_USER: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_name: cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_content_type: application/octet-stream
+
