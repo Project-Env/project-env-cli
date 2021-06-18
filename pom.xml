@@ -27,7 +27,7 @@
         <jackson-databind.version>2.12.3</jackson-databind.version>
         <mbknor-jackson-jsonschema_2.13.version>1.0.39</mbknor-jackson-jsonschema_2.13.version>
         <system-lambda.version>1.2.0</system-lambda.version>
-        <slf4j-api.version>1.7.30</slf4j-api.version>
+        <slf4j-api.version>1.7.31</slf4j-api.version>
         <reflections.version>0.9.12</reflections.version>
 
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
