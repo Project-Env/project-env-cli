@@ -6,11 +6,16 @@ tools:
     toolName: "jdk"
     downloadUris:
       - targetOs: "MACOS"
-        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x64_mac_hotspot_11.0.9.1_1.tar.gz"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.1.0/graalvm-ce-java11-darwin-amd64-21.1.0.tar.gz"
       - targetOs: "WINDOWS"
-        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x86-32_windows_hotspot_11.0.9.1_1.zip"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.1.0/graalvm-ce-java11-windows-amd64-21.1.0.zip"
       - targetOs: "LINUX"
-        downloadUri: "https://github.com/AdoptOpenJDK/openjdk11-binaries/releases/download/jdk-11.0.9.1%2B1/OpenJDK11U-jdk_x64_linux_hotspot_11.0.9.1_1.tar.gz"
+        downloadUri: "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-21.1.0/graalvm-ce-java11-linux-amd64-21.1.0.tar.gz"
+    postExtractionCommands:
+      - executableName: "gu"
+        arguments:
+          - "install"
+          - "native-image"
 
   maven:
     toolName: "maven"

@@ -1,0 +1,29 @@
+tools_directory = ".tools"
+
+[jdk]
+java_version = "11"
+distribution = "GraalVM"
+distribution_version = "20.3.0"
+post_extraction_commands = [
+    "gu install native-image"
+]
+
+[maven]
+version = "3.6.3"
+global_settings_file = "settings.xml"
+user_settings_file = "settings-${USER}.xml"
+
+[gradle]
+version = "6.7.1"
+
+[nodejs]
+version = "14.15.3"
+post_extraction_commands = ["npm install -g yarn"]
+
+[git]
+hooks_directory = "hooks"
+
+[[generic]]
+download_url = "https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-ri/3.0.0/jaxb-ri-3.0.0.zip"
+environment_variables = { JAXB_HOME = "/" }
+path_elements = ["bin"]

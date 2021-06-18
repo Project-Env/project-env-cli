@@ -7,25 +7,37 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            gu_executable_ext: .cmd
+          - os: ubuntu-latest
+            sonar_profile: -Psonar
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v1
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
-    - uses: actions/cache@v1
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
-    - run: |
-        curl -L https://github.com/Project-Env/project-env-shell/releases/download/0.0.7/project-env-shell-linux-amd64 -o project-env-cli
-        chmod +x ./project-env-cli
-        ./project-env-cli --config-file=project-env.yml --output-template=github-actions.peb --output-file=github-actions-env.sh
-        ./github-actions-env.sh
-    - run: mvn -B -Psonar verify
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: ${{ matrix.os == 'windows-latest'}}
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - uses: DeLaGuardo/setup-graalvm@3.1
+        with:
+          graalvm-version: '21.1.0.java11'
+      - run: gu${{ matrix.gu_executable_ext }} install native-image
+      - uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+      - run: mvn -B ${{ matrix.sonar_profile }} -Pnative-image verify
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
