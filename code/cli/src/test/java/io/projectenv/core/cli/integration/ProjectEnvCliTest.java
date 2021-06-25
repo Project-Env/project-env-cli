@@ -1,7 +1,7 @@
 package io.projectenv.core.cli.integration;
 
 
-import io.projectenv.core.cli.ProjectEnv;
+import io.projectenv.core.cli.ProjectEnvCli;
 import org.assertj.core.api.Assertions;
 
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ProjectEnvTest extends AbstractProjectEnvTest {
+class ProjectEnvCliTest extends AbstractProjectEnvCliTest {
 
     @Override
     protected String executeProjectEnvShell(String... params) throws Exception {
@@ -30,7 +30,7 @@ class ProjectEnvTest extends AbstractProjectEnvTest {
     }
 
     private void executeProjectEnvCli(String... params) {
-        Assertions.assertThat(ProjectEnv.executeProjectEnvCli(params)).isZero();
+        Assertions.assertThat(ProjectEnvCli.executeProjectEnvCli(params)).isZero();
     }
 
 }

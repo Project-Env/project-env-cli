@@ -1,9 +1,7 @@
 package io.projectenv.core.cli.integration;
 
-import com.google.gson.reflect.TypeToken;
-import io.projectenv.core.cli.gson.BaseGsonBuilderFactory;
+import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.integration.assertions.*;
-import io.projectenv.core.toolsupport.api.ToolInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.SoftAssertions;
@@ -14,11 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
 
-abstract class AbstractProjectEnvTest {
+abstract class AbstractProjectEnvCliTest {
 
     @Test
     void executeProjectEnvShell(@TempDir File projectRoot) throws Exception {
@@ -50,7 +45,7 @@ abstract class AbstractProjectEnvTest {
         );
 
         var assertions = new SoftAssertions();
-        assertions.assertThat(parseOutput(output))
+        assertions.assertThat(ToolInfoParser.fromJson(output))
                 .containsOnlyKeys("gradle", "jdk", "nodejs", "git", "maven", "generic")
                 .hasEntrySatisfying("gradle", new GradleAssertions(assertions))
                 .hasEntrySatisfying("jdk", new JdkAssertions(assertions))
@@ -63,12 +58,5 @@ abstract class AbstractProjectEnvTest {
     }
 
     protected abstract String executeProjectEnvShell(String... params) throws Exception;
-
-    private Map<String, List<ToolInfo>> parseOutput(String output) {
-        Type toolInfosType = new TypeToken<Map<String, List<ToolInfo>>>() {
-        }.getType();
-
-        return BaseGsonBuilderFactory.createBaseGsonBuilder().create().fromJson(output, toolInfosType);
-    }
 
 }

@@ -1,6 +1,6 @@
 package io.projectenv.core.cli.integration.assertions;
 
-import io.projectenv.core.toolsupport.api.ToolInfo;
+import io.projectenv.core.cli.api.ToolInfo;
 import org.apache.commons.io.FilenameUtils;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;

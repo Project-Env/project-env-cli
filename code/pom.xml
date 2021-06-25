@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>api</module>
+        <module>cli-api</module>
         <module>cli</module>
         <module>tool-support</module>
         <module>process</module>

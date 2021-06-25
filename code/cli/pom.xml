@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>io.projectenv.core</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>cli-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -141,7 +141,7 @@
                         </executions>
                         <configuration>
                             <buildArgs>--enable-url-protocols=https --no-fallback</buildArgs>
-                            <mainClass>io.projectenv.core.cli.ProjectEnv</mainClass>
+                            <mainClass>io.projectenv.core.cli.ProjectEnvCli</mainClass>
                             <imageName>${cli.binary}</imageName>
                         </configuration>
                     </plugin>

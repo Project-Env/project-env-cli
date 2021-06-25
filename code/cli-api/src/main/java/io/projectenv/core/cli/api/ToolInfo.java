@@ -1,4 +1,4 @@
-package io.projectenv.core.toolsupport.api;
+package io.projectenv.core.cli.api;
 
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;

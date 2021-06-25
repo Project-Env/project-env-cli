@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ProjectEnvIT extends AbstractProjectEnvTest {
+class ProjectEnvCliIT extends AbstractProjectEnvCliTest {
 
     @Override
     protected String executeProjectEnvShell(String... params) throws Exception {

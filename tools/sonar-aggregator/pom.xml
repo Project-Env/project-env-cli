@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>io.projectenv.core</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>cli-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -1,7 +1,7 @@
 package io.projectenv.core.toolsupport.nodejs;
 
-import io.projectenv.core.toolsupport.api.ImmutableToolInfo;
-import io.projectenv.core.toolsupport.api.ToolInfo;
+import io.projectenv.core.cli.api.ImmutableToolInfo;
+import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.spi.ToolSupport;

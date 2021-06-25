@@ -1,6 +1,7 @@
 package io.projectenv.core.cli;
 
 import com.google.gson.Gson;
+import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.common.ServiceLoaderHelper;
 import io.projectenv.core.cli.common.ToolSupportHelper;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
@@ -8,7 +9,7 @@ import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
 import io.projectenv.core.cli.gson.BaseGsonBuilderFactory;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
 import io.projectenv.core.process.ProcessOutputWriterAccessor;
-import io.projectenv.core.toolsupport.api.ToolInfo;
+import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
@@ -22,12 +23,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-@Command(name = "project-env")
-public final class ProjectEnv implements Callable<Integer> {
-
-    private static final Gson GSON = BaseGsonBuilderFactory
-            .createBaseGsonBuilder()
-            .create();
+@Command(name = "project-env-cli")
+public final class ProjectEnvCli implements Callable<Integer> {
 
     @CommandLine.Option(names = {"--project-root"}, defaultValue = ".")
     protected File projectRoot;
@@ -56,7 +53,7 @@ public final class ProjectEnv implements Callable<Integer> {
     }
 
     public static int executeProjectEnvCli(String[] args) {
-        return new CommandLine(new ProjectEnv()).execute(args);
+        return new CommandLine(new ProjectEnvCli()).execute(args);
     }
 
     private ProjectEnvConfiguration readProjectEnvConfiguration() throws IOException {
@@ -113,7 +110,7 @@ public final class ProjectEnv implements Callable<Integer> {
     }
 
     private void writeOutput(Map<String, List<ToolInfo>> toolInfos) {
-        ProcessOutputWriterAccessor.getProcessResultWriter().write(GSON.toJson(toolInfos));
+        ProcessOutputWriterAccessor.getProcessResultWriter().write(ToolInfoParser.toJson(toolInfos));
     }
 
 }

@@ -1,7 +1,7 @@
 package io.projectenv.core.toolsupport.gradle;
 
-import io.projectenv.core.toolsupport.api.ImmutableToolInfo;
-import io.projectenv.core.toolsupport.api.ToolInfo;
+import io.projectenv.core.cli.api.ImmutableToolInfo;
+import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.toolsupport.commons.commands.ExecuteCommandStep;
 import io.projectenv.core.toolsupport.commons.commands.ExtractArchiveStep;
 import io.projectenv.core.toolsupport.commons.commands.RegisterMainExecutableStep;
