@@ -49,11 +49,9 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("mvn"));
 
-        if (StringUtils.isNotEmpty(toolConfiguration.getGlobalSettingsFile())) {
-            var globalSettingsFile = new File(context.getProjectRoot(), toolConfiguration.getGlobalSettingsFile());
-            if (globalSettingsFile.exists()) {
-                steps.add(new OverwriteFileStep(globalSettingsFile, "conf/settings.xml"));
-            }
+        var globalSettingsFile = toolConfiguration.getGlobalSettingsFile();
+        if (StringUtils.isNotEmpty(globalSettingsFile)) {
+                steps.add(new OverwriteFileStep(context.getProjectRoot(), globalSettingsFile, "conf/settings.xml"));
         }
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {

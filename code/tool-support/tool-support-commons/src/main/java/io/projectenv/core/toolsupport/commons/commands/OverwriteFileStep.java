@@ -14,17 +14,24 @@ import java.security.MessageDigest;
 
 public class OverwriteFileStep implements LocalToolInstallationStep {
 
-    private final File source;
+    private final File sourceRoot;
+    private final String rawSource;
     private final String rawTarget;
 
-    public OverwriteFileStep(File source, String rawTarget) {
-        this.source = source;
+    public OverwriteFileStep(File sourceRoot, String rawSource, String rawTarget) {
+        this.sourceRoot = sourceRoot;
+        this.rawSource = rawSource;
         this.rawTarget = rawTarget;
     }
 
     @Override
     public LocalToolInstallationDetails executeInstallStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
         try {
+            var source = new File(sourceRoot, rawSource);
+            if (!source.exists()) {
+                return intermediateInstallationDetails;
+            }
+
             var target = new File(intermediateInstallationDetails.getBinariesRoot().orElse(installationRoot), rawTarget);
             FileUtils.forceMkdirParent(target);
             FileUtils.copyFile(source, target);
@@ -45,7 +52,7 @@ public class OverwriteFileStep implements LocalToolInstallationStep {
 
     @Override
     public void updateChecksum(MessageDigest digest) {
-        digest.update(source.getPath().getBytes(StandardCharsets.UTF_8));
+        digest.update(rawSource.getBytes(StandardCharsets.UTF_8));
         digest.update(rawTarget.getBytes(StandardCharsets.UTF_8));
     }
 
