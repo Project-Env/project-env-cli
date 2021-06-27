@@ -78,7 +78,7 @@ public final class ProjectEnvCli implements Callable<Integer> {
 
     private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws ProjectEnvException {
         try {
-            var toolInstallationInfos = new HashMap<String, List<ToolInfo>>();
+            var toolInstallationInfos = new LinkedHashMap<String, List<ToolInfo>>();
             for (ToolSupport<?> toolSupport : ServiceLoaderHelper.loadService(ToolSupport.class)) {
                 List<ToolInfo> toolInfos = installOrUpdateTool(toolSupport, configuration, toolSupportContext);
                 if (!toolInfos.isEmpty()) {
