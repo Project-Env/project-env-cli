@@ -1,6 +1,6 @@
 package io.projectenv.core.toolsupport.jdk.download;
 
-import io.projectenv.core.toolsupport.commons.system.OperatingSystem;
+import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.jdk.ImmutableJdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.JdkConfiguration.JdkDistribution;
 import org.junit.jupiter.api.Test;

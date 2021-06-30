@@ -1,6 +1,6 @@
 package io.projectenv.core.toolsupport.commons.commands;
 
-import io.projectenv.core.toolsupport.commons.archive.ArchiveExtractorFactory;
+import io.projectenv.core.commons.archive.ArchiveExtractorFactory;
 import io.projectenv.core.toolsupport.spi.installation.ImmutableLocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;

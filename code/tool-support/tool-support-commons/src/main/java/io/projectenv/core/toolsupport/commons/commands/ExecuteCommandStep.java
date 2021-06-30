@@ -1,6 +1,6 @@
 package io.projectenv.core.toolsupport.commons.commands;
 
-import io.projectenv.core.process.ProcessHelper;
+import io.projectenv.core.commons.process.ProcessHelper;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStepException;

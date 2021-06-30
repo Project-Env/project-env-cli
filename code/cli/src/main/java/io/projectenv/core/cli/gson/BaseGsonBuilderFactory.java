@@ -1,14 +1,9 @@
 package io.projectenv.core.cli.gson;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-import io.projectenv.core.cli.common.ServiceLoaderHelper;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ServiceLoader;
 
 public final class BaseGsonBuilderFactory {
 
@@ -18,31 +13,11 @@ public final class BaseGsonBuilderFactory {
 
     public static GsonBuilder createBaseGsonBuilder() {
         var gsonBuilder = new GsonBuilder();
-        for (var factory : ServiceLoaderHelper.loadService(TypeAdapterFactory.class)) {
+        for (var factory : ServiceLoader.load(TypeAdapterFactory.class, TypeAdapterFactory.class.getClassLoader())) {
             gsonBuilder.registerTypeAdapterFactory(factory);
         }
 
-        gsonBuilder.registerTypeAdapter(File.class, new FileTypeAdapter());
-
         return gsonBuilder;
-    }
-
-    private static class FileTypeAdapter extends TypeAdapter<File> {
-
-        @Override
-        public void write(JsonWriter out, File value) throws IOException {
-            try {
-                out.value(value.getCanonicalPath());
-            } catch (IOException e) {
-                throw new IllegalStateException("cannot get canonical path from file");
-            }
-        }
-
-        @Override
-        public File read(JsonReader in) throws IOException {
-            return new File(in.nextString());
-        }
-
     }
 
 }

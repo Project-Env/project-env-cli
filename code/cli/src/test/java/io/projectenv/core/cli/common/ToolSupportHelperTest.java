@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.common;
 
+import io.projectenv.core.cli.ToolSupportHelper;
 import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;

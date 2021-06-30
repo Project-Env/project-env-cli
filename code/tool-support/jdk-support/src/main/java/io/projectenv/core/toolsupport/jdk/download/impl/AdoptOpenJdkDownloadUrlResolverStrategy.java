@@ -1,9 +1,9 @@
 package io.projectenv.core.toolsupport.jdk.download.impl;
 
-import io.projectenv.core.toolsupport.commons.download.DownloadUrlSubstitutorFactory;
-import io.projectenv.core.toolsupport.commons.download.ImmutableDownloadUrlDictionary;
-import io.projectenv.core.toolsupport.commons.system.CPUArchitecture;
-import io.projectenv.core.toolsupport.commons.system.OperatingSystem;
+import io.projectenv.core.commons.download.DownloadUrlSubstitutorFactory;
+import io.projectenv.core.commons.download.ImmutableDownloadUrlDictionary;
+import io.projectenv.core.commons.system.CPUArchitecture;
+import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.jdk.JdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverStrategy;
 

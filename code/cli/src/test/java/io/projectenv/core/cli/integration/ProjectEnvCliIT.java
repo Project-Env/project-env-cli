@@ -1,6 +1,6 @@
 package io.projectenv.core.cli.integration;
 
-import io.projectenv.core.process.ProcessHelper;
+import io.projectenv.core.commons.process.ProcessHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;

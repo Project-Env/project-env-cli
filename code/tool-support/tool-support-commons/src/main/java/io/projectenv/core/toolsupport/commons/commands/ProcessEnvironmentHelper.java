@@ -1,6 +1,6 @@
 package io.projectenv.core.toolsupport.commons.commands;
 
-import io.projectenv.core.toolsupport.commons.system.OperatingSystem;
+import io.projectenv.core.commons.system.OperatingSystem;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;

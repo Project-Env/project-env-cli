@@ -1,6 +1,6 @@
 package io.projectenv.core.cli.integration.assertions;
 
-import io.projectenv.core.toolsupport.commons.system.OperatingSystem;
+import io.projectenv.core.commons.system.OperatingSystem;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.OptionalAssert;

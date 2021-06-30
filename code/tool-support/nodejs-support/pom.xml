@@ -24,6 +24,11 @@
             <artifactId>tool-support-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.projectenv.core.commons</groupId>
+            <artifactId>string-substitutor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
