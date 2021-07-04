@@ -35,7 +35,7 @@ public final class ProcessHelper {
     public static void bindStdOutput(Process process) {
         new Thread(() -> {
             try (var scanner = new Scanner(process.getInputStream())) {
-                while (scanner.hasNextBigDecimal()) {
+                while (scanner.hasNextLine()) {
                     ProcessOutputWriterAccessor.getProcessInfoWriter().write(scanner.nextLine());
                 }
             }
@@ -45,7 +45,7 @@ public final class ProcessHelper {
     public static void bindErrOutput(Process process) {
         new Thread(() -> {
             try (var scanner = new Scanner(process.getErrorStream())) {
-                while (scanner.hasNextBigDecimal()) {
+                while (scanner.hasNextLine()) {
                     ProcessOutputWriterAccessor.getProcessInfoWriter().write(scanner.nextLine());
                 }
             }
