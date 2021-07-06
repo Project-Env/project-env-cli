@@ -274,7 +274,7 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <url>https://maven.pkg.github.com/Project-Env/project-env-core</url>
+            <url>https://maven.pkg.github.com/Project-Env/project-env-cli</url>
         </repository>
     </distributionManagement>
 
