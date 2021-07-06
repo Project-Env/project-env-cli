@@ -4,6 +4,7 @@ import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Optional;
 
 @Gson.TypeAdapters(fieldNamingStrategy = true)
 @Value.Immutable
@@ -11,9 +12,9 @@ public interface MavenConfiguration {
 
     String getVersion();
 
-    String getGlobalSettingsFile();
+    Optional<String> getGlobalSettingsFile();
 
-    String getUserSettingsFile();
+    Optional<String> getUserSettingsFile();
 
     List<String> getPostExtractionCommands();
 

@@ -9,11 +9,9 @@ import io.projectenv.core.toolsupport.spi.ToolSupportException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationManagerException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,10 +47,9 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("mvn"));
 
-        var globalSettingsFile = toolConfiguration.getGlobalSettingsFile();
-        if (StringUtils.isNotEmpty(globalSettingsFile)) {
-                steps.add(new OverwriteFileStep(context.getProjectRoot(), globalSettingsFile, "conf/settings.xml"));
-        }
+        toolConfiguration
+                .getGlobalSettingsFile()
+                .ifPresent(s -> steps.add(new OverwriteFileStep(context.getProjectRoot(), s, "conf/settings.xml")));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
             steps.add(new ExecuteCommandStep(rawPostExtractionCommand));
@@ -62,9 +59,7 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
     }
 
     private String getSystemSpecificDownloadUri(MavenConfiguration toolConfiguration) {
-        String version = toolConfiguration.getVersion();
-
-        return MessageFormat.format("https://downloads.apache.org/maven/maven-3/{0}/binaries/apache-maven-{0}-bin.tar.gz", version);
+        return MavenDownloadUrlResolver.resolveUrl(toolConfiguration.getVersion());
     }
 
     private ToolInfo createProjectEnvToolInfo(MavenConfiguration toolConfiguration,
@@ -80,12 +75,14 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
                         .stream().map(Pair::getLeft)
                         .collect(Collectors.toList()));
 
-        if (StringUtils.isNotEmpty(toolConfiguration.getUserSettingsFile())) {
-            var userSettingsFile = new File(context.getProjectRoot(), toolConfiguration.getUserSettingsFile());
-            if (userSettingsFile.exists()) {
-                builder.putUnhandledProjectResources("userSettingsFile", userSettingsFile);
-            }
-        }
+        toolConfiguration
+                .getUserSettingsFile()
+                .ifPresent(value -> {
+                    var userSettingsFile = new File(context.getProjectRoot(), value);
+                    if (userSettingsFile.exists()) {
+                        builder.putUnhandledProjectResources("userSettingsFile", userSettingsFile);
+                    }
+                });
 
         return builder.build();
     }
