@@ -13,6 +13,20 @@
 
     <artifactId>process</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.projectenv.core.commons</groupId>
+            <artifactId>system</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

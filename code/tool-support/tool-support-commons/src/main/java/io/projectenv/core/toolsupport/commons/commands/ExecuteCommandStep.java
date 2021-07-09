@@ -1,5 +1,6 @@
 package io.projectenv.core.toolsupport.commons.commands;
 
+import io.projectenv.core.commons.process.ProcessEnvironmentHelper;
 import io.projectenv.core.commons.process.ProcessHelper;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
@@ -24,7 +25,7 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
     @Override
     public LocalToolInstallationDetails executeInstallStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
         try {
-            var processEnvironment = ProcessEnvironmentHelper.createProcessEnvironmentFromToolInfo(
+            var processEnvironment = ProcessEnvironmentHelper.createProcessEnvironment(
                     intermediateInstallationDetails.getEnvironmentVariables(),
                     intermediateInstallationDetails.getPathElements());
 
@@ -42,7 +43,7 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
             processBuilder.command().addAll(parameters);
             processBuilder.directory(intermediateInstallationDetails.getBinariesRoot().orElse(installationRoot));
 
-            ProcessHelper.startAndWaitFor(processBuilder);
+            ProcessHelper.executeProcess(processBuilder);
 
             return intermediateInstallationDetails;
         } catch (IOException e) {
