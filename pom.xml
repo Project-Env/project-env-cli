@@ -33,7 +33,7 @@
         <commons-collections4.version>4.4</commons-collections4.version>
         <xz.version>1.9</xz.version>
         <junit-jupiter.version>5.7.2</junit-jupiter.version>
-        <assertj-core.version>3.20.1</assertj-core.version>
+        <assertj-core.version>3.20.2</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
         <commons-text.version>1.9</commons-text.version>
         <picocli.version>4.6.1</picocli.version>
@@ -42,7 +42,7 @@
         <reflections.version>0.9.11</reflections.version>
         <system-lambda.version>1.2.0</system-lambda.version>
         <log4j.version>2.14.1</log4j.version>
-        <mockito-inline.version>3.11.1</mockito-inline.version>
+        <mockito-inline.version>3.11.2</mockito-inline.version>
 
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -54,7 +54,7 @@
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
     </properties>
