@@ -15,6 +15,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessInfoWriter;
+
 public class DefaultLocalToolInstallationManager implements LocalToolInstallationManager {
 
     private static final String DEFAULT_LOCK_FILENAME = ".lock";
@@ -28,33 +30,48 @@ public class DefaultLocalToolInstallationManager implements LocalToolInstallatio
 
     @Override
     public LocalToolInstallationDetails installOrUpdateTool(String toolName, List<LocalToolInstallationStep> localToolInstallationSteps) throws LocalToolInstallationManagerException {
+        var toolIdentifier = createToolIdentifier(toolName, localToolInstallationSteps);
+        var toolInstallationRoot = resolveToolInstallationRoot(toolIdentifier);
+
         try (var ignored = tryAcquireLockFile()) {
-            var toolIdentifier = createToolIdentifier(toolName, localToolInstallationSteps);
-            var toolInstallationRoot = resolveToolInstallationRoot(toolIdentifier);
             if (toolInstallationRoot.exists()) {
                 return updateTool(toolInstallationRoot, localToolInstallationSteps);
             } else {
                 FileUtils.forceMkdir(toolInstallationRoot);
                 return installTool(toolInstallationRoot, localToolInstallationSteps);
             }
-        } catch (NoSuchAlgorithmException | IOException | LocalToolInstallationStepException | TimeoutException e) {
-            throw new LocalToolInstallationManagerException("failed to install tool", e);
+        } catch (IOException | LocalToolInstallationStepException | TimeoutException e) {
+            cleanUpFailedToolInstallation(toolInstallationRoot);
+
+            throw new LocalToolInstallationManagerException("failed to install tool " + toolName, e);
         }
     }
 
-    private String createToolIdentifier(String toolName, List<LocalToolInstallationStep> localToolInstallationSteps) throws NoSuchAlgorithmException {
-        var messageDigest = MessageDigest.getInstance("SHA-256");
-        for (var installationStep : localToolInstallationSteps) {
-            installationStep.updateChecksum(messageDigest);
+    private void cleanUpFailedToolInstallation(File toolInstallationRoot) {
+        try {
+            FileUtils.forceDelete(toolInstallationRoot);
+        } catch (IOException e) {
+            getProcessInfoWriter().write("failed to delete tool installation directory {0}: {1}", toolInstallationRoot.getAbsolutePath(), e.getMessage());
         }
+    }
 
-        var toolInstallationChecksum = Base64.getEncoder()
-                .withoutPadding()
-                .encodeToString(messageDigest.digest())
-                .replace("/", "_")
-                .replace("+", "-");
+    private String createToolIdentifier(String toolName, List<LocalToolInstallationStep> localToolInstallationSteps) {
+        try {
+            var messageDigest = MessageDigest.getInstance("SHA-256");
+            for (var installationStep : localToolInstallationSteps) {
+                installationStep.updateChecksum(messageDigest);
+            }
 
-        return MessageFormat.format("{0}-{1}", toolName, toolInstallationChecksum);
+            var toolInstallationChecksum = Base64.getEncoder()
+                    .withoutPadding()
+                    .encodeToString(messageDigest.digest())
+                    .replace("/", "_")
+                    .replace("+", "-");
+
+            return MessageFormat.format("{0}-{1}", toolName, toolInstallationChecksum);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private File resolveToolInstallationRoot(String toolIdentifier) {
