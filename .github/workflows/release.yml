@@ -74,7 +74,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
           /usr/bin/codesign --force -s $APPLE_IDENTITY code/cli/target/project-env-cli -v
           security delete-keychain $KEY_CHAIN_NAME
-          tar -czf code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }} code/cli/target/project-env-cli
+          cd code/cli/target && tar -czf cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }} project-env-cli
         env:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
