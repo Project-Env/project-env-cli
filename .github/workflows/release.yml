@@ -62,6 +62,25 @@ jobs:
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sign executable
+        if: ${{ matrix.os == 'macos-latest'}}
+        run: |
+          security delete-keychain $KEY_CHAIN_NAME || true
+          security create-keychain -p $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
+          security default-keychain -s $KEY_CHAIN_NAME
+          security unlock-keychain -p $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
+          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
+          security import certificate.p12 -k $KEY_CHAIN_NAME -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
+          /usr/bin/codesign --force -s $APPLE_IDENTITY code/cli/target/project-env-cli -v
+          security delete-keychain $KEY_CHAIN_NAME
+          tar -czf code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }} code/cli/target/project-env-cli
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
+          KEY_CHAIN_PASSWORD: password
+          KEY_CHAIN_NAME: project-env.keychain
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
