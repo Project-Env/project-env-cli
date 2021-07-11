@@ -12,8 +12,6 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         include:
-          - os: windows-latest
-            gu_executable_ext: .cmd
           - os: ubuntu-latest
             sonar_profile: -Psonar
     steps:
@@ -30,13 +28,9 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: DeLaGuardo/setup-graalvm@3.1
+      - uses: Project-Env/project-env-github-action@1.0.0
         with:
-          graalvm-version: '21.1.0.java11'
-      - run: gu${{ matrix.gu_executable_ext }} install native-image
-      - uses: stCarolas/setup-maven@v4
-        with:
-          maven-version: 3.6.3
+          cli-version: '3.0.4'
       - run: mvn -B ${{ matrix.sonar_profile }} -Pnative-image verify
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
