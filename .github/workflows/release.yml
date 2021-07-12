@@ -26,7 +26,7 @@ jobs:
     needs: create-release
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
           - os: ubuntu-latest
             cli_assembly_id: linux-amd64
@@ -58,25 +58,19 @@ jobs:
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Sign executable
+      - name: Sign and notarize executable
         if: ${{ matrix.os == 'macos-latest'}}
-        run: |
-          security delete-keychain $KEY_CHAIN_NAME || true
-          security create-keychain -p $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
-          security default-keychain -s $KEY_CHAIN_NAME
-          security unlock-keychain -p $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
-          echo $APPLE_CERTIFICATE | base64 --decode > certificate.p12
-          security import certificate.p12 -k $KEY_CHAIN_NAME -P $APPLE_CERTIFICATE_PASSWORD -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEY_CHAIN_PASSWORD $KEY_CHAIN_NAME
-          /usr/bin/codesign --force -s $APPLE_IDENTITY code/cli/target/project-env-cli -v
-          security delete-keychain $KEY_CHAIN_NAME
-          cd code/cli/target && tar -czf cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }} project-env-cli
+        run: etc/github-actions/sign-and-notarize-executable.sh
         env:
+          EXECUTABLE_PATH: code/cli/target/project-env-cli
+          EXECUTABLE_PACKAGE_PATH: code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          EXECUTABLE_ID: io.projectenv.core.cli
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_ID_TEAM: ${{ secrets.APPLE_ID_TEAM }}
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
-          KEY_CHAIN_PASSWORD: password
-          KEY_CHAIN_NAME: project-env.keychain
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
