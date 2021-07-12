@@ -13,18 +13,18 @@ security import certificate.p12 -k "$KEY_CHAIN_NAME" -P "$APPLE_CERTIFICATE_PASS
 security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEY_CHAIN_PASSWORD" "$KEY_CHAIN_NAME"
 
 # sign the executable
-codesign --force --deep --options=runtime -s "$APPLE_IDENTITY" "$EXECUTABLE_PATH" -v
+codesign --force --deep --options=runtime -s "$APPLE_IDENTITY" "$EXECUTABLE_NAME" -v
 security delete-keychain "$KEY_CHAIN_NAME"
 
 # upload the signed executable to the notarization service
-ditto -c -k "$EXECUTABLE_PATH" "$EXECUTABLE_PATH".zip
+ditto -c -k "$EXECUTABLE_NAME" "$EXECUTABLE_NAME".zip
 xcrun altool --notarize-app \
   --primary-bundle-id="$EXECUTABLE_ID" \
-  --file="$EXECUTABLE_PATH".zip \
+  --file="$EXECUTABLE_NAME".zip \
   --username="$APPLE_ID" \
   --password="$APPLE_ID_PASSWORD" \
   --asc-provider="$APPLE_ID_TEAM"
-rm "$EXECUTABLE_PATH".zip
+rm "$EXECUTABLE_NAME".zip
 
 # update the package with the signed executable
-rm "$EXECUTABLE_PACKAGE_PATH" && tar -czf "$EXECUTABLE_PACKAGE_PATH" "$EXECUTABLE_PATH"
+rm "$EXECUTABLE_PACKAGE_NAME" && tar -czf "$EXECUTABLE_PACKAGE_NAME" "$EXECUTABLE_NAME"

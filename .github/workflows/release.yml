@@ -60,10 +60,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Sign and notarize executable
         if: ${{ matrix.os == 'macos-latest'}}
-        run: etc/github-actions/sign-and-notarize-executable.sh
+        run: ../../../etc/github-actions/sign-and-notarize-executable.sh
+        working-directory: code/cli/target
         env:
-          EXECUTABLE_PATH: code/cli/target/project-env-cli
-          EXECUTABLE_PACKAGE_PATH: code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          EXECUTABLE_NAME: project-env-cli
+          EXECUTABLE_PACKAGE_NAME: cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           EXECUTABLE_ID: io.projectenv.core.cli
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
