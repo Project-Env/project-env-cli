@@ -52,7 +52,7 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
                 .ifPresent(s -> steps.add(new OverwriteFileStep(context.getProjectRoot(), s, "conf/settings.xml")));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
-            steps.add(new ExecuteCommandStep(rawPostExtractionCommand));
+            steps.add(new ExecuteCommandStep(rawPostExtractionCommand, context.getProjectRoot()));
         }
 
         return steps;

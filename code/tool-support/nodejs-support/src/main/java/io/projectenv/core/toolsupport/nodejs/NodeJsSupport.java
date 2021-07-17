@@ -39,7 +39,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
 
     private LocalToolInstallationDetails installTool(NodeJsConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         try {
-            var steps = createInstallationSteps(toolConfiguration);
+            var steps = createInstallationSteps(toolConfiguration, context);
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
@@ -47,7 +47,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
         }
     }
 
-    private List<LocalToolInstallationStep> createInstallationSteps(NodeJsConfiguration toolConfiguration) {
+    private List<LocalToolInstallationStep> createInstallationSteps(NodeJsConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
@@ -61,7 +61,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
         steps.add(new RegisterMainExecutableStep("node"));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
-            steps.add(new ExecuteCommandStep(rawPostExtractionCommand));
+            steps.add(new ExecuteCommandStep(rawPostExtractionCommand, context.getProjectRoot()));
         }
 
         return steps;

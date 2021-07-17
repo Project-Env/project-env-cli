@@ -35,7 +35,7 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
 
     private LocalToolInstallationDetails installTool(GradleConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         try {
-            var steps = createInstallationSteps(toolConfiguration);
+            var steps = createInstallationSteps(toolConfiguration, context);
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
@@ -43,7 +43,7 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
         }
     }
 
-    private List<LocalToolInstallationStep> createInstallationSteps(GradleConfiguration toolConfiguration) {
+    private List<LocalToolInstallationStep> createInstallationSteps(GradleConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
@@ -51,7 +51,7 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
         steps.add(new RegisterMainExecutableStep("gradle"));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
-            steps.add(new ExecuteCommandStep(rawPostExtractionCommand));
+            steps.add(new ExecuteCommandStep(rawPostExtractionCommand, context.getProjectRoot()));
         }
 
         return steps;

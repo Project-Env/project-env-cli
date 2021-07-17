@@ -16,10 +16,14 @@ import java.util.List;
 
 public class ExecuteCommandStep implements LocalToolInstallationStep {
 
-    private final String rawCommand;
+    private static final String PROJECT_ENV_TOOL_ROOT = "PROJECT_ENV_TOOL_ROOT";
 
-    public ExecuteCommandStep(String rawCommand) {
+    private final String rawCommand;
+    private final File workingDirectory;
+
+    public ExecuteCommandStep(String rawCommand, File workingDirectory) {
         this.rawCommand = rawCommand;
+        this.workingDirectory = workingDirectory;
     }
 
     @Override
@@ -39,9 +43,10 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
 
             var processBuilder = new ProcessBuilder();
             processBuilder.environment().putAll(processEnvironment);
+            processBuilder.environment().put(PROJECT_ENV_TOOL_ROOT, getProjectEnvToolRoot(installationRoot, intermediateInstallationDetails));
             processBuilder.command().add(resolveExecutable(executable, intermediateInstallationDetails.getPathElements()));
             processBuilder.command().addAll(parameters);
-            processBuilder.directory(intermediateInstallationDetails.getBinariesRoot().orElse(installationRoot));
+            processBuilder.directory(workingDirectory);
 
             ProcessHelper.executeProcess(processBuilder);
 
@@ -50,9 +55,8 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
             throw new LocalToolInstallationStepException("failed to execute step", e);
         }
     }
-
     @Override
-    public LocalToolInstallationDetails executeUpdateStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
+    public LocalToolInstallationDetails executeUpdateStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) {
         return intermediateInstallationDetails;
     }
 
@@ -75,6 +79,10 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
         } else {
             return executableName;
         }
+    }
+
+    private String getProjectEnvToolRoot(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws IOException {
+        return intermediateInstallationDetails.getBinariesRoot().orElse(installationRoot).getCanonicalPath();
     }
 
     @Override

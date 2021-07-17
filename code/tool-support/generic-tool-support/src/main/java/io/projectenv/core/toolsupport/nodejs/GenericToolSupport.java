@@ -32,7 +32,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
 
     private LocalToolInstallationDetails installTool(GenericToolConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         try {
-            var steps = createInstallationSteps(toolConfiguration);
+            var steps = createInstallationSteps(toolConfiguration, context);
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
@@ -40,7 +40,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
         }
     }
 
-    private List<LocalToolInstallationStep> createInstallationSteps(GenericToolConfiguration toolConfiguration) {
+    private List<LocalToolInstallationStep> createInstallationSteps(GenericToolConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
@@ -56,7 +56,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
         toolConfiguration.getPrimaryExecutable().ifPresent(s -> steps.add(new RegisterMainExecutableStep(s)));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
-            steps.add(new ExecuteCommandStep(rawPostExtractionCommand));
+            steps.add(new ExecuteCommandStep(rawPostExtractionCommand, context.getProjectRoot()));
         }
 
         return steps;
