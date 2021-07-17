@@ -13,19 +13,24 @@ import io.projectenv.core.toolsupport.spi.ToolSupportException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
+import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessInfoWriter;
+import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessResultWriter;
+import static picocli.CommandLine.ExitCode;
+
 @Command(name = "project-env-cli")
 public final class ProjectEnvCli implements Callable<Integer> {
 
-    @CommandLine.Option(names = {"--project-root"}, defaultValue = ".")
+    @Option(names = {"--project-root"}, defaultValue = ".")
     protected File projectRoot;
 
-    @CommandLine.Option(names = {"--config-file"}, required = true)
+    @Option(names = {"--config-file"}, required = true)
     protected File configFile;
 
     @Override
@@ -35,12 +40,12 @@ public final class ProjectEnvCli implements Callable<Integer> {
             var toolInfos = installOrUpdateTools(configuration);
             writeOutput(toolInfos);
 
-            return CommandLine.ExitCode.OK;
+            return ExitCode.OK;
         } catch (Exception e) {
             var rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
 
-            ProcessOutputWriterAccessor.getProcessInfoWriter().write("failed to install tools: {0}", rootCauseMessage);
-            return CommandLine.ExitCode.SOFTWARE;
+            getProcessInfoWriter().write("failed to install tools: {0}", rootCauseMessage);
+            return ExitCode.SOFTWARE;
         }
     }
 
@@ -56,14 +61,18 @@ public final class ProjectEnvCli implements Callable<Integer> {
         return TomlConfigurationFactory.fromFile(configFile);
     }
 
-    private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration) throws ProjectEnvException {
+    private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration) throws IOException {
         var toolSupportContext = createToolSupportContext(configuration);
 
         return installOrUpdateTools(configuration, toolSupportContext);
     }
 
-    private ToolSupportContext createToolSupportContext(ProjectEnvConfiguration configuration) {
+    private ToolSupportContext createToolSupportContext(ProjectEnvConfiguration configuration) throws IOException {
         var toolsDirectory = new File(projectRoot, configuration.getToolsDirectory());
+        if (!toolsDirectory.getCanonicalPath().startsWith(projectRoot.getCanonicalPath())) {
+            throw new IllegalArgumentException("tools root must be located in project root");
+        }
+
         var localToolInstallationManager = new DefaultLocalToolInstallationManager(toolsDirectory);
 
         return ImmutableToolSupportContext.builder()
@@ -97,7 +106,7 @@ public final class ProjectEnvCli implements Callable<Integer> {
 
         var toolInfos = new ArrayList<ToolInfo>();
         for (var toolConfiguration : toolConfigurations) {
-            ProcessOutputWriterAccessor.getProcessInfoWriter().write("installing {0}...", toolSupport.getToolIdentifier());
+            getProcessInfoWriter().write("installing {0}...", toolSupport.getToolIdentifier());
 
             toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
         }
@@ -106,7 +115,7 @@ public final class ProjectEnvCli implements Callable<Integer> {
     }
 
     private void writeOutput(Map<String, List<ToolInfo>> toolInfos) {
-        ProcessOutputWriterAccessor.getProcessResultWriter().write(ToolInfoParser.toJson(toolInfos));
+        getProcessResultWriter().write(ToolInfoParser.toJson(toolInfos));
     }
 
 }
