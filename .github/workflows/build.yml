@@ -11,9 +11,6 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        include:
-          - os: ubuntu-latest
-            sonar_profile: -Psonar
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
@@ -31,7 +28,12 @@ jobs:
       - uses: Project-Env/project-env-github-action@v1.0.0
         with:
           cli-version: '3.0.4'
-      - run: mvn -B ${{ matrix.sonar_profile }} -Pnative-image verify
+      - run: mvn -B -Psonar -Pnative-image verify
+        if: ${{ matrix.os == 'ubuntu-latest' && github.actor != 'dependabot[bot]' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - run: mvn -B -Pnative-image verify
+        if: ${{ matrix.os != 'ubuntu-latest' || github.actor == 'dependabot[bot]' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
