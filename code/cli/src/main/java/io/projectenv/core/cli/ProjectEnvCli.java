@@ -5,7 +5,6 @@ import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
-import io.projectenv.core.commons.process.ProcessOutputWriterAccessor;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
@@ -28,10 +27,10 @@ import static picocli.CommandLine.ExitCode;
 public final class ProjectEnvCli implements Callable<Integer> {
 
     @Option(names = {"--project-root"}, defaultValue = ".")
-    protected File projectRoot;
+    private File projectRoot;
 
     @Option(names = {"--config-file"}, required = true)
-    protected File configFile;
+    private File configFile;
 
     @Override
     public Integer call() {

@@ -8,12 +8,9 @@ import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.SoftAssertions;
 
 import java.io.File;
-import java.util.List;
 import java.util.function.Consumer;
 
-import static org.assertj.core.api.InstanceOfAssertFactories.*;
-
-public abstract class AbstractToolInfoAssertions implements Consumer<List<ToolInfo>> {
+public abstract class AbstractToolInfoAssertions implements Consumer<ToolInfo> {
 
     private final SoftAssertions assertions;
 
@@ -22,15 +19,13 @@ public abstract class AbstractToolInfoAssertions implements Consumer<List<ToolIn
     }
 
     @Override
-    public void accept(List<ToolInfo> toolInfo) {
-        var toolInfoAssert = assertions.assertThat(toolInfo).singleElement();
-
-        assertToolBinariesRoot(toolInfoAssert.extracting(ToolInfo::getToolBinariesRoot, optional(File.class)));
-        assertPrimaryExecutable(toolInfoAssert.extracting(ToolInfo::getPrimaryExecutable, optional(File.class)));
-        assertEnvironmentVariables(toolInfoAssert.extracting(ToolInfo::getEnvironmentVariables, map(String.class, File.class)));
-        assertPathElements(toolInfoAssert.extracting(ToolInfo::getPathElements, list(File.class)));
-        assertHandledProjectResources(toolInfoAssert.extracting(ToolInfo::getHandledProjectResources, list(File.class)));
-        assertUnhandledProjectResources(toolInfoAssert.extracting(ToolInfo::getUnhandledProjectResources, map(String.class, File.class)));
+    public void accept(ToolInfo toolInfo) {
+        assertToolBinariesRoot(assertions.assertThat(toolInfo.getToolBinariesRoot()));
+        assertPrimaryExecutable(assertions.assertThat(toolInfo.getPrimaryExecutable()));
+        assertEnvironmentVariables(assertions.assertThat(toolInfo.getEnvironmentVariables()));
+        assertPathElements(assertions.assertThat(toolInfo.getPathElements()));
+        assertHandledProjectResources(assertions.assertThat(toolInfo.getHandledProjectResources()));
+        assertUnhandledProjectResources(assertions.assertThat(toolInfo.getUnhandledProjectResources()));
     }
 
     protected abstract void assertToolBinariesRoot(OptionalAssert<File> assertions);

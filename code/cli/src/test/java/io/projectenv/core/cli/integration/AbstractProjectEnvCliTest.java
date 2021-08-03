@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.integration;
 
+import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.integration.assertions.*;
 import org.apache.commons.io.FileUtils;
@@ -12,6 +13,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 
 abstract class AbstractProjectEnvCliTest {
 
@@ -44,16 +47,22 @@ abstract class AbstractProjectEnvCliTest {
                 "--project-root=" + projectRoot.getAbsolutePath()
         );
 
-        var assertions = new SoftAssertions();
-        assertions.assertThat(ToolInfoParser.fromJson(output))
-                .containsOnlyKeys("gradle", "jdk", "nodejs", "git", "maven", "generic")
-                .hasEntrySatisfying("gradle", new GradleAssertions(assertions))
-                .hasEntrySatisfying("jdk", new JdkAssertions(assertions))
-                .hasEntrySatisfying("nodejs", new NodeJsAssertions(assertions))
-                .hasEntrySatisfying("git", new GitAssertions(assertions))
-                .hasEntrySatisfying("maven", new MavenAssertions(assertions))
-                .hasEntrySatisfying("generic", new JaxbRiAssertions(assertions));
+        var result = ToolInfoParser.fromJson(output);
 
+        var assertions = new SoftAssertions();
+        assertions.assertThat(result).containsOnlyKeys("gradle", "jdk", "nodejs", "git", "maven", "generic");
+        assertions.assertThat(result).extractingByKey("gradle", list(ToolInfo.class))
+                .hasSize(1).allSatisfy(new GradleAssertions(assertions));
+        assertions.assertThat(result).extractingByKey("jdk", list(ToolInfo.class))
+                .hasSize(1).allSatisfy(new JdkAssertions(assertions));
+        assertions.assertThat(result).extractingByKey("nodejs", list(ToolInfo.class))
+                .hasSize(1).allSatisfy(new NodeJsAssertions(assertions));
+        assertions.assertThat(result).extractingByKey("git", list(ToolInfo.class))
+                .hasSize(1).allSatisfy(new GitAssertions(assertions));
+        assertions.assertThat(result).extractingByKey("maven", list(ToolInfo.class))
+                .hasSize(1).allSatisfy(new MavenAssertions(assertions));
+        assertions.assertThat(result).extractingByKey("generic", list(ToolInfo.class))
+                .hasSize(2).anySatisfy(new JaxbRiAssertions(assertions)).anySatisfy(new MongoDbToolsAssertions(assertions));
         assertions.assertAll();
     }
 

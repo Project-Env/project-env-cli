@@ -2,8 +2,8 @@ package io.projectenv.core.toolsupport.nodejs;
 
 import io.projectenv.core.cli.api.ImmutableToolInfo;
 import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportException;
@@ -65,7 +65,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
     private String getSystemSpecificDownloadUri(GenericToolConfiguration toolConfiguration) {
         return toolConfiguration.getDownloadUrls()
                 .stream()
-                .filter(downloadUrlConfiguration -> downloadUrlConfiguration.getTargetOS() == OperatingSystem.getCurrentOperatingSystem())
+                .filter(downloadUrlConfiguration -> downloadUrlConfiguration.getTargetOs() == OperatingSystem.getCurrentOperatingSystem())
                 .findFirst()
                 .map(GenericToolConfiguration.DownloadUrlConfiguration::getDownloadUrl)
                 .or(toolConfiguration::getDownloadUrl)

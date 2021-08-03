@@ -27,3 +27,11 @@ hooks_directory = "hooks"
 download_url = "https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-ri/3.0.0/jaxb-ri-3.0.0.zip"
 environment_variables = { JAXB_HOME = "/" }
 path_elements = ["bin"]
+
+[[generic]]
+download_urls = [
+    { target_os = "macos", download_url = "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-macos-x86_64-100.4.1.zip" },
+    { target_os = "windows", download_url = "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-windows-x86_64-100.4.1.zip" },
+    { target_os = "linux", download_url = "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.4.1.tgz" }
+]
+path_elements = ["bin"]

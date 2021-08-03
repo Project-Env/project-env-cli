@@ -14,6 +14,7 @@ public class ArchiveAccessorFactory {
 
     private static final Map<String, ArchiveSpecificAccessorFactory> FACTORIES = Map.of(
             ".tar.gz", ArchiveAccessorFactory::createTarGzArchiveAccessor,
+            ".tgz", ArchiveAccessorFactory::createTarGzArchiveAccessor,
             ".tar.xz", ArchiveAccessorFactory::createTarXzArchiveAccessor,
             ".tar", ArchiveAccessorFactory::createTarArchiveAccessor,
             ".zip", ArchiveAccessorFactory::createZipArchiveAccessor

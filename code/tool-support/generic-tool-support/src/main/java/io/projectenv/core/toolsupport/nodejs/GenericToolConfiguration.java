@@ -24,11 +24,13 @@ public interface GenericToolConfiguration {
 
     List<String> getPostExtractionCommands();
 
+    @Gson.TypeAdapters(fieldNamingStrategy = true)
+    @Value.Immutable
     interface DownloadUrlConfiguration {
 
         String getDownloadUrl();
 
-        OperatingSystem getTargetOS();
+        OperatingSystem getTargetOs();
 
     }
 
