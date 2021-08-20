@@ -21,6 +21,8 @@ public interface JdkConfiguration {
     enum JdkDistribution {
         @SerializedName("AdoptOpenJDK")
         ADOPTOPENJDK,
+        @SerializedName("Adoptium")
+        ADOPTIUM,
         @SerializedName("GraalVM")
         GRAALVM
     }
