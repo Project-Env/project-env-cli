@@ -1,19 +1,23 @@
 package io.projectenv.core.toolsupport.jdk.download.impl;
 
-import io.projectenv.core.commons.download.DownloadUrlSubstitutorFactory;
+import io.projectenv.core.commons.download.DownloadUrlDictionary;
 import io.projectenv.core.commons.download.ImmutableDownloadUrlDictionary;
 import io.projectenv.core.commons.system.CPUArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.jdk.JdkConfiguration;
-import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverStrategy;
 
 import java.util.Map;
 
-public class GraalVmDownloadUrlResolverStrategy implements JdkDownloadUrlResolverStrategy {
+public class GraalVmDownloadUrlResolverStrategy extends AbstractJdkDownloadUrlResolverStrategy {
+    
+    @Override
+    protected String getDownloadUrlPattern(JdkConfiguration jdkConfiguration) {
+        return "https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${DISTRIBUTION_VERSION}/graalvm-ce-java${JAVA_VERSION}-${OS}-${CPU_ARCH}-${DISTRIBUTION_VERSION}.${FILE_EXT}";
+    }
 
     @Override
-    public String resolveUrl(JdkConfiguration jdkConfiguration) {
-        var dictionary = ImmutableDownloadUrlDictionary.builder()
+    protected DownloadUrlDictionary getDownloadUrlDictionary(JdkConfiguration jdkConfiguration) {
+        return ImmutableDownloadUrlDictionary.builder()
                 .putParameters("JAVA_VERSION", jdkConfiguration.getJavaVersion())
                 .putParameters("DISTRIBUTION_VERSION", jdkConfiguration.getDistributionVersion())
                 .putOperatingSystemSpecificParameters("OS", Map.of(
@@ -30,10 +34,6 @@ public class GraalVmDownloadUrlResolverStrategy implements JdkDownloadUrlResolve
                         CPUArchitecture.X64, "amd64"
                 ))
                 .build();
-
-        return DownloadUrlSubstitutorFactory
-                .createDownloadUrlVariableSubstitutor(dictionary)
-                .replace("https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${DISTRIBUTION_VERSION}/graalvm-ce-java${JAVA_VERSION}-${OS}-${CPU_ARCH}-${DISTRIBUTION_VERSION}.${FILE_EXT}");
     }
 
 }

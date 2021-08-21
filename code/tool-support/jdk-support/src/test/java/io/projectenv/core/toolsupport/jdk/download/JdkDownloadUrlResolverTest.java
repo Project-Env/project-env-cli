@@ -40,6 +40,21 @@ class JdkDownloadUrlResolverTest {
         assertResolveUrlReturnsValidUrlForAllOS(JdkDistribution.ADOPTOPENJDK, "16", "16.0.1+9");
     }
 
+    @Test
+    void testAdoptiumVersion8() throws IOException {
+        assertResolveUrlReturnsValidUrlForAllOS(JdkDistribution.ADOPTIUM, "8", "8u302-b08");
+    }
+
+    @Test
+    void testAdoptiumVersion11() throws IOException {
+        assertResolveUrlReturnsValidUrlForAllOS(JdkDistribution.ADOPTIUM, "11", "11.0.12+7");
+    }
+
+    @Test
+    void testAdoptiumVersion16() throws IOException {
+        assertResolveUrlReturnsValidUrlForAllOS(JdkDistribution.ADOPTIUM, "16", "16.0.2+7");
+    }
+
     private void assertResolveUrlReturnsValidUrlForAllOS(JdkDistribution distribution, String javaVersion, String distributionVersion) throws IOException {
         for (OperatingSystem operatingSystem : OperatingSystem.values()) {
             try (MockedStatic<OperatingSystem> mock = Mockito.mockStatic(OperatingSystem.class)) {
