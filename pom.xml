@@ -42,7 +42,7 @@
         <reflections.version>0.9.11</reflections.version>
         <system-lambda.version>1.2.0</system-lambda.version>
         <log4j.version>2.14.1</log4j.version>
-        <mockito-inline.version>3.12.3</mockito-inline.version>
+        <mockito-inline.version>3.12.4</mockito-inline.version>
 
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
