@@ -17,12 +17,21 @@ public final class ProcessHelper {
     }
 
     public static ProcessResult executeProcess(ProcessBuilder processBuilder, boolean returnStdOutput) throws IOException {
+        return executeProcess(processBuilder, returnStdOutput, false);
+    }
+
+    public static ProcessResult executeProcess(ProcessBuilder processBuilder, boolean returnStdOutput, boolean returnErrOutput) throws IOException {
         try {
             var process = processBuilder.start();
 
-            var stdOutput = new StringBuilder();
+            var errOutput = new StringBuilder();
+            if (!returnErrOutput) {
+                bindErrOutput(process);
+            } else {
+                bindErrOutput(process, line -> errOutput.append(line).append('\n'));
+            }
 
-            bindErrOutput(process);
+            var stdOutput = new StringBuilder();
             if (!returnStdOutput) {
                 bindStdOutput(process);
             } else {
@@ -36,7 +45,8 @@ public final class ProcessHelper {
 
             return ImmutableProcessResult.builder()
                     .exitCode(process.exitValue())
-                    .output(returnStdOutput ? Optional.of(stdOutput.toString()) : Optional.empty())
+                    .stdOutput(returnStdOutput ? Optional.of(stdOutput.toString()) : Optional.empty())
+                    .errOutput(returnErrOutput ? Optional.of(errOutput.toString()) : Optional.empty())
                     .build();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

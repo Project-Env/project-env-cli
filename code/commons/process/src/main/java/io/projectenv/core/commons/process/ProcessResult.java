@@ -9,6 +9,8 @@ public interface ProcessResult {
 
     int getExitCode();
 
-    Optional<String> getOutput();
+    Optional<String> getStdOutput();
+
+    Optional<String> getErrOutput();
 
 }

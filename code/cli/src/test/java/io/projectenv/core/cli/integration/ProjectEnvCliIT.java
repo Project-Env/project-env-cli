@@ -22,7 +22,7 @@ class ProjectEnvCliIT extends AbstractProjectEnvCliTest {
         var processResult = ProcessHelper.executeProcess(processBuilder, true);
         assertThat(processResult.getExitCode()).describedAs("process exit code").isZero();
 
-        return processResult.getOutput().orElse(null);
+        return processResult.getStdOutput().orElse(null);
     }
 
 }
