@@ -28,7 +28,7 @@ If you want to install a JDK, you need to add a `[jdk]` section to the `project-
 Option | Mandatory | Description | Valid values
 --- | --- | --- | ---
 `java_version` | Yes | The Java version. | Depends on the used distribution (e.g. `8`, `11` or `16`).
-`distribution` | Yes | The name of the distribution. | Must be `GraalVM` or `AdoptOpenJDK`.
+`distribution` | Yes | The name of the distribution. | Must be `GraalVM`, `AdoptOpenJDK` or `Adoptium`.
 `distribution_version` | Yes | The distribution version. | Depends on the used distribution.
 `post_extraction_commands` |  | Arbitrary commands which should be executed after extracting the distribution. |
 
