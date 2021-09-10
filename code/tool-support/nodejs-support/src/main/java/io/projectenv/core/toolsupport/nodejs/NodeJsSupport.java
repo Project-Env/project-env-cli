@@ -2,14 +2,11 @@ package io.projectenv.core.toolsupport.nodejs;
 
 import io.projectenv.core.cli.api.ImmutableToolInfo;
 import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.toolsupport.commons.commands.ExecuteCommandStep;
-import io.projectenv.core.toolsupport.commons.commands.ExtractArchiveStep;
-import io.projectenv.core.toolsupport.commons.commands.RegisterMainExecutableStep;
-import io.projectenv.core.toolsupport.commons.commands.RegisterPathElementStep;
 import io.projectenv.core.commons.download.DownloadUrlSubstitutorFactory;
 import io.projectenv.core.commons.download.ImmutableDownloadUrlDictionary;
 import io.projectenv.core.commons.system.CPUArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportException;
@@ -51,6 +48,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new FindBinariesRootStep());
 
         if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.WINDOWS) {
             steps.add(new RegisterPathElementStep("/"));

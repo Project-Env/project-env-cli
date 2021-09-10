@@ -32,6 +32,11 @@ public final class ProcessOutputWriterAccessor {
             printStream.println(output);
         }
 
+        @Override
+        public void write(Throwable throwable) {
+            throwable.printStackTrace(printStream);
+        }
+
     }
 
 }

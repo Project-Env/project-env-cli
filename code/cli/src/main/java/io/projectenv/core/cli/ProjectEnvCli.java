@@ -32,6 +32,9 @@ public final class ProjectEnvCli implements Callable<Integer> {
     @Option(names = {"--config-file"}, required = true)
     private File configFile;
 
+    @Option(names = {"--debug"})
+    private boolean debug;
+
     @Override
     public Integer call() {
         try {
@@ -44,6 +47,10 @@ public final class ProjectEnvCli implements Callable<Integer> {
             var rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
 
             getProcessInfoWriter().write("failed to install tools: {0}", rootCauseMessage);
+            if (debug) {
+                getProcessInfoWriter().write(e);
+            }
+
             return ExitCode.SOFTWARE;
         }
     }

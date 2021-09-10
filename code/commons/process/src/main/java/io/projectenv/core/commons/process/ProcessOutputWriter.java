@@ -10,4 +10,6 @@ public interface ProcessOutputWriter {
 
     void write(String output);
 
+    void write(Throwable throwable);
+
 }

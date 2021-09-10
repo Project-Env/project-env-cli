@@ -2,8 +2,8 @@ package io.projectenv.core.toolsupport.jdk;
 
 import io.projectenv.core.cli.api.ImmutableToolInfo;
 import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolver;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
@@ -45,8 +45,10 @@ public class JdkSupport implements ToolSupport<JdkConfiguration> {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new FindBinariesRootStep());
+        
         if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.MACOS) {
-            steps.add(new SetBinariesRootStep("/Home"));
+            steps.add(new SelectBinariesRootStep("/Home"));
         }
 
         steps.add(new RegisterEnvironmentVariableStep("JAVA_HOME", "/"));

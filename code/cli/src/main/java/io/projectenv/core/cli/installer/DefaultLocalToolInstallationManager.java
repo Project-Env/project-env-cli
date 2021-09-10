@@ -40,7 +40,7 @@ public class DefaultLocalToolInstallationManager implements LocalToolInstallatio
                 FileUtils.forceMkdir(toolInstallationRoot);
                 return installTool(toolInstallationRoot, localToolInstallationSteps);
             }
-        } catch (IOException | LocalToolInstallationStepException | TimeoutException e) {
+        } catch (Exception e) {
             cleanUpFailedToolInstallation(toolInstallationRoot);
 
             throw new LocalToolInstallationManagerException("failed to install tool " + toolName, e);

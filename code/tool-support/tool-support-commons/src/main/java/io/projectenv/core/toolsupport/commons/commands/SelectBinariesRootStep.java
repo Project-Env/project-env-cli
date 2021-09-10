@@ -9,11 +9,11 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
-public class SetBinariesRootStep implements LocalToolInstallationStep {
+public class SelectBinariesRootStep implements LocalToolInstallationStep {
 
     private final String rawBinariesRoot;
 
-    public SetBinariesRootStep(String rawBinariesRoot) {
+    public SelectBinariesRootStep(String rawBinariesRoot) {
         this.rawBinariesRoot = rawBinariesRoot;
     }
 

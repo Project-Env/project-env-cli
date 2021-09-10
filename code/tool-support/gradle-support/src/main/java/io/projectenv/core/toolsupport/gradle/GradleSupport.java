@@ -2,10 +2,7 @@ package io.projectenv.core.toolsupport.gradle;
 
 import io.projectenv.core.cli.api.ImmutableToolInfo;
 import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.toolsupport.commons.commands.ExecuteCommandStep;
-import io.projectenv.core.toolsupport.commons.commands.ExtractArchiveStep;
-import io.projectenv.core.toolsupport.commons.commands.RegisterMainExecutableStep;
-import io.projectenv.core.toolsupport.commons.commands.RegisterPathElementStep;
+import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportException;
@@ -47,6 +44,7 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("gradle"));
 

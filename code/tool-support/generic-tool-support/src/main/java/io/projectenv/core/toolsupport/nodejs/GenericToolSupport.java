@@ -44,6 +44,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new FindBinariesRootStep());
 
         for (var pathElement : toolConfiguration.getPathElements()) {
             steps.add(new RegisterPathElementStep(pathElement));

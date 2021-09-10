@@ -101,7 +101,7 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
 
     private Set<PosixFilePermission> posixFilePermissionsFromMode(int decimalMode) {
         // to determine the Posix permission flags, we only need the last 12 bits
-        var relevantPermissionBits = decimalMode & 0b111111111111;
+        var relevantPermissionBits = decimalMode & 0b111111111;
 
         var permissionFlags = Integer.toOctalString(relevantPermissionBits).toCharArray();
 
