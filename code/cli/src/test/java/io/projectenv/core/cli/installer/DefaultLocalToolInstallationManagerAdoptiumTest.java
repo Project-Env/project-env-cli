@@ -11,10 +11,10 @@ import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultLocalToolInstallationManagerAdoptiumTest {
+class DefaultLocalToolInstallationManagerAdoptiumTest {
 
     @Test
-    public void testAdoptiumInstallation(@TempDir File projectRoot) throws Exception {
+    void testAdoptiumInstallation(@TempDir File projectRoot) throws Exception {
         var installationManager = new DefaultLocalToolInstallationManager(new File(projectRoot, ".tools"));
 
         var configuration = ImmutableJdkConfiguration.builder()
