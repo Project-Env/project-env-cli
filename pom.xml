@@ -39,7 +39,7 @@
         <picocli.version>4.6.1</picocli.version>
         <graalvm.version>21.2.0</graalvm.version>
         <pebble.version>3.1.5</pebble.version>
-        <reflections.version>0.9.11</reflections.version>
+        <reflections.version>0.10.1</reflections.version>
         <system-lambda.version>1.2.0</system-lambda.version>
         <log4j.version>2.14.1</log4j.version>
         <mockito-inline.version>3.12.4</mockito-inline.version>
