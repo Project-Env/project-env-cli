@@ -32,7 +32,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <xz.version>1.9</xz.version>
-        <junit-jupiter.version>5.8.0</junit-jupiter.version>
+        <junit-jupiter.version>5.8.1</junit-jupiter.version>
         <assertj-core.version>3.20.2</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
         <commons-text.version>1.9</commons-text.version>
