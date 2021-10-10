@@ -5,6 +5,7 @@ import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
+import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
@@ -19,8 +20,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessInfoWriter;
-import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessResultWriter;
 import static picocli.CommandLine.ExitCode;
 
 @Command(name = "project-env-cli")
@@ -38,6 +37,10 @@ public final class ProjectEnvCli implements Callable<Integer> {
     @Override
     public Integer call() {
         try {
+            if (debug) {
+                ProcessOutput.activateDebugMode();
+            }
+
             var configuration = readProjectEnvConfiguration();
             var toolInfos = installOrUpdateTools(configuration);
             writeOutput(toolInfos);
@@ -46,10 +49,8 @@ public final class ProjectEnvCli implements Callable<Integer> {
         } catch (Exception e) {
             var rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
 
-            getProcessInfoWriter().write("failed to install tools: {0}", rootCauseMessage);
-            if (debug) {
-                getProcessInfoWriter().write(e);
-            }
+            ProcessOutput.writeInfoMessage("failed to install tools: {0}", rootCauseMessage);
+            ProcessOutput.writeDebugMessage(e);
 
             return ExitCode.SOFTWARE;
         }
@@ -112,7 +113,7 @@ public final class ProjectEnvCli implements Callable<Integer> {
 
         var toolInfos = new ArrayList<ToolInfo>();
         for (var toolConfiguration : toolConfigurations) {
-            getProcessInfoWriter().write("installing {0}...", toolSupport.getToolIdentifier());
+            ProcessOutput.writeInfoMessage("installing {0}...", toolSupport.getToolIdentifier());
 
             toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
         }
@@ -121,7 +122,7 @@ public final class ProjectEnvCli implements Callable<Integer> {
     }
 
     private void writeOutput(Map<String, List<ToolInfo>> toolInfos) {
-        getProcessResultWriter().write(ToolInfoParser.toJson(toolInfos));
+        ProcessOutput.writeResult(ToolInfoParser.toJson(toolInfos));
     }
 
 }

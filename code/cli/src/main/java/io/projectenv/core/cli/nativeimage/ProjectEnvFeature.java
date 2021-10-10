@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.annotations.SerializedName;
 import com.oracle.svm.core.annotate.AutomaticFeature;
 import io.projectenv.core.commons.nativeimage.NativeImageHelper;
-import io.projectenv.core.commons.process.ProcessOutputWriterAccessor;
+import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import org.apache.commons.compress.archivers.zip.ZipExtraField;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -26,7 +26,7 @@ public class ProjectEnvFeature implements Feature {
     }
 
     private void configureProcessOutputWriter() {
-        RuntimeClassInitialization.initializeAtBuildTime(ProcessOutputWriterAccessor.class);
+        RuntimeClassInitialization.initializeAtBuildTime(ProcessOutput.class);
     }
 
     private void registerZipExtraFieldClasses() {
