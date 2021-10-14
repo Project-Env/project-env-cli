@@ -5,6 +5,8 @@ import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolver;
+import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverException;
+import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverFactory;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportException;
@@ -18,6 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class JdkSupport implements ToolSupport<JdkConfiguration> {
+
+    private final JdkDownloadUrlResolver jdkDownloadUrlResolver = JdkDownloadUrlResolverFactory.createJdkDownloadUrlResolver();
 
     @Override
     public String getToolIdentifier() {
@@ -36,17 +40,17 @@ public class JdkSupport implements ToolSupport<JdkConfiguration> {
             var steps = createInstallationSteps(toolConfiguration, context);
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
-        } catch (LocalToolInstallationManagerException e) {
+        } catch (LocalToolInstallationManagerException | JdkDownloadUrlResolverException e) {
             throw new ToolSupportException("failed to install tool", e);
         }
     }
 
-    private List<LocalToolInstallationStep> createInstallationSteps(JdkConfiguration toolConfiguration, ToolSupportContext context) {
+    private List<LocalToolInstallationStep> createInstallationSteps(JdkConfiguration toolConfiguration, ToolSupportContext context) throws JdkDownloadUrlResolverException {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
         steps.add(new FindBinariesRootStep());
-        
+
         if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.MACOS) {
             steps.add(new SelectBinariesRootStep("/Home"));
         }
@@ -62,8 +66,8 @@ public class JdkSupport implements ToolSupport<JdkConfiguration> {
         return steps;
     }
 
-    private String getSystemSpecificDownloadUri(JdkConfiguration toolConfiguration) {
-        return JdkDownloadUrlResolver.resolveUrl(toolConfiguration);
+    private String getSystemSpecificDownloadUri(JdkConfiguration toolConfiguration) throws JdkDownloadUrlResolverException {
+        return jdkDownloadUrlResolver.resolveUrl(toolConfiguration);
     }
 
     private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails) {

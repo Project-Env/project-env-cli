@@ -2,6 +2,7 @@ package io.projectenv.core.cli.installer;
 
 import io.projectenv.core.cli.installer.lock.LockFile;
 import io.projectenv.core.cli.installer.lock.LockFileHelper;
+import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.installation.*;
 import org.apache.commons.io.FileUtils;
 
@@ -14,8 +15,6 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-
-import static io.projectenv.core.commons.process.ProcessOutputWriterAccessor.getProcessInfoWriter;
 
 public class DefaultLocalToolInstallationManager implements LocalToolInstallationManager {
 
@@ -51,7 +50,7 @@ public class DefaultLocalToolInstallationManager implements LocalToolInstallatio
         try {
             FileUtils.forceDelete(toolInstallationRoot);
         } catch (IOException e) {
-            getProcessInfoWriter().write("failed to delete tool installation directory {0}: {1}", toolInstallationRoot.getAbsolutePath(), e.getMessage());
+            ProcessOutput.writeInfoMessage("failed to delete tool installation directory {0}: {1}", toolInstallationRoot.getAbsolutePath(), e.getMessage());
         }
     }
 

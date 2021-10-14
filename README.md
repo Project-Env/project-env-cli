@@ -27,28 +27,25 @@ If you want to install a JDK, you need to add a `[jdk]` section to the `project-
 
 Option | Mandatory | Description | Valid values
 --- | --- | --- | ---
-`java_version` | Yes | The Java version. | Depends on the used distribution (e.g. `8`, `11` or `16`).
-`distribution` | Yes | The name of the distribution. | Must be `GraalVM`, `AdoptOpenJDK` or `Adoptium`.
+`distribution` | Yes | The name of the distribution. | All distributions supported by the [Disco API](https://github.com/foojayio/discoapi) are valid.
 `distribution_version` | Yes | The distribution version. | Depends on the used distribution.
 `post_extraction_commands` |  | Arbitrary commands which should be executed after extracting the distribution. |
 
 #### Examples
 
-##### AdoptOpenJDK 11
+##### Temurin 11
 
 ```
 [jdk]
-java_version = "11"
-distribution = "AdoptOpenJDK"
-distribution_version = "11.0.9.1+1"
+distribution = "Temurin"
+distribution_version = "11.0.12+7"
 ```
 
 ##### GraalVM 11 with native image
 
 ```
 [jdk]
-java_version = "11"
-distribution = "GraalVM"
+distribution = "GraalVM CE 11"
 distribution_version = "20.3.0"
 post_extraction_commands = [
     "gu install native-image"

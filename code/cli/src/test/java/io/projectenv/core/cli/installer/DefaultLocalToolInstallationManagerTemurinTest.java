@@ -1,7 +1,6 @@
 package io.projectenv.core.cli.installer;
 
 import io.projectenv.core.toolsupport.jdk.ImmutableJdkConfiguration;
-import io.projectenv.core.toolsupport.jdk.JdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.JdkSupport;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import org.junit.jupiter.api.Test;
@@ -11,15 +10,14 @@ import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DefaultLocalToolInstallationManagerAdoptiumTest {
+class DefaultLocalToolInstallationManagerTemurinTest {
 
     @Test
-    void testAdoptiumInstallation(@TempDir File projectRoot) throws Exception {
+    void testTemurinInstallation(@TempDir File projectRoot) throws Exception {
         var installationManager = new DefaultLocalToolInstallationManager(new File(projectRoot, ".tools"));
 
         var configuration = ImmutableJdkConfiguration.builder()
-                .javaVersion("11")
-                .distribution(JdkConfiguration.JdkDistribution.ADOPTIUM)
+                .distribution("Temurin")
                 .distributionVersion("11.0.12+7")
                 .build();
 

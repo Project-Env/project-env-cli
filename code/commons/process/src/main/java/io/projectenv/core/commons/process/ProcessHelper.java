@@ -55,7 +55,7 @@ public final class ProcessHelper {
     }
 
     private static void bindStdOutput(Process process) {
-        bindStdOutput(process, line -> ProcessOutputWriterAccessor.getProcessInfoWriter().write(line));
+        bindStdOutput(process, ProcessOutput::writeInfoMessage);
     }
 
     private static void bindStdOutput(Process process, ProcessOutputHandler handler) {
@@ -63,7 +63,7 @@ public final class ProcessHelper {
     }
 
     private static void bindErrOutput(Process process) {
-        bindErrOutput(process, line -> ProcessOutputWriterAccessor.getProcessInfoWriter().write(line));
+        bindErrOutput(process, ProcessOutput::writeInfoMessage);
     }
 
     private static void bindErrOutput(Process process, ProcessOutputHandler handler) {

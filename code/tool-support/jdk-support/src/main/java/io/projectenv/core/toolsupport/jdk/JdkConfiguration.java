@@ -1,6 +1,5 @@
 package io.projectenv.core.toolsupport.jdk;
 
-import com.google.gson.annotations.SerializedName;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
@@ -10,21 +9,10 @@ import java.util.List;
 @Value.Immutable
 public interface JdkConfiguration {
 
-    String getJavaVersion();
-
-    JdkDistribution getDistribution();
+    String getDistribution();
 
     String getDistributionVersion();
 
     List<String> getPostExtractionCommands();
-
-    enum JdkDistribution {
-        @SerializedName("AdoptOpenJDK")
-        ADOPTOPENJDK,
-        @SerializedName("Adoptium")
-        ADOPTIUM,
-        @SerializedName("GraalVM")
-        GRAALVM
-    }
 
 }
