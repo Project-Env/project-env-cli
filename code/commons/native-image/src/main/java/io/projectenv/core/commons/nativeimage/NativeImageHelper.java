@@ -1,7 +1,9 @@
 package io.projectenv.core.commons.nativeimage;
 
 import com.oracle.svm.core.jdk.Resources;
+import com.oracle.svm.core.jdk.proxy.DynamicProxyRegistry;
 import io.projectenv.core.commons.process.ProcessOutput;
+import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
@@ -10,6 +12,8 @@ import org.reflections.util.ConfigurationBuilder;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public final class NativeImageHelper {
 
@@ -68,6 +72,16 @@ public final class NativeImageHelper {
         for (var innerClazz : clazz.getDeclaredClasses()) {
             registerClassForReflection(innerClazz);
         }
+    }
+
+    public static void registerDynamicProxy(Class<?>... interfaces) {
+        ProcessOutput.writeInfoMessage("registering dynamic proxy for interfaces {0} in native image", asJoinedStringList(interfaces));
+
+        ImageSingletons.lookup(DynamicProxyRegistry.class).addProxyClass(interfaces);
+    }
+
+    private static String asJoinedStringList(Class<?>... interfaces) {
+        return Arrays.stream(interfaces).map(Class::getName).collect(Collectors.joining(", "));
     }
 
     private static boolean isConcreteClass(Class<?> clazz) {
