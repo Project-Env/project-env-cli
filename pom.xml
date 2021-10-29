@@ -37,10 +37,9 @@
         <toml4j.version>0.7.2</toml4j.version>
         <commons-text.version>1.9</commons-text.version>
         <picocli.version>4.6.1</picocli.version>
-        <graalvm.version>21.2.0</graalvm.version>
+        <graalvm.version>21.3.0</graalvm.version>
         <pebble.version>3.1.5</pebble.version>
         <reflections.version>0.9.11</reflections.version>
-        <system-lambda.version>1.2.0</system-lambda.version>
         <log4j.version>2.14.1</log4j.version>
         <mockito-inline.version>4.0.0</mockito-inline.version>
 
@@ -57,6 +56,7 @@
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <native-maven-plugin.version>0.9.7.1</native-maven-plugin.version>
     </properties>
 
     <modules>
@@ -157,11 +157,6 @@
                 <version>${graalvm.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-lambda</artifactId>
-                <version>${system-lambda.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
                 <version>${log4j.version}</version>
@@ -258,9 +253,9 @@
                     <version>${maven-jar-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.graalvm.nativeimage</groupId>
-                    <artifactId>native-image-maven-plugin</artifactId>
-                    <version>${graalvm.version}</version>
+                    <groupId>org.graalvm.buildtools</groupId>
+                    <artifactId>native-maven-plugin</artifactId>
+                    <version>${native-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

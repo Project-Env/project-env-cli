@@ -25,23 +25,28 @@ public final class ProcessHelper {
             var process = processBuilder.start();
 
             var errOutput = new StringBuilder();
+            Thread errOutputThread;
             if (!returnErrOutput) {
-                bindErrOutput(process);
+                errOutputThread = bindErrOutput(process);
             } else {
-                bindErrOutput(process, line -> errOutput.append(line).append('\n'));
+                errOutputThread = bindErrOutput(process, line -> errOutput.append(line).append('\n'));
             }
 
             var stdOutput = new StringBuilder();
+            Thread stdOutputThread;
             if (!returnStdOutput) {
-                bindStdOutput(process);
+                stdOutputThread = bindStdOutput(process);
             } else {
-                bindStdOutput(process, line -> stdOutput.append(line).append('\n'));
+                stdOutputThread = bindStdOutput(process, line -> stdOutput.append(line).append('\n'));
             }
 
             var terminated = process.waitFor(1, TimeUnit.HOURS);
             if (!terminated) {
                 process.destroy();
             }
+
+            stdOutputThread.join();
+            errOutputThread.join();
 
             return ImmutableProcessResult.builder()
                     .exitCode(process.exitValue())
@@ -54,30 +59,33 @@ public final class ProcessHelper {
         }
     }
 
-    private static void bindStdOutput(Process process) {
-        bindStdOutput(process, ProcessOutput::writeInfoMessage);
+    private static Thread bindStdOutput(Process process) {
+        return bindStdOutput(process, ProcessOutput::writeInfoMessage);
     }
 
-    private static void bindStdOutput(Process process, ProcessOutputHandler handler) {
-        bindOutput(process.getInputStream(), handler);
+    private static Thread bindStdOutput(Process process, ProcessOutputHandler handler) {
+        return bindOutput(process.getInputStream(), handler);
     }
 
-    private static void bindErrOutput(Process process) {
-        bindErrOutput(process, ProcessOutput::writeInfoMessage);
+    private static Thread bindErrOutput(Process process) {
+        return bindErrOutput(process, ProcessOutput::writeInfoMessage);
     }
 
-    private static void bindErrOutput(Process process, ProcessOutputHandler handler) {
-        bindOutput(process.getErrorStream(), handler);
+    private static Thread bindErrOutput(Process process, ProcessOutputHandler handler) {
+        return bindOutput(process.getErrorStream(), handler);
     }
 
-    private static void bindOutput(InputStream source, ProcessOutputHandler handler) {
-        new Thread(() -> {
+    private static Thread bindOutput(InputStream source, ProcessOutputHandler handler) {
+        var thread = new Thread(() -> {
             try (var scanner = new Scanner(source)) {
                 while (scanner.hasNextLine()) {
                     handler.handleOutput(scanner.nextLine());
                 }
             }
-        }).start();
+        });
+        thread.start();
+
+        return thread;
     }
 
     private interface ProcessOutputHandler {

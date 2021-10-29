@@ -44,7 +44,8 @@ abstract class AbstractProjectEnvCliTest {
     private void executeAndAssertExecution(File projectRoot, File configFile) throws Exception {
         var output = executeProjectEnvShell(
                 "--config-file=" + configFile.getAbsolutePath(),
-                "--project-root=" + projectRoot.getAbsolutePath()
+                "--project-root=" + projectRoot.getAbsolutePath(),
+                "--debug"
         );
 
         var result = ToolInfoParser.fromJson(output);

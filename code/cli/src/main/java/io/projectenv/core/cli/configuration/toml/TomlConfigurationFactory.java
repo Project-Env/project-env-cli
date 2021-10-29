@@ -7,6 +7,7 @@ import io.projectenv.core.cli.configuration.ImmutableProjectEnvBaseConfiguration
 import io.projectenv.core.cli.configuration.ProjectEnvBaseConfiguration;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.gson.BaseGsonBuilderFactory;
+import io.projectenv.core.commons.system.EnvironmentVariables;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.IOUtils;
@@ -53,6 +54,7 @@ public final class TomlConfigurationFactory {
 
     private static class FallbackEnvironmentVariableStringLookup implements StringLookup {
 
+        private static final StringLookup PARENT_LOOKUP = StringLookupFactory.INSTANCE.functionStringLookup(EnvironmentVariables::get);
         private static final BidiMap<String, String> FALLBACK_MAPPING = new DualHashBidiMap<>(Map.of(
                 "USER", "USERNAME"
         ));
@@ -76,7 +78,7 @@ public final class TomlConfigurationFactory {
         }
 
         private String lookupParent(String key) {
-            return StringLookupFactory.INSTANCE.environmentVariableStringLookup().lookup(key);
+            return PARENT_LOOKUP.lookup(key);
         }
 
     }
