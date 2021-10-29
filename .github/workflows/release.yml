@@ -52,7 +52,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.0.0
         with:
-          cli-version: '3.0.4'
+          cli-version: '3.3.0'
       - run: |
           mvn -B -s etc/m2/settings-ci.xml ${{ matrix.maven_phase }} -Pnative-image "-Drevision=${{ github.event.inputs.version }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
