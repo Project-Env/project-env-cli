@@ -1,5 +1,7 @@
 package io.projectenv.core.toolsupport.jdk.download.impl.discoapi;
 
+import java.time.Duration;
+
 public final class DiscoApiClientFactory {
 
     private DiscoApiClientFactory() {
@@ -7,7 +9,7 @@ public final class DiscoApiClientFactory {
     }
 
     public static DiscoApiClient createDiscoApiClient() {
-        return new SimpleDiscoApiClient();
+        return RetryingProxy.wrap(new SimpleDiscoApiClient(), 10, Duration.ofSeconds(1));
     }
 
 }

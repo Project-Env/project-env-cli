@@ -5,7 +5,10 @@ import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.jdk.JdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolver;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverException;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.*;
+import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiClient;
+import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiJdkPackage;
+import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiJdkPackageDetails;
+import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiResult;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -13,9 +16,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
-
-    private static final int MAX_RETRIES = 2;
-    private static final int RETRY_TIMEOUT_MS = 500;
 
     private final DiscoApiClient discoApiClient;
 
@@ -25,29 +25,20 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
 
     @Override
     public String resolveUrl(JdkConfiguration jdkConfiguration) throws JdkDownloadUrlResolverException {
-        int retries = 0;
-
-        while (true) {
-            try {
-                var ephemeralId = resolveEphemeralId(jdkConfiguration);
-                if (StringUtils.isEmpty(ephemeralId)) {
-                    throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration);
-                }
-
-                var downloadUri = resolveDirectDownloadUri(ephemeralId);
-                if (StringUtils.isEmpty(downloadUri)) {
-                    throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration);
-                }
-
-                return downloadUri;
-            } catch (Exception e) {
-                if (retries == MAX_RETRIES) {
-                    throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration, e);
-                }
-
-                waitForRetryTimoutFinished(jdkConfiguration);
-                retries++;
+        try {
+            var ephemeralId = resolveEphemeralId(jdkConfiguration);
+            if (StringUtils.isEmpty(ephemeralId)) {
+                throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration);
             }
+
+            var downloadUri = resolveDirectDownloadUri(ephemeralId);
+            if (StringUtils.isEmpty(downloadUri)) {
+                throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration);
+            }
+
+            return downloadUri;
+        } catch (Exception e) {
+            throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration, e);
         }
     }
 
@@ -102,16 +93,6 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
                 .findFirst()
                 .map(DiscoApiJdkPackageDetails::getDirectDownloadUri)
                 .orElse(null);
-    }
-
-    private void waitForRetryTimoutFinished(JdkConfiguration jdkConfiguration) throws JdkDownloadUrlResolverException {
-        try {
-            Thread.sleep(RETRY_TIMEOUT_MS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-
-            throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration, e);
-        }
     }
 
     private JdkDownloadUrlResolverException createFailedResolutionOfJdkDownloadUrlException(JdkConfiguration jdkConfiguration, Exception e) {
