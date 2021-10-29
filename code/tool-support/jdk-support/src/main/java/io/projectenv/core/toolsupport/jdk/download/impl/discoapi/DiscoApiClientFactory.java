@@ -9,7 +9,7 @@ public final class DiscoApiClientFactory {
     }
 
     public static DiscoApiClient createDiscoApiClient() {
-        return RetryingProxy.wrap(new SimpleDiscoApiClient(), 10, Duration.ofSeconds(1));
+        return RetryingProxy.wrap(new SimpleDiscoApiClient(), 15, Duration.ofSeconds(2));
     }
 
 }
