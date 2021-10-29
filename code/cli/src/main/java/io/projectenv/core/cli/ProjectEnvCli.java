@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 import static picocli.CommandLine.ExitCode;
 
-@Command(name = "project-env-cli")
+@Command(name = "project-env-cli", mixinStandardHelpOptions = true, versionProvider = ProjectEnvCli.ProjectEnvCliVersionProvider.class)
 public final class ProjectEnvCli implements Callable<Integer> {
 
     @Option(names = {"--project-root"}, defaultValue = ".")
@@ -123,6 +123,15 @@ public final class ProjectEnvCli implements Callable<Integer> {
 
     private void writeOutput(Map<String, List<ToolInfo>> toolInfos) {
         ProcessOutput.writeResult(ToolInfoParser.toJson(toolInfos));
+    }
+
+    static class ProjectEnvCliVersionProvider implements CommandLine.IVersionProvider {
+
+        @Override
+        public String[] getVersion() throws Exception {
+            return new String[]{ProjectEnvCliVersionHelper.getVersion()};
+        }
+
     }
 
 }

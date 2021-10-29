@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.integration;
 
+import io.projectenv.core.cli.ProjectEnvCliVersionHelper;
 import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.cli.api.ToolInfoParser;
 import io.projectenv.core.cli.integration.assertions.*;
@@ -14,9 +15,16 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.list;
 
 abstract class AbstractProjectEnvCliTest {
+
+    @Test
+    void executeProjectEnvShell() throws Exception {
+        assertThat(executeProjectEnvShell("--version"))
+                .isEqualToIgnoringNewLines(ProjectEnvCliVersionHelper.getVersion());
+    }
 
     @Test
     void executeProjectEnvShell(@TempDir File projectRoot) throws Exception {

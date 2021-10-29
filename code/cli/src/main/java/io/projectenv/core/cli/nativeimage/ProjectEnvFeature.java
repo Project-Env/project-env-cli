@@ -3,6 +3,7 @@ package io.projectenv.core.cli.nativeimage;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.annotations.SerializedName;
 import com.oracle.svm.core.annotate.AutomaticFeature;
+import io.projectenv.core.cli.ProjectEnvCliVersionHelper;
 import io.projectenv.core.commons.nativeimage.NativeImageHelper;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiClient;
@@ -25,6 +26,7 @@ public class ProjectEnvFeature implements Feature {
         registerToolSupportService();
         registerGsonSupport();
         registerDynamicProxies();
+        registerVersionFile();
     }
 
     private void configureProcessOutputWriter() {
@@ -56,6 +58,14 @@ public class ProjectEnvFeature implements Feature {
 
     private void registerDynamicProxies() {
         NativeImageHelper.registerDynamicProxy(DiscoApiClient.class);
+    }
+
+    private void registerVersionFile() {
+        try {
+            NativeImageHelper.registerResource(ProjectEnvCliVersionHelper.VERSION_TXT);
+        } catch (IOException e) {
+            throw new IllegalStateException("failed to register resource" + ProjectEnvCliVersionHelper.VERSION_TXT + " for usage in native-image");
+        }
     }
 
 }
