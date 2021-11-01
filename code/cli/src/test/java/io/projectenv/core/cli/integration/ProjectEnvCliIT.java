@@ -16,7 +16,6 @@ class ProjectEnvCliIT extends AbstractProjectEnvCliTest {
         commands.addAll(Arrays.asList(params));
 
         var processBuilder = new ProcessBuilder(commands);
-        processBuilder.environment().put("USERNAME", "user");
         processBuilder.environment().put("USER", "user");
 
         var processResult = ProcessHelper.executeProcess(processBuilder, true);

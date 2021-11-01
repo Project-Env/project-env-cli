@@ -27,8 +27,8 @@ If you want to install a JDK, you need to add a `[jdk]` section to the `project-
 
 Option | Mandatory | Description | Valid values
 --- | --- | --- | ---
-`distribution` | Yes | The name of the distribution. | All distributions supported by the [Disco API](https://github.com/foojayio/discoapi) are valid.
-`distribution_version` | Yes | The distribution version. | Depends on the used distribution.
+`distribution` | Yes | The name of the distribution. | All distributions supported by the [Disco API](https://github.com/foojayio/discoapi) are valid (see [distributions endpoint](https://api.foojay.io/disco/v2.0/distributions?include_versions=true&include_synonyms=true) as reference).
+`distribution_version` | Yes | The distribution version. | Depends on the used distribution (see [distributions endpoint](https://api.foojay.io/disco/v2.0/distributions?include_versions=true&include_synonyms=true) as reference). 
 `post_extraction_commands` |  | Arbitrary commands which should be executed after extracting the distribution. |
 
 #### Examples

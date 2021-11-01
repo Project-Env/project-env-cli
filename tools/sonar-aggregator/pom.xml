@@ -50,6 +50,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>io.projectenv.core.commons</groupId>
+            <artifactId>system-test</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.projectenv.core.toolsupport</groupId>
             <artifactId>tool-support-spi</artifactId>
             <version>${project.version}</version>

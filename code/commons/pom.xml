@@ -21,6 +21,7 @@
         <module>string-substitutor</module>
         <module>archive</module>
         <module>system</module>
+        <module>system-test</module>
     </modules>
 
 </project>
