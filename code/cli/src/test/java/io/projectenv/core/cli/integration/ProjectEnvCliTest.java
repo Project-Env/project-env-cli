@@ -1,7 +1,7 @@
 package io.projectenv.core.cli.integration;
 
 import io.projectenv.core.cli.ProjectEnvCli;
-import io.projectenv.core.commons.system.EnvironmentVariablesMock;
+import io.projectenv.core.commons.system.TestEnvironmentVariables;
 import org.assertj.core.api.Assertions;
 
 import java.io.ByteArrayOutputStream;
@@ -13,7 +13,7 @@ class ProjectEnvCliTest extends AbstractProjectEnvCliTest {
 
     @Override
     protected String executeProjectEnvShell(String... params) throws Exception {
-        try (var environmentVariablesMock = EnvironmentVariablesMock.withEnvOverlay(Map.of("USER", "user"))) {
+        try (var testEnvironmentVariables = TestEnvironmentVariables.overlayEnv(Map.of("USER", "user"))) {
             var originalStream = System.out;
             try (var outputStream = new ByteArrayOutputStream()) {
                 System.setOut(new PrintStream(outputStream));

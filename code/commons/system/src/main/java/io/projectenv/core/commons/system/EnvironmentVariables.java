@@ -1,5 +1,7 @@
 package io.projectenv.core.commons.system;
 
+import java.util.Map;
+
 public class EnvironmentVariables {
 
     private EnvironmentVariables() {
@@ -7,7 +9,11 @@ public class EnvironmentVariables {
     }
 
     public static String get(String key) {
-        return System.getenv(key);
+        return get().get(key);
+    }
+
+    public static Map<String, String> get() {
+        return System.getenv();
     }
 
 }
