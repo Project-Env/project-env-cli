@@ -1,5 +1,6 @@
 package io.projectenv.core.commons.process;
 
+import io.projectenv.core.commons.system.EnvironmentVariables;
 import io.projectenv.core.commons.system.OperatingSystem;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +21,7 @@ public final class ProcessEnvironmentHelper {
     }
 
     public static Map<String, String> createProcessEnvironment(Map<String, File> environmentVariables, List<File> pathElements) {
-        Map<String, String> processEnvironment = new HashMap<>(System.getenv());
+        Map<String, String> processEnvironment = new HashMap<>(EnvironmentVariables.get());
 
         extendWithEnvironmentVariables(processEnvironment, environmentVariables);
         extendPathWithElements(processEnvironment, pathElements);
@@ -86,12 +87,12 @@ public final class ProcessEnvironmentHelper {
     }
 
     public static String getPathVariableContent() {
-        return System.getenv(getPathVariableName());
+        return EnvironmentVariables.get(getPathVariableName());
     }
 
     public static String getPathVariableName() {
         for (String pathVariableName : PATH_VARIABLE_NAME_CANDIDATES) {
-            if (System.getenv().containsKey(pathVariableName)) {
+            if (EnvironmentVariables.get().containsKey(pathVariableName)) {
                 return pathVariableName;
             }
         }
