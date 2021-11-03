@@ -1,8 +1,8 @@
 package io.projectenv.core.cli.integration;
 
-import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.cli.api.ToolInfoParser;
+import io.projectenv.core.cli.ToolInfoParser;
 import io.projectenv.core.cli.integration.assertions.*;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.SoftAssertions;

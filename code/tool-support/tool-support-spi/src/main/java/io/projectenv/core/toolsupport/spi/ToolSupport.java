@@ -1,7 +1,5 @@
 package io.projectenv.core.toolsupport.spi;
 
-import io.projectenv.core.cli.api.ToolInfo;
-
 public interface ToolSupport<T> {
 
     String getToolIdentifier();

@@ -1,6 +1,5 @@
-package io.projectenv.core.cli.api;
+package io.projectenv.core.toolsupport.spi;
 
-import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
 import java.io.File;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Gson.TypeAdapters(fieldNamingStrategy = true)
 @Value.Immutable
 public interface ToolInfo {
 

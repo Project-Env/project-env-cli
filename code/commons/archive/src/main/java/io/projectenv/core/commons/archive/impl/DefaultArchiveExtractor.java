@@ -1,31 +1,31 @@
 package io.projectenv.core.commons.archive.impl;
 
 import io.projectenv.core.commons.archive.ArchiveExtractor;
+import io.projectenv.core.commons.archive.impl.accessor.ArchiveAccessor;
 import io.projectenv.core.commons.archive.impl.accessor.ArchiveAccessorFactory;
 import io.projectenv.core.commons.archive.impl.accessor.ArchiveEntry;
 import io.projectenv.core.commons.system.OperatingSystem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 public class DefaultArchiveExtractor implements ArchiveExtractor {
 
-    private static final List<Pattern> IGNORED_ARCHIVE_ENTRIES = List.of(
+    private static final List<Pattern> IGNORED_ARCHIVE_ENTRIES = Collections.singletonList(
             // dot underscore files which are created on macOS systems and hold metadata
             Pattern.compile(".*/\\._.+")
     );
 
     public void extractArchive(File archive, File targetDirectory) throws IOException {
-        try (var archiveAccessor = ArchiveAccessorFactory.createArchiveAccessor(archive)) {
+        try (ArchiveAccessor archiveAccessor = ArchiveAccessorFactory.createArchiveAccessor(archive)) {
 
             ArchiveEntry entry;
 
@@ -34,7 +34,7 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
                     continue;
                 }
 
-                var target = new File(targetDirectory, entry.getName());
+                File target = new File(targetDirectory, entry.getName());
                 checkThatPathIsInsideBasePath(target, targetDirectory);
 
                 if (entry.isDirectory()) {
@@ -65,7 +65,7 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
     }
 
     protected void createSymbolicLink(ArchiveEntry archiveEntry, File target, File targetDirectory) throws IOException {
-        var linkDestination = new File(archiveEntry.getLinkName());
+        File linkDestination = new File(archiveEntry.getLinkName());
         checkThatPathIsInsideBasePath(new File(target.isDirectory() ? target : target.getParentFile(), archiveEntry.getLinkName()), targetDirectory);
 
         FileUtils.forceMkdirParent(target.getCanonicalFile());
@@ -76,8 +76,8 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
     private void createFile(ArchiveEntry archiveEntry, File target) throws IOException {
         FileUtils.forceMkdirParent(target.getCanonicalFile());
 
-        try (var inputStream = archiveEntry.createInputStream();
-             var outputStream = new FileOutputStream(target)) {
+        try (InputStream inputStream = archiveEntry.createInputStream();
+             OutputStream outputStream = new FileOutputStream(target)) {
 
             IOUtils.copy(inputStream, outputStream);
         }
@@ -93,7 +93,7 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
             return;
         }
 
-        var mode = archiveEntry.getMode();
+        Integer mode = archiveEntry.getMode();
         if (mode != null) {
             Files.setPosixFilePermissions(target.toPath(), posixFilePermissionsFromMode(mode));
         }
@@ -101,12 +101,12 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
 
     private Set<PosixFilePermission> posixFilePermissionsFromMode(int decimalMode) {
         // to determine the Posix permission flags, we only need the last 12 bits
-        var relevantPermissionBits = decimalMode & 0b111111111;
+        int relevantPermissionBits = decimalMode & 0b111111111;
 
-        var permissionFlags = Integer.toOctalString(relevantPermissionBits).toCharArray();
+        char[] permissionFlags = Integer.toOctalString(relevantPermissionBits).toCharArray();
 
-        var posixPermissions = new StringBuilder();
-        for (var permissionFlag : permissionFlags) {
+        StringBuilder posixPermissions = new StringBuilder();
+        for (char permissionFlag : permissionFlags) {
             if ((permissionFlag & 0b100) != 0) {
                 posixPermissions.append('r');
             } else {

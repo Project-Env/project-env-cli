@@ -6,11 +6,13 @@ import io.projectenv.core.commons.process.ProcessOutput;
 import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -24,7 +26,7 @@ public final class NativeImageHelper {
     }
 
     public static void registerResource(String resource) throws IOException {
-        try (var inputStream = ClassLoader.getSystemResourceAsStream(resource)) {
+        try (InputStream inputStream = ClassLoader.getSystemResourceAsStream(resource)) {
             if (inputStream == null) {
                 throw new IllegalArgumentException("resource " + resource + " could not be resolved");
             }
@@ -40,8 +42,8 @@ public final class NativeImageHelper {
     }
 
     public static void registerClassAndSubclassesForReflection(Class<?> clazz) {
-        var reflections = new Reflections();
-        for (var subClazz : reflections.getSubTypesOf(clazz)) {
+        Reflections reflections = new Reflections();
+        for (Class<?> subClazz : reflections.getSubTypesOf(clazz)) {
             registerClassForReflection(subClazz);
         }
     }
@@ -49,11 +51,11 @@ public final class NativeImageHelper {
     public static void registerFieldsWithAnnotationForReflection(String basePackage, Class<? extends Annotation> annotationClazz) {
         ProcessOutput.writeInfoMessage("scanning package {0} for fields with annotation {1}", basePackage, annotationClazz.getSimpleName());
 
-        var reflections = new Reflections(new ConfigurationBuilder()
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(basePackage)
-                .setScanners(new FieldAnnotationsScanner()));
+                .setScanners(Scanners.FieldsAnnotated));
 
-        for (var field : reflections.getFieldsAnnotatedWith(annotationClazz)) {
+        for (Field field : reflections.getFieldsAnnotatedWith(annotationClazz)) {
             ProcessOutput.writeInfoMessage("registering field {0} for reflection in native image", field.getName());
             RuntimeReflection.register(field);
         }
@@ -69,7 +71,7 @@ public final class NativeImageHelper {
             RuntimeReflection.register(clazz.getDeclaredConstructors());
         }
 
-        for (var innerClazz : clazz.getDeclaredClasses()) {
+        for (Class<?> innerClazz : clazz.getDeclaredClasses()) {
             registerClassForReflection(innerClazz);
         }
     }

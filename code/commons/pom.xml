@@ -15,6 +15,10 @@
     <artifactId>commons-root</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <maven.compiler.release>8</maven.compiler.release>
+    </properties>
+
     <modules>
         <module>native-image</module>
         <module>process</module>

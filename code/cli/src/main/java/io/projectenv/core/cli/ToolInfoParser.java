@@ -1,4 +1,4 @@
-package io.projectenv.core.cli.api;
+package io.projectenv.core.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,10 +32,7 @@ public final class ToolInfoParser {
     }
 
     private static Gson createGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(File.class, new FileTypeAdapter())
-                .registerTypeAdapterFactory(new GsonAdaptersToolInfo())
-                .create();
+        return new GsonBuilder().registerTypeAdapter(File.class, new FileTypeAdapter()).create();
     }
 
     private static class FileTypeAdapter extends TypeAdapter<File> {

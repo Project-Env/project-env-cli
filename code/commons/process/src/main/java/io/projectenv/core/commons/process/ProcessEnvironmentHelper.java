@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 public final class ProcessEnvironmentHelper {
 
-    private static final List<String> PATH_VARIABLE_NAME_CANDIDATES = List.of("PATH", "Path");
+    private static final List<String> PATH_VARIABLE_NAME_CANDIDATES = Arrays.asList("PATH", "Path");
 
-    private static final Map<OperatingSystem, List<String>> OS_EXECUTABLE_EXTENSIONS = Map.of(
-            OperatingSystem.WINDOWS, List.of(".exe", ".cmd")
+    private static final Map<OperatingSystem, List<String>> OS_EXECUTABLE_EXTENSIONS = Collections.singletonMap(
+            OperatingSystem.WINDOWS, Arrays.asList(".exe", ".cmd")
     );
 
     private ProcessEnvironmentHelper() {
@@ -44,8 +44,8 @@ public final class ProcessEnvironmentHelper {
     }
 
     public static String createExtendedPathValue(List<File> pathExtensions) {
-        var pathExtension = new StringJoiner(File.pathSeparator);
-        for (var file : pathExtensions) {
+        StringJoiner pathExtension = new StringJoiner(File.pathSeparator);
+        for (File file : pathExtensions) {
             pathExtension.add(file.getAbsolutePath());
         }
 
@@ -57,18 +57,18 @@ public final class ProcessEnvironmentHelper {
     }
 
     public static File resolveExecutableFromPathElements(String executable, List<File> pathElements) {
-        var possibleExtensions = new ArrayList<>();
+        List<String> possibleExtensions = new ArrayList<>();
 
         if (OS_EXECUTABLE_EXTENSIONS.containsKey(OperatingSystem.getCurrentOperatingSystem())) {
             possibleExtensions.addAll(OS_EXECUTABLE_EXTENSIONS.get(OperatingSystem.getCurrentOperatingSystem()));
         }
         possibleExtensions.add(StringUtils.EMPTY);
 
-        for (var possibleExtension : possibleExtensions) {
-            var executableWithExtension = executable + possibleExtension;
+        for (String possibleExtension : possibleExtensions) {
+            String executableWithExtension = executable + possibleExtension;
 
-            for (var pathElement : pathElements) {
-                var executableCandidate = new File(pathElement, executableWithExtension);
+            for (File pathElement : pathElements) {
+                File executableCandidate = new File(pathElement, executableWithExtension);
                 if (executableCandidate.exists()) {
                     return executableCandidate;
                 }
@@ -79,7 +79,7 @@ public final class ProcessEnvironmentHelper {
     }
 
     public static List<File> getPathElements() {
-        var pathVariableContent = getPathVariableContent();
+        String pathVariableContent = getPathVariableContent();
 
         return Arrays.stream(StringUtils.split(pathVariableContent, File.pathSeparator))
                 .map(File::new)

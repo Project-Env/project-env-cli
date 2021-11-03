@@ -8,17 +8,23 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ArchiveAccessorFactory {
 
-    private static final Map<String, ArchiveSpecificAccessorFactory> FACTORIES = Map.of(
-            ".tar.gz", ArchiveAccessorFactory::createTarGzArchiveAccessor,
-            ".tgz", ArchiveAccessorFactory::createTarGzArchiveAccessor,
-            ".tar.xz", ArchiveAccessorFactory::createTarXzArchiveAccessor,
-            ".tar", ArchiveAccessorFactory::createTarArchiveAccessor,
-            ".zip", ArchiveAccessorFactory::createZipArchiveAccessor
-    );
+    private static final Map<String, ArchiveSpecificAccessorFactory> FACTORIES = createFactories();
+
+    private static Map<String, ArchiveSpecificAccessorFactory> createFactories() {
+        Map<String, ArchiveSpecificAccessorFactory> factories = new HashMap<>();
+        factories.put(".tar.gz", ArchiveAccessorFactory::createTarGzArchiveAccessor);
+        factories.put(".tgz", ArchiveAccessorFactory::createTarGzArchiveAccessor);
+        factories.put(".tar.xz", ArchiveAccessorFactory::createTarXzArchiveAccessor);
+        factories.put(".tar", ArchiveAccessorFactory::createTarArchiveAccessor);
+        factories.put(".zip", ArchiveAccessorFactory::createZipArchiveAccessor);
+
+        return factories;
+    }
 
     public static ArchiveAccessor createArchiveAccessor(File archive) throws IOException {
         for (Map.Entry<String, ArchiveSpecificAccessorFactory> factoryEntry : FACTORIES.entrySet()) {
@@ -31,7 +37,7 @@ public class ArchiveAccessorFactory {
     }
 
     private static ArchiveAccessor createZipArchiveAccessor(File archive) throws IOException {
-        var zipFile = new ZipFile(archive);
+        ZipFile zipFile = new ZipFile(archive);
 
         return new ZipArchiveAccessor(zipFile);
     }
@@ -57,7 +63,7 @@ public class ArchiveAccessorFactory {
     }
 
     private static ArchiveAccessor createTarArchiveAccessor(InputStream tarInputStream) {
-        var tarArchiveInputStream = new TarArchiveInputStream(tarInputStream);
+        TarArchiveInputStream tarArchiveInputStream = new TarArchiveInputStream(tarInputStream);
 
         return new TarArchiveAccessor(tarArchiveInputStream);
     }

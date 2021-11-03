@@ -1,10 +1,6 @@
 package io.projectenv.core.toolsupport.git;
 
-import io.projectenv.core.cli.api.ImmutableToolInfo;
-import io.projectenv.core.cli.api.ToolInfo;
-import io.projectenv.core.toolsupport.spi.ToolSupport;
-import io.projectenv.core.toolsupport.spi.ToolSupportContext;
-import io.projectenv.core.toolsupport.spi.ToolSupportException;
+import io.projectenv.core.toolsupport.spi.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

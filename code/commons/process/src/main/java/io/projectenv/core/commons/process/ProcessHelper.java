@@ -22,9 +22,9 @@ public final class ProcessHelper {
 
     public static ProcessResult executeProcess(ProcessBuilder processBuilder, boolean returnStdOutput, boolean returnErrOutput) throws IOException {
         try {
-            var process = processBuilder.start();
+            Process process = processBuilder.start();
 
-            var errOutput = new StringBuilder();
+            StringBuilder errOutput = new StringBuilder();
             Thread errOutputThread;
             if (!returnErrOutput) {
                 errOutputThread = bindErrOutput(process);
@@ -32,7 +32,7 @@ public final class ProcessHelper {
                 errOutputThread = bindErrOutput(process, line -> errOutput.append(line).append('\n'));
             }
 
-            var stdOutput = new StringBuilder();
+            StringBuilder stdOutput = new StringBuilder();
             Thread stdOutputThread;
             if (!returnStdOutput) {
                 stdOutputThread = bindStdOutput(process);
@@ -40,7 +40,7 @@ public final class ProcessHelper {
                 stdOutputThread = bindStdOutput(process, line -> stdOutput.append(line).append('\n'));
             }
 
-            var terminated = process.waitFor(1, TimeUnit.HOURS);
+            boolean terminated = process.waitFor(1, TimeUnit.HOURS);
             if (!terminated) {
                 process.destroy();
             }
@@ -76,8 +76,8 @@ public final class ProcessHelper {
     }
 
     private static Thread bindOutput(InputStream source, ProcessOutputHandler handler) {
-        var thread = new Thread(() -> {
-            try (var scanner = new Scanner(source)) {
+        Thread thread = new Thread(() -> {
+            try (Scanner scanner = new Scanner(source)) {
                 while (scanner.hasNextLine()) {
                     handler.handleOutput(scanner.nextLine());
                 }

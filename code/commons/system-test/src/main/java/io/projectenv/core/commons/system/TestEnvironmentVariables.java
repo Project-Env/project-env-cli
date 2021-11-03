@@ -1,5 +1,6 @@
 package io.projectenv.core.commons.system;
 
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 import java.util.HashMap;
@@ -14,11 +15,11 @@ public class TestEnvironmentVariables {
     }
 
     public static AutoCloseable overlayEnv(Map<String, String> overlay) {
-        var originalEnv = EnvironmentVariables.get();
+        Map<String, String> originalEnv = EnvironmentVariables.get();
 
-        var mock = Mockito.mockStatic(EnvironmentVariables.class);
+        MockedStatic<EnvironmentVariables> mock = Mockito.mockStatic(EnvironmentVariables.class);
 
-        var overlaidEnv = new HashMap<>();
+        Map<String, String> overlaidEnv = new HashMap<>();
         overlaidEnv.putAll(originalEnv);
         overlaidEnv.putAll(overlay);
         mock.when(EnvironmentVariables::get).thenReturn(overlaidEnv);

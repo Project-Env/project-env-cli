@@ -19,11 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.projectenv.core</groupId>
-            <artifactId>cli-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.projectenv.core.commons</groupId>
             <artifactId>native-image</artifactId>
             <version>${project.version}</version>

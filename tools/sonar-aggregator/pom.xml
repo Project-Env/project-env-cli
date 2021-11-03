@@ -20,11 +20,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.projectenv.core</groupId>
-            <artifactId>cli-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.projectenv.core.commons</groupId>
             <artifactId>archive</artifactId>
             <version>${project.version}</version>
