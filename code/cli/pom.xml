@@ -19,11 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>native-image</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.projectenv.core.toolsupport</groupId>
             <artifactId>tool-support-spi</artifactId>
             <version>${project.version}</version>
@@ -60,6 +55,11 @@
         </dependency>
 
         <dependency>
+            <groupId>io.projectenv.commons</groupId>
+            <artifactId>native-image</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.moandjiezana.toml</groupId>
             <artifactId>toml4j</artifactId>
         </dependency>
@@ -91,9 +91,8 @@
         </dependency>
 
         <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
+            <groupId>io.projectenv.commons</groupId>
             <artifactId>system-test</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

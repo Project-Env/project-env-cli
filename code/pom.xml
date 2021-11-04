@@ -15,7 +15,6 @@
     <modules>
         <module>cli</module>
         <module>tool-support</module>
-        <module>commons</module>
     </modules>
 
     <build>

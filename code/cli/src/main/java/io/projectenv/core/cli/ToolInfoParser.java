@@ -6,6 +6,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.projectenv.core.toolsupport.spi.GsonAdaptersToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolInfo;
 
 import java.io.File;
@@ -32,7 +33,10 @@ public final class ToolInfoParser {
     }
 
     private static Gson createGson() {
-        return new GsonBuilder().registerTypeAdapter(File.class, new FileTypeAdapter()).create();
+        return new GsonBuilder()
+                .registerTypeAdapter(File.class, new FileTypeAdapter())
+                .registerTypeAdapterFactory(new GsonAdaptersToolInfo())
+                .create();
     }
 
     private static class FileTypeAdapter extends TypeAdapter<File> {
@@ -40,7 +44,9 @@ public final class ToolInfoParser {
         @Override
         public void write(JsonWriter out, File value) throws IOException {
             try {
-                out.value(value.getCanonicalPath());
+                if (value != null) {
+                    out.value(value.getCanonicalPath());
+                }
             } catch (IOException e) {
                 throw new IllegalStateException("cannot get canonical path from file");
             }

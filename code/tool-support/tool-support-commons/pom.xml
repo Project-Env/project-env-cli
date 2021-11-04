@@ -19,15 +19,14 @@
             <artifactId>tool-support-spi</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
+            <groupId>io.projectenv.commons</groupId>
             <artifactId>archive</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
+            <groupId>io.projectenv.commons</groupId>
             <artifactId>process</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
