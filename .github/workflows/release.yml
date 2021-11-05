@@ -31,16 +31,13 @@ jobs:
           - os: ubuntu-latest
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
-            maven_phase: deploy
           - os: windows-latest
             cli_assembly_id: windows-amd64
             cli_assembly_format: zip
-            maven_phase: package
             gu_executable_ext: .cmd
           - os: macos-latest
             cli_assembly_id: macos-amd64
             cli_assembly_format: tar.gz
-            maven_phase: package
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
@@ -52,9 +49,9 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.0.0
         with:
-          cli-version: '3.3.0'
+          cli-version: '3.4.0'
       - run: |
-          mvn -B -s etc/m2/settings-ci.xml ${{ matrix.maven_phase }} -Pnative-image "-Drevision=${{ github.event.inputs.version }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+          mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ github.event.inputs.version }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

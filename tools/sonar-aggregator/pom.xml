@@ -20,41 +20,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.projectenv.core</groupId>
-            <artifactId>cli-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>archive</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>native-image</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>process</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>string-substitutor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>system</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>system-test</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.projectenv.core.toolsupport</groupId>
             <artifactId>tool-support-spi</artifactId>
             <version>${project.version}</version>

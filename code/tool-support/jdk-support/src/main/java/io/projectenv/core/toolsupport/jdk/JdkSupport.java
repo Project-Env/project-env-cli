@@ -1,15 +1,11 @@
 package io.projectenv.core.toolsupport.jdk;
 
-import io.projectenv.core.cli.api.ImmutableToolInfo;
-import io.projectenv.core.cli.api.ToolInfo;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolver;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverException;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverFactory;
-import io.projectenv.core.toolsupport.spi.ToolSupport;
-import io.projectenv.core.toolsupport.spi.ToolSupportContext;
-import io.projectenv.core.toolsupport.spi.ToolSupportException;
+import io.projectenv.core.toolsupport.spi.*;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationManagerException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;

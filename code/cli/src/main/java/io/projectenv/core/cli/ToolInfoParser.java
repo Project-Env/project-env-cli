@@ -1,4 +1,4 @@
-package io.projectenv.core.cli.api;
+package io.projectenv.core.cli;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,8 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.projectenv.core.toolsupport.spi.GsonAdaptersToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +44,9 @@ public final class ToolInfoParser {
         @Override
         public void write(JsonWriter out, File value) throws IOException {
             try {
-                out.value(value.getCanonicalPath());
+                if (value != null) {
+                    out.value(value.getCanonicalPath());
+                }
             } catch (IOException e) {
                 throw new IllegalStateException("cannot get canonical path from file");
             }

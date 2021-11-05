@@ -13,10 +13,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>cli-api</module>
         <module>cli</module>
         <module>tool-support</module>
-        <module>commons</module>
     </modules>
 
     <build>
