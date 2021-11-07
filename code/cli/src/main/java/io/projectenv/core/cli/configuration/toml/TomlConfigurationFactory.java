@@ -3,10 +3,10 @@ package io.projectenv.core.cli.configuration.toml;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.moandjiezana.toml.Toml;
+import io.projectenv.commons.gson.GsonFactory;
 import io.projectenv.core.cli.configuration.ImmutableProjectEnvBaseConfiguration;
 import io.projectenv.core.cli.configuration.ProjectEnvBaseConfiguration;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
-import io.projectenv.core.cli.gson.BaseGsonBuilderFactory;
 import io.projectenv.core.commons.system.EnvironmentVariables;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 
 public final class TomlConfigurationFactory {
 
-    private static final Gson GSON = BaseGsonBuilderFactory
-            .createBaseGsonBuilder()
+    private static final Gson GSON = GsonFactory
+            .createGsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 

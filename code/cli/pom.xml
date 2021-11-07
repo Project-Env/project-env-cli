@@ -58,6 +58,10 @@
             <groupId>io.projectenv.commons</groupId>
             <artifactId>native-image</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.projectenv.commons</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.moandjiezana.toml</groupId>
