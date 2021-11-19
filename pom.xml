@@ -42,7 +42,7 @@
         <pebble.version>3.1.5</pebble.version>
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.14.1</log4j.version>
-        <mockito-inline.version>4.0.0</mockito-inline.version>
+        <mockito-inline.version>4.1.0</mockito-inline.version>
         <archunit-junit5.version>0.22.0</archunit-junit5.version>
 
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
