@@ -10,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MavenSupport implements ToolSupport<MavenConfiguration> {
 
@@ -70,7 +69,7 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
                 .pathElements(localToolInstallationDetails.getPathElements())
                 .handledProjectResources(localToolInstallationDetails.getFileOverwrites()
                         .stream().map(Pair::getLeft)
-                        .collect(Collectors.toList()));
+                        .toList());
 
         toolConfiguration
                 .getUserSettingsFile()

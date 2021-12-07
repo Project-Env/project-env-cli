@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class TomlConfigurationFactory {
 
@@ -113,9 +112,9 @@ public final class TomlConfigurationFactory {
         }
 
         private static <T> List<T> readAs(List<Toml> tomlList, Class<T> configurationClass) {
-            return List.copyOf(tomlList.stream()
+            return tomlList.stream()
                     .map(table -> readAs(table, configurationClass))
-                    .collect(Collectors.toList()));
+                    .toList();
         }
 
         private static <T> T readAs(Toml toml, Class<T> configurationClass) {
