@@ -42,6 +42,7 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
         steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("mvn"));
+        steps.add(new RegisterEnvironmentVariableStep("MAVEN_HOME","/"));
 
         toolConfiguration
                 .getGlobalSettingsFile()
