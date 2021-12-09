@@ -45,16 +45,11 @@ public class MongoDbToolsAssertions extends AbstractToolInfoAssertions {
     }
 
     private String getBinariesRoot() {
-        switch (OperatingSystem.getCurrentOperatingSystem()) {
-            case MACOS:
-                return "mongodb-database-tools-macos-x86_64-100.4.1";
-            case WINDOWS:
-                return "mongodb-database-tools-windows-x86_64-100.4.1";
-            case LINUX:
-                return "mongodb-database-tools-ubuntu2004-x86_64-100.4.1";
-            default:
-                throw new IllegalStateException("unsupported OS");
-        }
+        return switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS -> "mongodb-database-tools-macos-x86_64-100.4.1";
+            case WINDOWS -> "mongodb-database-tools-windows-x86_64-100.4.1";
+            case LINUX -> "mongodb-database-tools-ubuntu2004-x86_64-100.4.1";
+        };
     }
 
 }

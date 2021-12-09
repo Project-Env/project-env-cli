@@ -45,28 +45,18 @@ public class NodeJsAssertions extends AbstractToolInfoAssertions {
     }
 
     private String getBinariesRoot() {
-        switch (OperatingSystem.getCurrentOperatingSystem()) {
-            case MACOS:
-                return "node-v14.15.3-darwin-x64";
-            case WINDOWS:
-                return "node-v14.15.3-win-x64";
-            case LINUX:
-                return "node-v14.15.3-linux-x64";
-            default:
-                throw new IllegalStateException("unsupported OS");
-        }
+        return switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS -> "node-v14.15.3-darwin-x64";
+            case WINDOWS -> "node-v14.15.3-win-x64";
+            case LINUX -> "node-v14.15.3-linux-x64";
+        };
     }
 
     private String getBinPath() {
-        switch (OperatingSystem.getCurrentOperatingSystem()) {
-            case MACOS:
-            case LINUX:
-                return getBinariesRoot() + "/bin";
-            case WINDOWS:
-                return getBinariesRoot();
-            default:
-                throw new IllegalStateException("unsupported OS");
-        }
+        return switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS, LINUX -> getBinariesRoot() + "/bin";
+            case WINDOWS -> getBinariesRoot();
+        };
     }
 
 }

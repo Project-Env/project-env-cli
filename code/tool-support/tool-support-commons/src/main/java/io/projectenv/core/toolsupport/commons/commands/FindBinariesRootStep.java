@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class FindBinariesRootStep implements LocalToolInstallationStep {
 
@@ -41,7 +40,7 @@ public class FindBinariesRootStep implements LocalToolInstallationStep {
                 .orElse(List.of())
                 .stream()
                 .filter(this::shouldConsiderFile)
-                .collect(Collectors.toList());
+                .toList();
 
         if (files.size() == 1) {
             return getToolBinariesRoot(files.get(0));

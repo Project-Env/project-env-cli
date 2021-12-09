@@ -14,7 +14,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
 
@@ -92,7 +91,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
                 .pathElements(localToolInstallationDetails.getPathElements())
                 .handledProjectResources(localToolInstallationDetails.getFileOverwrites()
                         .stream().map(Pair::getLeft)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
     }
 

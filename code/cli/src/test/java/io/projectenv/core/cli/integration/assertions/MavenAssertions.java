@@ -25,7 +25,7 @@ public class MavenAssertions extends AbstractToolInfoAssertions {
 
     @Override
     protected void assertEnvironmentVariables(MapAssert<String, File> assertions) {
-        assertions.isEmpty();
+        assertions.hasSize(1).hasEntrySatisfying("MAVEN_HOME", directoryPathEndsWithCondition(getBinariesRoot()));
     }
 
     @Override
