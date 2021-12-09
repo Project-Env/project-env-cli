@@ -18,7 +18,7 @@ class DefaultLocalToolInstallationManagerTemurinTest {
 
         var configuration = ImmutableJdkConfiguration.builder()
                 .distribution("Temurin")
-                .distributionVersion("11.0.12+7")
+                .version("11.0.12+7")
                 .build();
 
         var context = ImmutableToolSupportContext

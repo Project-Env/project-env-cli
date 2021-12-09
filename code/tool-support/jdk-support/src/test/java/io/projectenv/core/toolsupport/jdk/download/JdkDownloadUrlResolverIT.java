@@ -60,7 +60,7 @@ class JdkDownloadUrlResolverIT {
 
                 var configuration = ImmutableJdkConfiguration.builder()
                         .distribution(distribution)
-                        .distributionVersion(distributionVersion)
+                        .version(distributionVersion)
                         .build();
 
                 var rawUrl = jdkDownloadUrlResolver.resolveUrl(configuration);
