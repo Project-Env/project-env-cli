@@ -44,7 +44,7 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
 
     private String resolveEphemeralId(JdkConfiguration jdkConfiguration) throws IOException {
         var result = discoApiClient.getJdkPackages(
-                jdkConfiguration.getDistributionVersion(),
+                jdkConfiguration.getVersion(),
                 jdkConfiguration.getDistribution(),
                 getCurrentCPUArchitecture(),
                 getRequiredArchiveType(),
@@ -104,7 +104,7 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
     }
 
     private String createFailedResolutionOfJdkDownloadUrlMessage(JdkConfiguration jdkConfiguration) {
-        return "failed to resolve JDK download URL for version " + jdkConfiguration.getDistributionVersion() + " of distribution " +
+        return "failed to resolve JDK download URL for version " + jdkConfiguration.getVersion() + " of distribution " +
                 jdkConfiguration.getDistribution() + " through Disco API";
     }
 

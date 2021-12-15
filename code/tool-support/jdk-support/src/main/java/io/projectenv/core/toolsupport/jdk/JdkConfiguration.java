@@ -1,5 +1,6 @@
 package io.projectenv.core.toolsupport.jdk;
 
+import com.google.gson.annotations.SerializedName;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
 
@@ -11,7 +12,8 @@ public interface JdkConfiguration {
 
     String getDistribution();
 
-    String getDistributionVersion();
+    @SerializedName(value = "version", alternate = "distribution_version")
+    String getVersion();
 
     List<String> getPostExtractionCommands();
 
