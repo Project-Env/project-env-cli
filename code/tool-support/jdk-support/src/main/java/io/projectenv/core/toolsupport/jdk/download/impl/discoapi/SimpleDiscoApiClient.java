@@ -21,14 +21,22 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class SimpleDiscoApiClient implements DiscoApiClient {
 
-    private static final String DISCO_API_BASE_URL = "https://api.foojay.io/";
-    private static final String DISCO_API_JDK_PACKAGES_URL = DISCO_API_BASE_URL + "disco/v2.0/packages/jdks?version={0}&distro={1}&architecture={2}&archive_type={3}&operating_system={4}";
-    private static final String DISCO_API_JDK_PACKAGE_DETAIL_URL = DISCO_API_BASE_URL + "disco/v2.0/ephemeral_ids/{0}";
+    private static final String DISCO_API_BASE_URL = "https://api.foojay.io/disco/v2.0/";
+    private static final String DISCO_API_DISTRIBUTIONS_URL = DISCO_API_BASE_URL + "distributions?include_versions={0}&include_synonyms={1}";
+    private static final String DISCO_API_JDK_PACKAGES_URL = DISCO_API_BASE_URL + "packages/jdks?version={0}&distro={1}&architecture={2}&archive_type={3}&operating_system={4}";
+    private static final String DISCO_API_JDK_PACKAGE_DETAIL_URL = DISCO_API_BASE_URL + "ephemeral_ids/{0}";
 
     private static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
+
+    @Override
+    public DiscoApiResult<List<DiscoApiDistribution>> getDistributions(boolean includeVersions, boolean includeSynonyms) throws IOException {
+        return callApi(formatUrl(DISCO_API_DISTRIBUTIONS_URL, includeVersions, includeSynonyms), new TypeToken<DiscoApiResult<List<DiscoApiDistribution>>>() {
+        }.getType());
+    }
 
     public DiscoApiResult<List<DiscoApiJdkPackage>> getJdkPackages(String version, String distro, String architecture, String archiveType, String operatingSystem) throws IOException {
         return callApi(formatUrl(DISCO_API_JDK_PACKAGES_URL, version, distro, architecture, archiveType, operatingSystem), new TypeToken<DiscoApiResult<List<DiscoApiJdkPackage>>>() {
@@ -40,8 +48,9 @@ public class SimpleDiscoApiClient implements DiscoApiClient {
         }.getType());
     }
 
-    private String formatUrl(String url, String... parameters) {
+    private String formatUrl(String url, Object... parameters) {
         String[] encodedParameters = Arrays.stream(parameters)
+                .map(Objects::toString)
                 .map(parameter -> URLEncoder.encode(parameter, StandardCharsets.UTF_8))
                 .toArray(String[]::new);
 
@@ -86,6 +95,7 @@ public class SimpleDiscoApiClient implements DiscoApiClient {
                 .registerTypeAdapterFactory(new GsonAdaptersDiscoApiResult())
                 .registerTypeAdapterFactory(new GsonAdaptersDiscoApiJdkPackage())
                 .registerTypeAdapterFactory(new GsonAdaptersDiscoApiJdkPackageDetails())
+                .registerTypeAdapterFactory(new GsonAdaptersDiscoApiDistribution())
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
     }

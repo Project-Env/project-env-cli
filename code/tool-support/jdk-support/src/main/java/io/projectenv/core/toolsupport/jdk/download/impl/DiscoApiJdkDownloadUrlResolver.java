@@ -5,10 +5,7 @@ import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.jdk.JdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolver;
 import io.projectenv.core.toolsupport.jdk.download.JdkDownloadUrlResolverException;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiClient;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiJdkPackage;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiJdkPackageDetails;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiResult;
+import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -26,7 +23,8 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
     @Override
     public String resolveUrl(JdkConfiguration jdkConfiguration) throws JdkDownloadUrlResolverException {
         try {
-            var ephemeralId = resolveEphemeralId(jdkConfiguration);
+            var distributionApiName = resolveDistributionApiName(jdkConfiguration);
+            var ephemeralId = resolveEphemeralId(jdkConfiguration, distributionApiName);
             if (StringUtils.isEmpty(ephemeralId)) {
                 throw createFailedResolutionOfJdkDownloadUrlException(jdkConfiguration);
             }
@@ -42,10 +40,35 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
         }
     }
 
-    private String resolveEphemeralId(JdkConfiguration jdkConfiguration) throws IOException {
+    private String resolveDistributionApiName(JdkConfiguration jdkConfiguration) throws IOException {
+        var result = discoApiClient.getDistributions(false, true);
+
+        return Optional.ofNullable(result)
+                .map(DiscoApiResult::getResult)
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(distribution -> {
+                    if (StringUtils.equalsIgnoreCase(distribution.getName(), jdkConfiguration.getDistribution())) {
+                        return true;
+                    }
+
+                    for (String synonym : distribution.getSynonyms()) {
+                        if (StringUtils.equalsIgnoreCase(synonym, jdkConfiguration.getDistribution())) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                })
+                .findFirst()
+                .map(DiscoApiDistribution::getApiParameter)
+                .orElse(jdkConfiguration.getDistribution());
+    }
+
+    private String resolveEphemeralId(JdkConfiguration jdkConfiguration, String distributionApiName) throws IOException {
         var result = discoApiClient.getJdkPackages(
                 jdkConfiguration.getVersion(),
-                jdkConfiguration.getDistribution(),
+                distributionApiName,
                 getCurrentCPUArchitecture(),
                 getRequiredArchiveType(),
                 getCurrentOperatingSystem());
