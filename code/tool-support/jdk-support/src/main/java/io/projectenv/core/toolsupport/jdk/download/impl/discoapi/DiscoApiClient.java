@@ -5,6 +5,8 @@ import java.util.List;
 
 public interface DiscoApiClient {
 
+    DiscoApiResult<List<DiscoApiDistribution>> getDistributions(boolean includeVersions, boolean includeSynonyms) throws IOException;
+
     DiscoApiResult<List<DiscoApiJdkPackage>> getJdkPackages(String version,
                                                             String distro,
                                                             String architecture,
