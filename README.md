@@ -63,6 +63,16 @@ post_extraction_commands = [
     "<command>",
 ]
 
+[groovy]
+# The Groovy version.
+# See https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips
+version = "<version>"
+# [optional]
+# Arbitrary commands which should be executed after extracting.
+post_extraction_commands = [
+    "<command>",
+]
+
 [git]
 # A directory with Git hooks which should be copied into the '.git/hooks' directory.
 hooks_directory = "<path>"
