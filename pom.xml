@@ -25,7 +25,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${maven.multiModuleProjectDirectory}/tools/sonar-aggregator/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>**/*Exception.java,**/nativeimage/**</sonar.coverage.exclusions>
 
-        <project-env-commons.version>1.1.0</project-env-commons.version>
+        <project-env-commons.version>1.2.0</project-env-commons.version>
         <immutable.version>2.9.0</immutable.version>
         <gson.version>2.8.9</gson.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
@@ -35,7 +35,7 @@
         <assertj-core.version>3.22.0</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
         <picocli.version>4.6.2</picocli.version>
-        <graalvm.version>21.3.0</graalvm.version>
+        <graalvm.version>22.0.0.2</graalvm.version>
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.17.1</log4j.version>
         <mockito-inline.version>4.2.0</mockito-inline.version>
