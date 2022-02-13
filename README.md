@@ -108,7 +108,7 @@ post_extraction_commands = [
 
 ### Examples
 
-See [project-env.toml](./code/cli/src/test/resources/io/projectenv/core/cli/integration/project-env.toml) used for integration testing.
+See [project-env.toml](https://github.com/Project-Env/project-env-cli/blob/main/code/cli/src/test/resources/io/projectenv/core/cli/integration/project-env.toml) used for integration testing.
 
 ### Usage of environment variables
 
