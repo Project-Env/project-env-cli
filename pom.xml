@@ -39,7 +39,7 @@
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.17.1</log4j.version>
         <mockito-inline.version>4.3.1</mockito-inline.version>
-        <archunit-junit5.version>0.22.0</archunit-junit5.version>
+        <archunit-junit5.version>0.23.0</archunit-junit5.version>
 
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.10.0</maven-compiler-plugin.version>
