@@ -70,6 +70,7 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
                 jdkConfiguration.getVersion(),
                 distributionApiName,
                 getCurrentCPUArchitecture(),
+                getLibCType(),
                 getRequiredArchiveType(),
                 getCurrentOperatingSystem());
 
@@ -77,6 +78,8 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
                 .map(DiscoApiResult::getResult)
                 .orElse(Collections.emptyList())
                 .stream()
+                // sometimes we get multiple results of which some have another Java version as the expected one
+                .filter(jdkPackage -> StringUtils.equals(jdkConfiguration.getVersion(), jdkPackage.getJavaVersion()))
                 .findFirst()
                 .map(DiscoApiJdkPackage::getEphemeralId)
                 .orElse(null);
@@ -89,6 +92,19 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
         }
 
         throw new IllegalArgumentException("unsupported CPU architecture: " + currentCPUArchitecture);
+    }
+
+    private String getLibCType() {
+        var currentOperatingSystem = OperatingSystem.getCurrentOperatingSystem();
+        if (currentOperatingSystem == OperatingSystem.MACOS) {
+            return "libc";
+        } else if (currentOperatingSystem == OperatingSystem.LINUX) {
+            return "glibc";
+        } else if (currentOperatingSystem == OperatingSystem.WINDOWS) {
+            return "c_std_lib";
+        }
+
+        throw new IllegalArgumentException("unsupported OS: " + currentOperatingSystem);
     }
 
     private String getRequiredArchiveType() {
@@ -128,7 +144,7 @@ public class DiscoApiJdkDownloadUrlResolver implements JdkDownloadUrlResolver {
 
     private String createFailedResolutionOfJdkDownloadUrlMessage(JdkConfiguration jdkConfiguration) {
         return "failed to resolve JDK download URL for version " + jdkConfiguration.getVersion() + " of distribution " +
-                jdkConfiguration.getDistribution() + " through Disco API";
+                jdkConfiguration.getDistribution() + " for " + OperatingSystem.getCurrentOperatingSystem() + " through Disco API";
     }
 
 }

@@ -27,7 +27,7 @@ public class SimpleDiscoApiClient implements DiscoApiClient {
 
     private static final String DISCO_API_BASE_URL = "https://api.foojay.io/disco/v2.0/";
     private static final String DISCO_API_DISTRIBUTIONS_URL = DISCO_API_BASE_URL + "distributions?include_versions={0}&include_synonyms={1}";
-    private static final String DISCO_API_JDK_PACKAGES_URL = DISCO_API_BASE_URL + "packages/jdks?version={0}&distro={1}&architecture={2}&archive_type={3}&operating_system={4}";
+    private static final String DISCO_API_JDK_PACKAGES_URL = DISCO_API_BASE_URL + "packages/jdks?version={0}&distro={1}&architecture={2}&libc_type={3}&archive_type={4}&operating_system={5}";
     private static final String DISCO_API_JDK_PACKAGE_DETAIL_URL = DISCO_API_BASE_URL + "ephemeral_ids/{0}";
 
     private static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
@@ -38,8 +38,8 @@ public class SimpleDiscoApiClient implements DiscoApiClient {
         }.getType());
     }
 
-    public DiscoApiResult<List<DiscoApiJdkPackage>> getJdkPackages(String version, String distro, String architecture, String archiveType, String operatingSystem) throws IOException {
-        return callApi(formatUrl(DISCO_API_JDK_PACKAGES_URL, version, distro, architecture, archiveType, operatingSystem), new TypeToken<DiscoApiResult<List<DiscoApiJdkPackage>>>() {
+    public DiscoApiResult<List<DiscoApiJdkPackage>> getJdkPackages(String version, String distro, String architecture, String libCType, String archiveType, String operatingSystem) throws IOException {
+        return callApi(formatUrl(DISCO_API_JDK_PACKAGES_URL, version, distro, architecture, libCType, archiveType, operatingSystem), new TypeToken<DiscoApiResult<List<DiscoApiJdkPackage>>>() {
         }.getType());
     }
 
