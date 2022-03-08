@@ -35,14 +35,13 @@ class JdkDownloadUrlResolverIT {
     private static Stream<Arguments> getTestArguments() {
         return Stream.of(
                 // test different names/synonyms for a distribution
-                Arguments.of("Graal VM CE 11", "21.1.0"),
-                Arguments.of("graalvm_ce11", "21.1.0"),
-                Arguments.of("graalvmce11", "21.1.0"),
-                Arguments.of("GraalVM CE 11", "21.1.0"),
-                Arguments.of("GraalVMCE11", "21.1.0"),
-                Arguments.of("GraalVM_CE11", "21.1.0"),
+                Arguments.of("Graal VM CE 11", "22.0.0.2"),
+                Arguments.of("graalvm_ce11", "22.0.0.2"),
+                Arguments.of("graalvmce11", "22.0.0.2"),
+                Arguments.of("GraalVM CE 11", "22.0.0.2"),
+                Arguments.of("GraalVMCE11", "22.0.0.2"),
+                Arguments.of("GraalVM_CE11", "22.0.0.2"),
                 // test other distributions
-                Arguments.of("GraalVM CE 16", "21.1.0"),
                 Arguments.of("Temurin", "8.0.302+8"),
                 Arguments.of("Temurin", "11.0.12+7"),
                 Arguments.of("Temurin", "16.0.2+7"),

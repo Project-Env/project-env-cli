@@ -10,6 +10,7 @@ public interface DiscoApiClient {
     DiscoApiResult<List<DiscoApiJdkPackage>> getJdkPackages(String version,
                                                             String distro,
                                                             String architecture,
+                                                            String libCType,
                                                             String archiveType,
                                                             String operatingSystem) throws IOException;
 

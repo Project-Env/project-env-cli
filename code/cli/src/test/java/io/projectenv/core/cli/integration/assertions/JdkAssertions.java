@@ -46,9 +46,9 @@ public class JdkAssertions extends AbstractToolInfoAssertions {
 
     private String getBinariesRoot() {
         if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.MACOS) {
-            return "graalvm-ce-java11-20.3.0/Contents/Home";
+            return "graalvm-ce-java11-22.0.0.2/Contents/Home";
         } else {
-            return "graalvm-ce-java11-20.3.0";
+            return "graalvm-ce-java11-22.0.0.2";
         }
     }
 

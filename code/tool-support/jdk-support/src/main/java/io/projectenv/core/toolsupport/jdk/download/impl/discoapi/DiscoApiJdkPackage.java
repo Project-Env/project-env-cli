@@ -9,4 +9,6 @@ public interface DiscoApiJdkPackage {
 
     String getEphemeralId();
 
+    String getJavaVersion();
+
 }
