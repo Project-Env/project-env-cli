@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/cache@v1
         with:
           path: ~/.m2
