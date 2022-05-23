@@ -13,11 +13,11 @@ The Project-Env CLI represents the raw core of Project-Env which allows the setu
 tools_directory = "<path>"
 
 [jdk]
-# Distribution version according to the Disco API.
-# See https://api.foojay.io/disco/v2.0/distributions?include_synonyms=false
+# Distribution version according the tools index.
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
 version = "<version>"
-# Distribution name according to the Disco API.
-# See https://api.foojay.io/disco/v2.0/distributions?include_versions=false
+# Distribution name according the tools index (usage of synonym possible too)
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
 distribution = "<name>"
 # [optional]
 # Arbitrary commands which should be executed after extracting.
@@ -27,7 +27,7 @@ post_extraction_commands = [
 
 [maven]
 # The Maven version.
-# See https://archive.apache.org/dist/maven/binaries
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
 version = "<version>"
 # [optional]
 # The project-relative path to a Maven settings file which should be used as a global settings file.
@@ -45,7 +45,7 @@ post_extraction_commands = [
 
 [gradle]
 # The Gradle version.
-# See https://gradle.org/releases
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
 version = "<version>"
 # [optional]
 # Arbitrary commands which should be executed after extracting.
@@ -55,17 +55,7 @@ post_extraction_commands = [
 
 [nodejs]
 # The NodeJS version.
-# See https://nodejs.org/download/release
-version = "<version>"
-# [optional]
-# Arbitrary commands which should be executed after extracting.
-post_extraction_commands = [
-    "<command>",
-]
-
-[groovy]
-# The Groovy version.
-# See https://groovy.jfrog.io/artifactory/dist-release-local/groovy-zips
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
 version = "<version>"
 # [optional]
 # Arbitrary commands which should be executed after extracting.

@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.projectenv.commons</groupId>
+            <artifactId>system</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>

@@ -53,11 +53,6 @@
             <artifactId>git-support</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.projectenv.core.toolsupport</groupId>
-            <artifactId>groovy-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>io.projectenv.commons</groupId>

@@ -1,8 +1,5 @@
 package io.projectenv.core.toolsupport.nodejs;
 
-import io.projectenv.core.commons.download.DownloadUrlSubstitutorFactory;
-import io.projectenv.core.commons.download.ImmutableDownloadUrlDictionary;
-import io.projectenv.core.commons.system.CPUArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.*;
@@ -13,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
 
@@ -42,7 +38,7 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
     private List<LocalToolInstallationStep> createInstallationSteps(NodeJsConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
         steps.add(new FindBinariesRootStep());
 
         if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.WINDOWS) {
@@ -60,27 +56,8 @@ public class NodeJsSupport implements ToolSupport<NodeJsConfiguration> {
         return steps;
     }
 
-    private String getSystemSpecificDownloadUri(NodeJsConfiguration toolConfiguration) {
-        var dictionary = ImmutableDownloadUrlDictionary.builder()
-                .putParameters("VERSION", toolConfiguration.getVersion())
-                .putOperatingSystemSpecificParameters("OS", Map.of(
-                        OperatingSystem.MACOS, "darwin",
-                        OperatingSystem.LINUX, "linux",
-                        OperatingSystem.WINDOWS, "win"
-                ))
-                .putOperatingSystemSpecificParameters("FILE_EXT", Map.of(
-                        OperatingSystem.MACOS, "tar.xz",
-                        OperatingSystem.LINUX, "tar.xz",
-                        OperatingSystem.WINDOWS, "zip"
-                ))
-                .putCPUArchitectureSpecificParameters("CPU_ARCH", Map.of(
-                        CPUArchitecture.X64, "x64"
-                ))
-                .build();
-
-        return DownloadUrlSubstitutorFactory
-                .createDownloadUrlVariableSubstitutor(dictionary)
-                .replace("https://nodejs.org/dist/v${VERSION}/node-v${VERSION}-${OS}-${CPU_ARCH}.${FILE_EXT}");
+    private String getSystemSpecificDownloadUri(NodeJsConfiguration toolConfiguration, ToolSupportContext context) {
+        return context.getToolsIndexManager().resolveNodeJsDistributionUrl(toolConfiguration.getVersion());
     }
 
     private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails) {

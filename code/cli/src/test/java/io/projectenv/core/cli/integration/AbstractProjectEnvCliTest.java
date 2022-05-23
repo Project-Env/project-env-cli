@@ -51,7 +51,7 @@ abstract class AbstractProjectEnvCliTest {
         var result = ToolInfoParser.fromJson(output);
 
         var assertions = new SoftAssertions();
-        assertions.assertThat(result).containsOnlyKeys("gradle", "jdk", "nodejs", "git", "maven", "groovy", "generic");
+        assertions.assertThat(result).containsOnlyKeys("gradle", "jdk", "nodejs", "git", "maven", "generic");
         assertions.assertThat(result).extractingByKey("gradle", list(ToolInfo.class))
                 .hasSize(1).allSatisfy(new GradleAssertions(assertions));
         assertions.assertThat(result).extractingByKey("jdk", list(ToolInfo.class))
@@ -62,8 +62,6 @@ abstract class AbstractProjectEnvCliTest {
                 .hasSize(1).allSatisfy(new GitAssertions(assertions));
         assertions.assertThat(result).extractingByKey("maven", list(ToolInfo.class))
                 .hasSize(1).allSatisfy(new MavenAssertions(assertions));
-        assertions.assertThat(result).extractingByKey("groovy", list(ToolInfo.class))
-                .hasSize(1).allSatisfy(new GroovyAssertions(assertions));
         assertions.assertThat(result).extractingByKey("generic", list(ToolInfo.class))
                 .hasSize(2).anySatisfy(new JaxbRiAssertions(assertions)).anySatisfy(new MongoDbToolsAssertions(assertions));
         assertions.assertAll();

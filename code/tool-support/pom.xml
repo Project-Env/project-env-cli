@@ -24,7 +24,6 @@
         <module>git-support</module>
         <module>gradle-support</module>
         <module>generic-tool-support</module>
-        <module>groovy-support</module>
     </modules>
 
 </project>
