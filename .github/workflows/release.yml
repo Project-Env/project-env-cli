@@ -47,7 +47,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.0.0
+      - uses: Project-Env/project-env-github-action@v1.2.0
         with:
           cli-version: '3.4.0'
       - run: |
