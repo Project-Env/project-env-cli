@@ -19,9 +19,6 @@ version = "6.7.1"
 version = "14.15.3"
 post_extraction_commands = ["npm install -g yarn"]
 
-[groovy]
-version = "4.0.0"
-
 [git]
 hooks_directory = "hooks"
 

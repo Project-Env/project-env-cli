@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import com.oracle.svm.core.annotate.AutomaticFeature;
 import io.projectenv.core.commons.nativeimage.NativeImageHelper;
 import io.projectenv.core.commons.process.ProcessOutput;
-import io.projectenv.core.toolsupport.jdk.download.impl.discoapi.DiscoApiClient;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import org.apache.commons.compress.archivers.zip.ZipExtraField;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -24,7 +23,6 @@ public class ProjectEnvFeature implements Feature {
         registerZipExtraFieldClasses();
         registerToolSupportService();
         registerGsonSupport();
-        registerDynamicProxies();
     }
 
     private void configureProcessOutputWriter() {
@@ -52,10 +50,6 @@ public class ProjectEnvFeature implements Feature {
         } catch (IOException e) {
             throw new IllegalStateException("failed to register services for usage in native-image");
         }
-    }
-
-    private void registerDynamicProxies() {
-        NativeImageHelper.registerDynamicProxy(DiscoApiClient.class);
     }
 
 }

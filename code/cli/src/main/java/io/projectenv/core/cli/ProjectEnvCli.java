@@ -2,6 +2,7 @@ package io.projectenv.core.cli;
 
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
+import io.projectenv.core.cli.index.DefaultToolsIndexManager;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.*;
@@ -76,14 +77,16 @@ public final class ProjectEnvCli implements Callable<Integer> {
         }
 
         var localToolInstallationManager = new DefaultLocalToolInstallationManager(toolsDirectory);
+        var toolsIndexManager = new DefaultToolsIndexManager(toolsDirectory);
 
         return ImmutableToolSupportContext.builder()
                 .projectRoot(projectRoot)
                 .localToolInstallationManager(localToolInstallationManager)
+                .toolsIndexManager(toolsIndexManager)
                 .build();
     }
 
-    private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws ProjectEnvException {
+    private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) {
         try {
             var toolInstallationInfos = new LinkedHashMap<String, List<ToolInfo>>();
             for (ToolSupport<?> toolSupport : ServiceLoader.load(ToolSupport.class, ToolSupport.class.getClassLoader())) {

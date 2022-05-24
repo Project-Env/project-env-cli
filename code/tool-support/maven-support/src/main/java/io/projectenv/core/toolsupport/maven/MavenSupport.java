@@ -38,11 +38,11 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
     private List<LocalToolInstallationStep> createInstallationSteps(MavenConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
         steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("mvn"));
-        steps.add(new RegisterEnvironmentVariableStep("MAVEN_HOME","/"));
+        steps.add(new RegisterEnvironmentVariableStep("MAVEN_HOME", "/"));
 
         toolConfiguration
                 .getGlobalSettingsFile()
@@ -55,8 +55,8 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
         return steps;
     }
 
-    private String getSystemSpecificDownloadUri(MavenConfiguration toolConfiguration) {
-        return MavenDownloadUrlResolver.resolveUrl(toolConfiguration.getVersion());
+    private String getSystemSpecificDownloadUri(MavenConfiguration toolConfiguration, ToolSupportContext context) {
+        return context.getToolsIndexManager().resolveMavenDistributionUrl(toolConfiguration.getVersion());
     }
 
     private ToolInfo createProjectEnvToolInfo(MavenConfiguration toolConfiguration,

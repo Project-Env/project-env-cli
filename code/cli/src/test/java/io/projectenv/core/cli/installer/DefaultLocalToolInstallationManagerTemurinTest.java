@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.installer;
 
+import io.projectenv.core.cli.index.DefaultToolsIndexManager;
 import io.projectenv.core.toolsupport.jdk.ImmutableJdkConfiguration;
 import io.projectenv.core.toolsupport.jdk.JdkSupport;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
@@ -15,6 +16,7 @@ class DefaultLocalToolInstallationManagerTemurinTest {
     @Test
     void testTemurinInstallation(@TempDir File projectRoot) throws Exception {
         var installationManager = new DefaultLocalToolInstallationManager(new File(projectRoot, ".tools"));
+        var defaultToolsIndexManager = new DefaultToolsIndexManager(new File(projectRoot, ".tools"));
 
         var configuration = ImmutableJdkConfiguration.builder()
                 .distribution("Temurin")
@@ -25,6 +27,7 @@ class DefaultLocalToolInstallationManagerTemurinTest {
                 .builder()
                 .projectRoot(projectRoot)
                 .localToolInstallationManager(installationManager)
+                .toolsIndexManager(defaultToolsIndexManager)
                 .build();
 
         var toolInfo = new JdkSupport().prepareTool(configuration, context);

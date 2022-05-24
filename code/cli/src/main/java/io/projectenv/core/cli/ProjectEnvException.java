@@ -1,8 +1,6 @@
 package io.projectenv.core.cli;
 
-import java.io.IOException;
-
-public class ProjectEnvException extends IOException {
+public class ProjectEnvException extends RuntimeException {
 
     public ProjectEnvException(String message) {
         super(message);

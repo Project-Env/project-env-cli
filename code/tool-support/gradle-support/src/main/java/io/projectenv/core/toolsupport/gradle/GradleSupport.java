@@ -7,7 +7,6 @@ import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationMana
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
     private List<LocalToolInstallationStep> createInstallationSteps(GradleConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration)));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
         steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("gradle"));
@@ -50,10 +49,8 @@ public class GradleSupport implements ToolSupport<GradleConfiguration> {
         return steps;
     }
 
-    private String getSystemSpecificDownloadUri(GradleConfiguration toolConfiguration) {
-        String version = toolConfiguration.getVersion();
-
-        return MessageFormat.format("https://downloads.gradle-dn.com/distributions/gradle-{0}-bin.zip", version);
+    private String getSystemSpecificDownloadUri(GradleConfiguration toolConfiguration, ToolSupportContext context) {
+        return context.getToolsIndexManager().resolveGradleDistributionUrl(toolConfiguration.getVersion());
     }
 
     private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails) {
