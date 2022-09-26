@@ -20,6 +20,11 @@ public class GitSupport implements ToolSupport<GitConfiguration> {
     }
 
     @Override
+    public Class<GitConfiguration> getToolConfigurationClass() {
+        return GitConfiguration.class;
+    }
+
+    @Override
     public ToolInfo prepareTool(GitConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         try {
             var gitHooksSourceDirectory = new File(context.getProjectRoot(), toolConfiguration.getHooksDirectory());

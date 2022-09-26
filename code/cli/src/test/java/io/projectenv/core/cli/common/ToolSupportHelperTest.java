@@ -27,6 +27,11 @@ class ToolSupportHelperTest {
         }
 
         @Override
+        public Class<TestToolConfiguration> getToolConfigurationClass() {
+            return TestToolConfiguration.class;
+        }
+
+        @Override
         public ToolInfo prepareTool(TestToolConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
             return null;
         }

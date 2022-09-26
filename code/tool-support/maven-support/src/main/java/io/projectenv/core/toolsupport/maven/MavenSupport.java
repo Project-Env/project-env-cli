@@ -1,7 +1,11 @@
 package io.projectenv.core.toolsupport.maven;
 
+import io.projectenv.core.toolsupport.commons.AbstractUpgradableToolSupport;
 import io.projectenv.core.toolsupport.commons.commands.*;
-import io.projectenv.core.toolsupport.spi.*;
+import io.projectenv.core.toolsupport.spi.ImmutableToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolSupportContext;
+import io.projectenv.core.toolsupport.spi.ToolSupportException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationManagerException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
@@ -10,8 +14,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class MavenSupport implements ToolSupport<MavenConfiguration> {
+public class MavenSupport extends AbstractUpgradableToolSupport<MavenConfiguration> {
 
     @Override
     public String getToolIdentifier() {
@@ -19,10 +24,25 @@ public class MavenSupport implements ToolSupport<MavenConfiguration> {
     }
 
     @Override
+    public Class<MavenConfiguration> getToolConfigurationClass() {
+        return MavenConfiguration.class;
+    }
+
+    @Override
     public ToolInfo prepareTool(MavenConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         var toolInstallationDetails = installTool(toolConfiguration, context);
 
         return createProjectEnvToolInfo(toolConfiguration, toolInstallationDetails, context);
+    }
+
+    @Override
+    protected String getCurrentVersion(MavenConfiguration toolConfiguration) {
+        return toolConfiguration.getVersion();
+    }
+
+    @Override
+    protected Set<String> getAllValidVersions(MavenConfiguration toolConfiguration, ToolSupportContext context) {
+        return context.getToolsIndexManager().getMavenVersions();
     }
 
     private LocalToolInstallationDetails installTool(MavenConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
