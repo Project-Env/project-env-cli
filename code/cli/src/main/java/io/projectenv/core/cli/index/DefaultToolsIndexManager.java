@@ -5,6 +5,7 @@ import io.projectenv.commons.gson.GsonFactory;
 import io.projectenv.core.cli.ProjectEnvException;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.commons.ToolVersionHelper;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndex;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexException;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
@@ -17,6 +18,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -82,30 +84,53 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     @Override
     public String resolveMavenDistributionUrl(String version) {
-        return Optional.ofNullable(getToolsIndex().getMavenVersions().get(version))
+        return Optional.ofNullable(getToolsIndex().getMavenVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve Maven " + version + " from tool index"));
     }
 
     @Override
+    public Set<String> getMavenVersions() {
+        return getToolsIndex().getMavenVersions().keySet();
+    }
+
+    @Override
     public String resolveGradleDistributionUrl(String version) {
-        return Optional.ofNullable(getToolsIndex().getGradleVersions().get(version))
+        return Optional.ofNullable(getToolsIndex().getGradleVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve Gradle " + version + " from tool index"));
     }
 
     @Override
+    public Set<String> getGradleVersions() {
+        return getToolsIndex().getGradleVersions().keySet();
+    }
+
+    @Override
     public String resolveNodeJsDistributionUrl(String version) {
-        return Optional.ofNullable(getToolsIndex().getNodeVersions().get(version))
+        return Optional.ofNullable(getToolsIndex().getNodeVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve NodeJS " + version + " from tool index"));
+    }
+
+    @Override
+    public Set<String> getNodeJsVersions() {
+        return getToolsIndex().getNodeVersions().keySet();
     }
 
     @Override
     public String resolveJdkDistributionUrl(String jdkDistribution, String version) {
         return resolveJdkDistributionId(jdkDistribution)
                 .map(jdkDistributionId -> getToolsIndex().getJdkVersions().get(jdkDistributionId))
-                .map(jdkDistributionEntry -> jdkDistributionEntry.get(version))
+                .map(jdkDistributionEntry -> jdkDistributionEntry.get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve " + jdkDistribution + " " + version + " from tool index"));
+    }
+
+    @Override
+    public Set<String> getJdkDistributionVersions(String jdkDistribution) {
+        return resolveJdkDistributionId(jdkDistribution)
+                .map(jdkDistributionId -> getToolsIndex().getJdkVersions().get(jdkDistributionId))
+                .map(Map::keySet)
+                .orElse(Collections.emptySet());
     }
 
     private Optional<String> resolveJdkDistributionId(String jdkDistribution) {

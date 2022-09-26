@@ -1,8 +1,12 @@
 package io.projectenv.core.toolsupport.jdk;
 
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.commons.AbstractUpgradableToolSupport;
 import io.projectenv.core.toolsupport.commons.commands.*;
-import io.projectenv.core.toolsupport.spi.*;
+import io.projectenv.core.toolsupport.spi.ImmutableToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolSupportContext;
+import io.projectenv.core.toolsupport.spi.ToolSupportException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationManagerException;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
@@ -10,8 +14,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class JdkSupport implements ToolSupport<JdkConfiguration> {
+public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> {
 
     @Override
     public String getToolIdentifier() {
@@ -19,10 +24,25 @@ public class JdkSupport implements ToolSupport<JdkConfiguration> {
     }
 
     @Override
+    public Class<JdkConfiguration> getToolConfigurationClass() {
+        return JdkConfiguration.class;
+    }
+
+    @Override
     public ToolInfo prepareTool(JdkConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         var toolInstallationDetails = installTool(toolConfiguration, context);
 
         return createProjectEnvToolInfo(toolInstallationDetails);
+    }
+
+    @Override
+    protected String getCurrentVersion(JdkConfiguration toolConfiguration) {
+        return toolConfiguration.getVersion();
+    }
+
+    @Override
+    protected Set<String> getAllValidVersions(JdkConfiguration toolConfiguration, ToolSupportContext context) {
+        return context.getToolsIndexManager().getJdkDistributionVersions(toolConfiguration.getDistribution());
     }
 
     private LocalToolInstallationDetails installTool(JdkConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {

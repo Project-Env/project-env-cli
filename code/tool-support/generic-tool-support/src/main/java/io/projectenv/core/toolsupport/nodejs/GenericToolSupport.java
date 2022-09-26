@@ -19,6 +19,11 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
     }
 
     @Override
+    public Class<GenericToolConfiguration> getToolConfigurationClass() {
+        return GenericToolConfiguration.class;
+    }
+
+    @Override
     public ToolInfo prepareTool(GenericToolConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         var toolInstallationDetails = installTool(toolConfiguration, context);
 

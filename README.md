@@ -106,6 +106,23 @@ If needed, environment variables can be injected by using the syntax `${<env>}`.
 
 Special case username: As the name of the environment variable containing the username is OS specific, both `USERNAME` and `USER` can be used to inject the username. If `USERNAME` is used, but no environment variable with that name can be found, the value of the variable `USER` is used. This works in the opposite direction too.
 
+## Commands
+
+### `install`
+Installs the tools as configured in the `project-env.toml` configuration file. If no command has been specified, the `install` command will be executed.
+
+### `upgrade`
+Upgrades the tool versions in the `project-env.toml` configuration file according to the `version` property upgrade scope flag. 
+
+The following upgrade scope flags exists:
+* `*`: Upgrade tool version to latest version including major, minor and patch versions
+* `^`: Upgrade tool version to latest version including minor and patch versions
+* `~`: Upgrade tool version to latest version including patch versions
+
+Note that the flag needs to be added as prefix (e.g. `version = "^11.0.16.1+1"`) and is not available for generic tools or tools without any `version` property.
+
+After running the `upgrade` command, the `install` command needs to be executed again to install the upgraded tools.
+
 ## Installation
 
 ### Homebrew

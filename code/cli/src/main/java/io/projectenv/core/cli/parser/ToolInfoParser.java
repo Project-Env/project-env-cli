@@ -1,4 +1,4 @@
-package io.projectenv.core.cli;
+package io.projectenv.core.cli.parser;
 
 import com.google.gson.reflect.TypeToken;
 import io.projectenv.commons.gson.GsonFactory;
