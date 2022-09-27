@@ -69,7 +69,7 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
         FileUtils.write(configFile, rawProjectEnvConfiguration, StandardCharsets.UTF_8);
     }
 
-    private String applyToolUpgrade(String rawProjectEnvConfiguration, Entry<String, List<ToolUpgradeInfo>> entry) throws IOException {
+    private String applyToolUpgrade(String rawProjectEnvConfiguration, Entry<String, List<ToolUpgradeInfo>> entry) {
         String toolIdentifier = entry.getKey();
         for (ToolUpgradeInfo toolUpgradeInfo : entry.getValue()) {
             rawProjectEnvConfiguration = applyToolUpgrade(rawProjectEnvConfiguration, toolIdentifier, toolUpgradeInfo);
@@ -83,7 +83,7 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
 
         String currentVersion = Pattern.quote(toolUpgradeInfo.getCurrentVersion());
         return rawProjectEnvConfiguration
-                .replaceFirst("([\\[]{1,2}" + toolIdentifier + "[\\]]{1,2}(\\n|.+)+)(" + currentVersion + ")", "$1" + toolUpgradeInfo.getUpgradedVersion());
+                .replaceFirst("([\\[]{1,2}" + toolIdentifier + "[\\]]{1,2}(\\R|.+)+)(" + currentVersion + ")", "$1" + toolUpgradeInfo.getUpgradedVersion());
     }
 
     private void writeOutput(Map<String, List<ToolUpgradeInfo>> toolUpgradeInfos) {
