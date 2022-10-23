@@ -2,10 +2,6 @@ name: Release
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'The name of the version which should be released'
-        required: true
 
 jobs:
   create-release:
@@ -13,14 +9,17 @@ jobs:
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
     steps:
+      - run: |
+          curl \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/Project-Env/project-env-cli/releases/next \
+            -d '{"tag_name":"v${{ github.event.inputs.version }}","name":"v${{ github.event.inputs.version }}"}'
       - id: release
-        uses: actions/create-release@v1
+        uses: release-drafter/release-drafter@v5.21.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.event.inputs.version }}
-          release_name: v${{ github.event.inputs.version }}
-          draft: true
   build:
     runs-on: ${{ matrix.os }}
     needs: create-release
