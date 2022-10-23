@@ -22,7 +22,7 @@ public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> 
     @Option(names = {"--project-root"}, defaultValue = ".")
     protected File projectRoot;
 
-    @Option(names = {"--config-file"}, required = true)
+    @Option(names = {"--config-file"}, defaultValue = "project-env.toml")
     protected File configFile;
 
     @Option(names = {"--debug"})

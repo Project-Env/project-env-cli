@@ -83,7 +83,7 @@ abstract class AbstractProjectEnvCliTest {
         assertions.assertThat(result).extractingByKey("gradle", list(ToolUpgradeInfo.class))
                 .hasSize(1).allSatisfy((toolUpgradeInfo) -> {
                     assertions.assertThat(toolUpgradeInfo.getCurrentVersion()).isEqualTo("^6.7.1");
-                    assertions.assertThat(toolUpgradeInfo.getUpgradedVersion()).isEqualTo("^6.9.2");
+                    assertions.assertThat(toolUpgradeInfo.getUpgradedVersion()).isEqualTo("^6.9.3");
                 });
         assertions.assertThat(result).extractingByKey("nodejs", list(ToolUpgradeInfo.class))
                 .hasSize(1).allSatisfy((toolUpgradeInfo) -> {
