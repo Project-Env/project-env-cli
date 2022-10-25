@@ -8,18 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
+      revision: ${{ steps.revision.outputs.revision }}
     steps:
-      - run: |
-          curl \
-            -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/Project-Env/project-env-cli/releases/next \
-            -d '{"tag_name":"v${{ github.event.inputs.version }}","name":"v${{ github.event.inputs.version }}"}'
       - id: release
         uses: release-drafter/release-drafter@v5.21.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: revision
+        run: echo "revision=$(echo '${{ steps.release.outputs.tag_name }}' | cut -c2-)" >> $GITHUB_OUTPUT
   build:
     runs-on: ${{ matrix.os }}
     needs: create-release
@@ -48,7 +44,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.0
       - run: |
-          mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ github.event.inputs.version }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+          mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,7 +54,7 @@ jobs:
         working-directory: code/cli/target
         env:
           EXECUTABLE_NAME: project-env-cli
-          EXECUTABLE_PACKAGE_NAME: cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          EXECUTABLE_PACKAGE_NAME: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           EXECUTABLE_ID: io.projectenv.core.cli
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
@@ -71,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: code/cli/target/cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
-          asset_name: cli-${{ github.event.inputs.version }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           asset_content_type: application/octet-stream
 
