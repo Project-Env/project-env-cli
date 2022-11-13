@@ -34,7 +34,7 @@
         <junit.version>5.9.1</junit.version>
         <assertj-core.version>3.23.1</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
-        <picocli.version>4.6.3</picocli.version>
+        <picocli.version>4.7.0</picocli.version>
         <graalvm.version>22.2.0</graalvm.version>
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.17.2</log4j.version>
