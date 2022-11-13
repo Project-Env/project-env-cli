@@ -55,7 +55,7 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
         <maven-assembly-plugin.version>3.4.2</maven-assembly-plugin.version>
-        <native-maven-plugin.version>0.9.16</native-maven-plugin.version>
+        <native-maven-plugin.version>0.9.17</native-maven-plugin.version>
     </properties>
 
     <modules>
