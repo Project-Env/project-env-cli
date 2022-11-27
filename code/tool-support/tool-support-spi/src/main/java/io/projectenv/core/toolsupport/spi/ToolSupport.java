@@ -14,4 +14,8 @@ public interface ToolSupport<T> {
         return Optional.empty();
     }
 
+    default Optional<ToolUpgradeInfo> upgradeToolVersion(T toolConfiguration, UpgradeScope upgradeScope, ToolSupportContext context) {
+        return Optional.empty();
+    }
+
 }
