@@ -1,9 +1,6 @@
 package io.projectenv.core.toolsupport.commons;
 
-import io.projectenv.core.toolsupport.spi.ImmutableToolUpgradeInfo;
-import io.projectenv.core.toolsupport.spi.ToolSupport;
-import io.projectenv.core.toolsupport.spi.ToolSupportContext;
-import io.projectenv.core.toolsupport.spi.ToolUpgradeInfo;
+import io.projectenv.core.toolsupport.spi.*;
 
 import java.util.Optional;
 import java.util.Set;
@@ -12,9 +9,20 @@ public abstract class AbstractUpgradableToolSupport<T> implements ToolSupport<T>
 
     @Override
     public Optional<ToolUpgradeInfo> upgradeToolVersion(T toolConfiguration, ToolSupportContext context) {
+        UpgradeScope upgradeScope = ToolVersionHelper.getUpgradeScope(getCurrentVersion(toolConfiguration));
+        if (upgradeScope == null) {
+            return Optional.empty();
+        }
+
+
+        return upgradeToolVersion(toolConfiguration, upgradeScope, context);
+    }
+
+    @Override
+    public Optional<ToolUpgradeInfo> upgradeToolVersion(T toolConfiguration, UpgradeScope upgradeScope, ToolSupportContext context) {
         String currentVersion = getCurrentVersion(toolConfiguration);
 
-        return ToolVersionHelper.getNextToolVersion(currentVersion, getAllValidVersions(toolConfiguration, context))
+        return ToolVersionHelper.getNextToolVersion(currentVersion, upgradeScope, getAllValidVersions(toolConfiguration, context))
                 .map(nextToolVersion -> ImmutableToolUpgradeInfo.builder()
                         .currentVersion(currentVersion)
                         .upgradedVersion(nextToolVersion)

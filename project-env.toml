@@ -1,7 +1,7 @@
 tools_directory = ".tools"
 
 [jdk]
-version = "22.2.0"
+version = "22.3.0"
 distribution = "GraalVM CE 17"
 post_extraction_commands = [
     "gu install native-image"

@@ -3,6 +3,7 @@ package io.projectenv.core.toolsupport.commons;
 import com.vdurmont.semver4j.Semver;
 import com.vdurmont.semver4j.Semver.SemverType;
 import com.vdurmont.semver4j.Semver.VersionDiff;
+import io.projectenv.core.toolsupport.spi.UpgradeScope;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Comparator;
@@ -16,13 +17,9 @@ public final class ToolVersionHelper {
         // noop
     }
 
-    public static Optional<String> getNextToolVersion(String currentVersion, Set<String> allValidVersions) {
-        UpgradeScope upgradeScope = getUpgradeScope(currentVersion);
-        if (upgradeScope == null) {
-            return Optional.empty();
-        }
-
-        String currentVersionWithoutPrefix = getVersionWithoutPrefix(currentVersion, upgradeScope);
+    public static Optional<String> getNextToolVersion(String currentVersion, UpgradeScope upgradeScope, Set<String> allValidVersions) {
+        UpgradeScope currentUpgradeScope = getUpgradeScope(currentVersion);
+        String currentVersionWithoutPrefix = getVersionWithoutPrefix(currentVersion, currentUpgradeScope);
         Semver currentVersionAsSemver = new Semver(currentVersionWithoutPrefix, SemverType.LOOSE);
 
         List<Semver> allValidVersionsAsSemver = allValidVersions
@@ -38,7 +35,9 @@ public final class ToolVersionHelper {
             }
 
             if (validDiffs.contains(currentVersionAsSemver.diff(versionCandidate))) {
-                return Optional.of(upgradeScope.prefix + versionCandidate.getOriginalValue());
+                String prefix = Optional.ofNullable(currentUpgradeScope).map(UpgradeScope::getPrefix).orElse("");
+
+                return Optional.of(prefix + versionCandidate.getOriginalValue());
             }
         }
 
@@ -54,12 +53,12 @@ public final class ToolVersionHelper {
             return currentVersion;
         }
 
-        return currentVersion.replace(upgradeScope.prefix, StringUtils.EMPTY);
+        return currentVersion.replace(upgradeScope.getPrefix(), StringUtils.EMPTY);
     }
 
-    private static UpgradeScope getUpgradeScope(String currentVersion) {
+    public static UpgradeScope getUpgradeScope(String currentVersion) {
         for (UpgradeScope upgradeScope : UpgradeScope.values()) {
-            if (currentVersion.startsWith(upgradeScope.prefix)) {
+            if (currentVersion.startsWith(upgradeScope.getPrefix())) {
                 return upgradeScope;
             }
         }
@@ -73,17 +72,6 @@ public final class ToolVersionHelper {
             case MINOR -> Set.of(VersionDiff.MINOR, VersionDiff.PATCH);
             case PATCH -> Set.of(VersionDiff.PATCH);
         };
-    }
-
-    private enum UpgradeScope {
-        MAJOR("*"), MINOR("^"), PATCH("~");
-
-        private final String prefix;
-
-        UpgradeScope(String prefix) {
-            this.prefix = prefix;
-        }
-
     }
 
 }

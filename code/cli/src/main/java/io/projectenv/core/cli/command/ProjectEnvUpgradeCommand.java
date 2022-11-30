@@ -5,12 +5,11 @@ import io.projectenv.core.cli.ToolSupportHelper;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.parser.ToolUpgradeInfoParser;
 import io.projectenv.core.commons.process.ProcessOutput;
-import io.projectenv.core.toolsupport.spi.ToolSupport;
-import io.projectenv.core.toolsupport.spi.ToolSupportContext;
-import io.projectenv.core.toolsupport.spi.ToolSupportException;
-import io.projectenv.core.toolsupport.spi.ToolUpgradeInfo;
+import io.projectenv.core.toolsupport.spi.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +19,12 @@ import java.util.regex.Pattern;
 
 @Command(name = "upgrade")
 public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
+
+    @Option(names = {"--force-scope"})
+    protected UpgradeScope scope;
+
+    @Option(names = {"--include-tools"}, split = ",")
+    protected List<String> includeTools;
 
     @Override
     protected void callInternal(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws Exception {
@@ -33,6 +38,10 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
         try {
             var toolUpgradeInfos = new LinkedHashMap<String, List<ToolUpgradeInfo>>();
             for (ToolSupport<?> toolSupport : ServiceLoader.load(ToolSupport.class, ToolSupport.class.getClassLoader())) {
+                if (!shouldUpgradeTool(toolSupport)) {
+                    continue;
+                }
+
                 List<ToolUpgradeInfo> specificToolUpgradeInfos = upgradeToolVersion(toolSupport, configuration, toolSupportContext);
                 if (!specificToolUpgradeInfos.isEmpty()) {
                     toolUpgradeInfos.put(toolSupport.getToolIdentifier(), specificToolUpgradeInfos);
@@ -45,6 +54,10 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
         }
     }
 
+    private boolean shouldUpgradeTool(ToolSupport<?> toolSupport) {
+        return CollectionUtils.isEmpty(includeTools) || includeTools.contains(toolSupport.getToolIdentifier());
+    }
+
     private <T> List<ToolUpgradeInfo> upgradeToolVersion(ToolSupport<T> toolSupport, ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws ToolSupportException {
         var toolSupportConfigurationClass = ToolSupportHelper.getToolSupportConfigurationClass(toolSupport);
         var toolConfigurations = configuration.getToolConfigurations(toolSupport.getToolIdentifier(), toolSupportConfigurationClass);
@@ -54,7 +67,11 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
 
         var toolUpgradeInfos = new ArrayList<ToolUpgradeInfo>();
         for (var toolConfiguration : toolConfigurations) {
-            toolSupport.upgradeToolVersion(toolConfiguration, toolSupportContext).ifPresent(toolUpgradeInfos::add);
+            if (scope != null) {
+                toolSupport.upgradeToolVersion(toolConfiguration, scope, toolSupportContext).ifPresent(toolUpgradeInfos::add);
+            } else {
+                toolSupport.upgradeToolVersion(toolConfiguration, toolSupportContext).ifPresent(toolUpgradeInfos::add);
+            }
         }
 
         return toolUpgradeInfos;
