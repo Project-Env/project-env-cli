@@ -36,6 +36,8 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
+      - run: ldd --version
+        if: ${{ matrix.os == 'ubuntu-latest'}}
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
         with:
