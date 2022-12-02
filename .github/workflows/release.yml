@@ -5,7 +5,7 @@ on:
 
 jobs:
   create-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       revision: ${{ steps.revision.outputs.revision }}
@@ -21,9 +21,9 @@ jobs:
     needs: create-release
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-latest ]
+        os: [ macos-latest, windows-latest, ubuntu-20.04 ]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
           - os: windows-latest
@@ -36,6 +36,8 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
+      - run: ldd --version
+        if: ${{ matrix.os == 'ubuntu-20.04'}}
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
         with:
