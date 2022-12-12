@@ -44,7 +44,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.3.0
+      - uses: Project-Env/project-env-github-action@v1.3.1
       - run: |
           mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
