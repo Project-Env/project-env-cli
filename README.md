@@ -112,9 +112,9 @@ Special case username: As the name of the environment variable containing the us
 Installs the tools as configured in the `project-env.toml` configuration file. If no command has been specified, the `install` command will be executed.
 
 ### `upgrade`
-Upgrades the tool versions in the `project-env.toml` configuration file according to the `version` property upgrade scope flag. 
+Upgrades the tool versions in the `project-env.toml` configuration file either as specified with the `--force-scope` option or according to the `version` property upgrade scope flag. 
 
-The following upgrade scope flags exists:
+The following upgrade scope flags are supported:
 * `*`: Upgrade tool version to latest version including major, minor and patch versions
 * `^`: Upgrade tool version to latest version including minor and patch versions
 * `~`: Upgrade tool version to latest version including patch versions
@@ -122,6 +122,9 @@ The following upgrade scope flags exists:
 Note that the flag needs to be added as prefix (e.g. `version = "^11.0.16.1+1"`) and is not available for generic tools or tools without any `version` property.
 
 After running the `upgrade` command, the `install` command needs to be executed again to install the upgraded tools.
+
+## Custom index
+The `PROJECT_ENV_TOOL_INDEX` env var can be used to specify a custom index URL.
 
 ## Installation
 

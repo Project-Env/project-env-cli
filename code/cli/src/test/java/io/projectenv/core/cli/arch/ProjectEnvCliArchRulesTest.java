@@ -18,7 +18,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "io.projectenv")
 class ProjectEnvCliArchRulesTest {
 
-    private static final DescribedPredicate<? super JavaMethodCall> SYSTEM_GETENV =createMethodPredicate(System.class, "getenv");
+    private static final DescribedPredicate<? super JavaMethodCall> SYSTEM_GETENV = createMethodPredicate(System.class, "getenv");
 
     @ArchTest
     public static final ArchRule disallowedSystemEnvAccess = noClasses()

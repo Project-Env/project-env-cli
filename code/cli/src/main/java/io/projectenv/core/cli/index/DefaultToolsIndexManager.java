@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.projectenv.commons.gson.GsonFactory;
 import io.projectenv.core.cli.ProjectEnvException;
 import io.projectenv.core.commons.process.ProcessOutput;
+import io.projectenv.core.commons.system.EnvironmentVariables;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.ToolVersionHelper;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndex;
@@ -11,6 +12,7 @@ import io.projectenv.core.toolsupport.spi.index.ToolsIndexException;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URI;
@@ -25,10 +27,15 @@ import java.util.Set;
 
 public class DefaultToolsIndexManager implements ToolsIndexManager {
 
-    private static final String TOOLS_INDEX_URL = "https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json";
+    private static final String DEFAULT_TOOLS_INDEX_URL = "https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json";
+    private static final String PROJECT_ENV_TOOL_INDEX_ENV = "PROJECT_ENV_TOOL_INDEX";
     private static final String TOOLS_INDEX_FILE = "tools-index.json";
 
     private static final Gson GSON = GsonFactory.createGsonBuilder().create();
+
+    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     private final File toolsRoot;
 
@@ -62,24 +69,42 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
     }
 
     private void downloadToolsIndex(File toolsIndexFile) throws IOException, InterruptedException {
-        var httpRequest = HttpRequest.newBuilder()
-                .uri(URI.create(TOOLS_INDEX_URL))
-                .GET()
-                .build();
+        try (InputStream inputStream = new BufferedInputStream(getToolsIndexInputStream());
+             OutputStream outputStream = new FileOutputStream(toolsIndexFile)) {
+            IOUtils.copy(inputStream, outputStream);
+        }
+    }
 
-        var httpClient = HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .build();
+    private InputStream getToolsIndexInputStream() throws IOException, InterruptedException {
+        URI toolIndexUri = resolveToolIndexUri();
+        if (StringUtils.equals("file", toolIndexUri.getScheme())) {
+            return getToolsIndexInputStreamFromFileUri(toolIndexUri);
+        } else {
+            return getToolsIndexInputStreamFromHttpUri(toolIndexUri);
+        }
+    }
 
-        HttpResponse<InputStream> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+    private URI resolveToolIndexUri() {
+        String toolIndexUri = EnvironmentVariables.get(PROJECT_ENV_TOOL_INDEX_ENV);
+        if (toolIndexUri == null) {
+            toolIndexUri = DEFAULT_TOOLS_INDEX_URL;
+        }
+
+        return URI.create(toolIndexUri);
+    }
+
+    private InputStream getToolsIndexInputStreamFromFileUri(URI toolIndexUri) throws IOException {
+        return new FileInputStream(new File(toolIndexUri));
+    }
+
+    private InputStream getToolsIndexInputStreamFromHttpUri(URI toolIndexUri) throws IOException, InterruptedException {
+        var httpRequest = HttpRequest.newBuilder().uri(toolIndexUri).GET().build();
+        HttpResponse<InputStream> response = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() != 200) {
             throw new ProjectEnvException("Received a non expected status code " + response.statusCode() + " while downloading the tool index");
         }
 
-        try (InputStream inputStream = new BufferedInputStream(response.body());
-             OutputStream outputStream = new FileOutputStream(toolsIndexFile)) {
-            IOUtils.copy(inputStream, outputStream);
-        }
+        return response.body();
     }
 
     @Override
