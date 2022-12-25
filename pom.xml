@@ -26,7 +26,7 @@
         <sonar.coverage.exclusions>**/*Exception.java,**/nativeimage/**</sonar.coverage.exclusions>
 
         <project-env-commons.version>1.2.0</project-env-commons.version>
-        <immutable.version>2.9.2</immutable.version>
+        <immutable.version>2.9.3</immutable.version>
         <gson.version>2.10</gson.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <commons-io.version>2.11.0</commons-io.version>
