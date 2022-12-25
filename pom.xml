@@ -38,7 +38,7 @@
         <graalvm.version>22.3.0</graalvm.version>
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.19.0</log4j.version>
-        <mockito-inline.version>4.9.0</mockito-inline.version>
+        <mockito-inline.version>4.10.0</mockito-inline.version>
         <archunit-junit5.version>1.0.1</archunit-junit5.version>
         <semver4j.version>3.1.0</semver4j.version>
 
