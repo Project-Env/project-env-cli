@@ -32,7 +32,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <junit.version>5.9.1</junit.version>
-        <assertj-core.version>3.24.1</assertj-core.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
         <picocli.version>4.7.0</picocli.version>
         <graalvm.version>22.3.0</graalvm.version>
