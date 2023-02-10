@@ -16,17 +16,11 @@
             <outputDirectory>.</outputDirectory>
             <includes>
                 <include>${cli.binary}*</include>
+                <include>*.dll</include>
             </includes>
             <excludes>
                 <exclude>*.txt</exclude>
             </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${env.JAVA_HOME}/bin</directory>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>vcruntime140*.dll</include>
-            </includes>
         </fileSet>
     </fileSets>
 
