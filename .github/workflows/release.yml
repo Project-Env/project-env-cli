@@ -36,8 +36,6 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
-      - run: .\etc\scripts\InstallNSIS.ps1
-        if: ${{ matrix.os == 'windows-latest'}}
       - run: ldd --version
         if: ${{ matrix.os == 'ubuntu-20.04'}}
       - uses: actions/checkout@v3
@@ -47,6 +45,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
+      - run: ./etc/scripts/InstallNSIS.ps1
+        if: ${{ matrix.os == 'windows-latest'}}
       - run: |
           mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
@@ -81,5 +81,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe
-          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe
           asset_content_type: application/octet-stream
