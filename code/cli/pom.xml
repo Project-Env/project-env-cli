@@ -134,11 +134,13 @@
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
-                                <phase>package</phase>
+                                <phase>compile</phase>
                             </execution>
                         </executions>
                         <configuration>
-                            <buildArgs>--enable-url-protocols=https --no-fallback --features=io.projectenv.core.cli.nativeimage.ProjectEnvFeature</buildArgs>
+                            <buildArgs>--enable-url-protocols=https --no-fallback
+                                --features=io.projectenv.core.cli.nativeimage.ProjectEnvFeature
+                            </buildArgs>
                             <mainClass>io.projectenv.core.cli.ProjectEnvCli</mainClass>
                             <imageName>${cli.binary}</imageName>
                         </configuration>
@@ -156,6 +158,86 @@
                                     <descriptors>
                                         <descriptor>src/assembly/assembly.xml</descriptor>
                                     </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-ddls</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>${env.JAVA_HOME}/bin</directory>
+                                            <includes>
+                                                <include>vcruntime140_1.dll</include>
+                                                <include>vcruntime140.dll</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>prepare-nsis-script</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}/src/nsis</directory>
+                                            <includes>
+                                                <include>*.nsi</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                        <resource>
+                                            <directory>${project.basedir}/src/nsis</directory>
+                                            <excludes>
+                                                <exclude>*.nsi</exclude>
+                                            </excludes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                    <delimiters>@</delimiters>
+                                    <outputDirectory>${project.build.directory}/nsis</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <executable>C:\Program Files (x86)\NSIS\makensis.exe</executable>
+                                    <arguments>${project.build.directory}/nsis/installer.nsi</arguments>
                                 </configuration>
                             </execution>
                         </executions>

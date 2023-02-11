@@ -36,6 +36,8 @@ jobs:
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
+      - run: .\etc\scripts\InstallNSIS.ps1
+        if: ${{ matrix.os == 'windows-latest'}}
       - run: ldd --version
         if: ${{ matrix.os == 'ubuntu-20.04'}}
       - uses: actions/checkout@v3
@@ -72,4 +74,12 @@ jobs:
           asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           asset_content_type: application/octet-stream
-
+      - uses: actions/upload-release-asset@v1
+        if: ${{ matrix.os == 'windows-latest'}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe
+          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          asset_content_type: application/octet-stream

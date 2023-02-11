@@ -27,6 +27,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
+      - run: ./etc/scripts/InstallNSIS.ps1
+        if: ${{ matrix.os == 'windows-latest'}}
       - run: mvn -B -s etc/m2/settings-ci.xml -Psonar -Pnative-image verify
         if: ${{ matrix.os == 'ubuntu-20.04' && github.actor != 'dependabot[bot]' }}
         env:
