@@ -1,4 +1,4 @@
-!define PRODUCT_NAME "Project-Env CLI"
+!define PRODUCT_NAME "ProjectEnv.ProjectEnvCli"
 !define PRODUCT_VERSION "@project.version@"
 !define PRODUCT_PUBLISHER "repolevedavaj"
 !define PRODUCT_WEB_SITE "https://projectenv.io"
