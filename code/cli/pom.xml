@@ -132,7 +132,7 @@
                         <executions>
                             <execution>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>compile-no-fork</goal>
                                 </goals>
                                 <phase>compile</phase>
                             </execution>
@@ -195,49 +195,6 @@
                                         </resource>
                                     </resources>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>prepare-nsis-script</id>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <phase>generate-resources</phase>
-                                <configuration>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.basedir}/src/nsis</directory>
-                                            <includes>
-                                                <include>*.nsi</include>
-                                            </includes>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                        <resource>
-                                            <directory>${project.basedir}/src/nsis</directory>
-                                            <excludes>
-                                                <exclude>*.nsi</exclude>
-                                            </excludes>
-                                            <filtering>false</filtering>
-                                        </resource>
-                                    </resources>
-                                    <delimiters>@</delimiters>
-                                    <outputDirectory>${project.build.directory}/nsis</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <executable>C:\Program Files (x86)\NSIS\makensis.exe</executable>
-                                    <arguments>${project.build.directory}/nsis/installer.nsi</arguments>
                                 </configuration>
                             </execution>
                         </executions>

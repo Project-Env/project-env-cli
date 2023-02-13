@@ -9,7 +9,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-20.04]
+        os: [ macos-latest, windows-latest, ubuntu-20.04 ]
+        include:
+          - os: ubuntu-20.04
+            cli_assembly_id: linux-amd64
+            cli_assembly_format: tar.gz
+          - os: windows-latest
+            cli_assembly_id: windows-amd64
+            cli_assembly_format: zip
+            gu_executable_ext: .cmd
+          - os: macos-latest
+            cli_assembly_id: macos-amd64
+            cli_assembly_format: tar.gz
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
@@ -27,14 +38,34 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
-      - run: ./etc/scripts/InstallNSIS.ps1
+      - uses: repolevedavaj/install-nsis@v1.0.0
+        with:
+          nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
-      - run: mvn -B -s etc/m2/settings-ci.xml -Psonar -Pnative-image verify
+      - run: mvn -B -s etc/m2/settings-ci.xml verify -Pnative-image -Psonar "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os == 'ubuntu-20.04' && github.actor != 'dependabot[bot]' }}
         env:
+          GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - run: mvn -B -s etc/m2/settings-ci.xml -Pnative-image verify
+      - run: mvn -B -s etc/m2/settings-ci.xml verify -Pnative-image "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os != 'ubuntu-20.04' || github.actor == 'dependabot[bot]' }}
         env:
+          GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          path: code/cli/target/cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+      - uses: repolevedavaj/create-cli-app-nsis-installer@main
+        if: ${{ matrix.os == 'windows-latest'}}
+        with:
+          package-identifier: ProjectEnv.ProjectEnvCli
+          package-name: Project-Env Cli
+          package-version: dev
+          source-directory: code/cli/target/cli-dev-windows-amd64
+      - uses: actions/upload-artifact@v3
+        if: ${{ matrix.os == 'windows-latest'}}
+        with:
+          name: cli-dev-${{ matrix.cli_assembly_id }}-setup.exe
+          path: code/cli/target/cli-dev-${{ matrix.cli_assembly_id }}-setup.exe
