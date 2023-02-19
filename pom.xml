@@ -35,7 +35,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <toml4j.version>0.7.2</toml4j.version>
         <picocli.version>4.7.1</picocli.version>
-        <graalvm.version>22.3.0</graalvm.version>
+        <graalvm.version>22.3.1</graalvm.version>
         <reflections.version>0.10.2</reflections.version>
         <log4j.version>2.19.0</log4j.version>
         <mockito-inline.version>5.1.1</mockito-inline.version>
