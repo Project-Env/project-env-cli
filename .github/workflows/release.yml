@@ -45,13 +45,21 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
-      - run: ./etc/scripts/InstallNSIS.ps1
+      - uses: repolevedavaj/install-nsis@v1.0.0
+        with:
+          nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
-      - run: |
-          mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+      - run: mvn -B -s etc/m2/settings-ci.xml package -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: repolevedavaj/create-cli-app-nsis-installer@main
+        if: ${{ matrix.os == 'windows-latest'}}
+        with:
+          package-identifier: ProjectEnv.ProjectEnvCli
+          package-name: Project-Env Cli
+          package-version: ${{ needs.create-release.outputs.revision }}
+          source-directory: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}
       - name: Sign and notarize executable
         if: ${{ matrix.os == 'macos-latest'}}
         run: ../../../etc/github-actions/sign-and-notarize-executable.sh

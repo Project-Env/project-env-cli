@@ -8,6 +8,7 @@
 
     <formats>
         <format>${cli.assembly.format}</format>
+        <format>dir</format>
     </formats>
 
     <fileSets>
