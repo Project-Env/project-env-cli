@@ -239,9 +239,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${maven-deploy-plugin.version}</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -294,9 +291,16 @@
 
     <repositories>
         <repository>
-            <id>github</id>
+            <id>github-project-env-commons-java</id>
             <url>https://maven.pkg.github.com/Project-Env/project-env-commons-java</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>github-project-env-cli</id>
+            <url>https://maven.pkg.github.com/Project-Env/project-env-cli</url>
+        </repository>
+    </distributionManagement>
 
 </project>
