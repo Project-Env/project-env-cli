@@ -131,3 +131,8 @@ The `PROJECT_ENV_TOOL_INDEX` env var can be used to specify a custom index URL.
 ### Homebrew
 
 `brew install --cask project-env/tap/project-env-cli`
+
+### Winget
+
+`winget install ProjectEnv.ProjectEnvCli`
+
