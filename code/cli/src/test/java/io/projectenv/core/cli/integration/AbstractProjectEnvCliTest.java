@@ -53,7 +53,11 @@ abstract class AbstractProjectEnvCliTest {
         assertions.assertThat(result).extractingByKey("maven", list(ToolInfo.class))
                 .hasSize(1).allSatisfy(new MavenAssertions(assertions));
         assertions.assertThat(result).extractingByKey("generic", list(ToolInfo.class))
-                .hasSize(2).anySatisfy(new JaxbRiAssertions(assertions)).anySatisfy(new MongoDbToolsAssertions(assertions));
+                .hasSize(3)
+                .anySatisfy(new JaxbRiAssertions(assertions))
+                .anySatisfy(new MongoDbToolsAssertions(assertions))
+                .anySatisfy(new MongoDbToolsAssertions(assertions))
+                .anySatisfy(new TerraformToolsAssertions(assertions));
         assertions.assertAll();
     }
 
