@@ -34,3 +34,12 @@ download_urls = [
     { target_os = "linux", download_url = "https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.4.1.tgz" }
 ]
 path_elements = ["bin"]
+
+[[generic]]
+download_urls = [
+    { target_os = "macos", download_url = "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_darwin_amd64.zip" },
+    { target_os = "windows", download_url = "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_windows_amd64.zip" },
+    { target_os = "linux", download_url = "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip" }
+]
+path_elements = ["/"]
+

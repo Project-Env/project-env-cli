@@ -43,10 +43,13 @@ public class FindBinariesRootStep implements LocalToolInstallationStep {
                 .toList();
 
         if (files.size() == 1) {
-            return getToolBinariesRoot(files.get(0));
-        } else {
-            return toolDirectory;
+            File file = files.get(0);
+            if (file.isDirectory()) {
+                return getToolBinariesRoot(file);
+            }
         }
+
+        return toolDirectory;
     }
 
     private boolean shouldConsiderFile(File file) {
