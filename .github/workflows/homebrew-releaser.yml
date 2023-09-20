@@ -8,7 +8,7 @@ jobs:
     steps:
       - id: revision
         run: echo "revision=$(echo ${GITHUB_REF#refs/tags/} | cut -c2-)" >> $GITHUB_OUTPUT
-      - uses: mislav/bump-homebrew-formula-action@v2
+      - uses: mislav/bump-homebrew-formula-action@v3
         with:
           formula-name: project-env-cli
           formula-path: Casks/project-env-cli.rb
