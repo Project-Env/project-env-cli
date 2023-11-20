@@ -9,6 +9,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      packages: write
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       revision: ${{ steps.revision.outputs.revision }}
@@ -24,6 +25,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      packages: write
     needs: create-release
     strategy:
       matrix:
