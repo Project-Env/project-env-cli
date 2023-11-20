@@ -45,7 +45,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
-      - uses: repolevedavaj/install-nsis@v1.0.0
+      - uses: repolevedavaj/install-nsis@v1.0.1
         with:
           nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
