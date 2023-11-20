@@ -40,7 +40,7 @@
         <log4j.version>2.20.0</log4j.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <archunit-junit5.version>1.0.1</archunit-junit5.version>
-        <semver4j.version>3.1.0</semver4j.version>
+        <semver4j.version>5.2.2</semver4j.version>
 
         <flatten-maven-plugin.version>1.4.1</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -188,7 +188,7 @@
                 <version>${archunit-junit5.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.vdurmont</groupId>
+                <groupId>org.semver4j</groupId>
                 <artifactId>semver4j</artifactId>
                 <version>${semver4j.version}</version>
             </dependency>

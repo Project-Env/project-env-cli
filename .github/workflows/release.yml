@@ -45,17 +45,17 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@v1.3.1
-      - uses: repolevedavaj/install-nsis@v1.0.0
+      - uses: repolevedavaj/install-nsis@v1.0.1
         with:
           nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
-      - run: mvn -B -s etc/m2/settings-ci.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+      - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os == 'ubuntu-20.04' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - run: mvn -B -s etc/m2/settings-ci.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os != 'ubuntu-20.04' }}
         env:
           GITHUB_USER: ${{ github.actor }}
