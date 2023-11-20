@@ -1,15 +1,13 @@
 package io.projectenv.core.toolsupport.commons;
 
-import com.vdurmont.semver4j.Semver;
-import com.vdurmont.semver4j.Semver.SemverType;
-import com.vdurmont.semver4j.Semver.VersionDiff;
 import io.projectenv.core.toolsupport.spi.UpgradeScope;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.semver4j.Semver;
+import org.semver4j.Semver.VersionDiff;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class ToolVersionHelper {
 
@@ -20,24 +18,24 @@ public final class ToolVersionHelper {
     public static Optional<String> getNextToolVersion(String currentVersion, UpgradeScope upgradeScope, Set<String> allValidVersions) {
         UpgradeScope currentUpgradeScope = getUpgradeScope(currentVersion);
         String currentVersionWithoutPrefix = getVersionWithoutPrefix(currentVersion, currentUpgradeScope);
-        Semver currentVersionAsSemver = new Semver(currentVersionWithoutPrefix, SemverType.LOOSE);
+        Semver currentVersionAsSemver = Semver.coerce(currentVersionWithoutPrefix);
 
-        List<Semver> allValidVersionsAsSemver = allValidVersions
+        List<ImmutablePair<String, Semver>> allValidVersionsAsSemver = allValidVersions
                 .stream()
-                .map(value -> new Semver(value, SemverType.LOOSE))
-                .sorted(Comparator.<Semver>naturalOrder().reversed())
+                .map(version -> ImmutablePair.of(version, Semver.coerce(version)))
+                .sorted(Collections.reverseOrder(Comparator.comparing(Pair::getRight)))
                 .toList();
 
         Set<VersionDiff> validDiffs = getValidDiffs(upgradeScope);
-        for (Semver versionCandidate : allValidVersionsAsSemver) {
-            if (versionCandidate.equals(currentVersionAsSemver)) {
+        for (ImmutablePair<String, Semver> versionCandidate : allValidVersionsAsSemver) {
+            if (versionCandidate.getRight().equals(currentVersionAsSemver)) {
                 break;
             }
 
-            if (validDiffs.contains(currentVersionAsSemver.diff(versionCandidate))) {
+            if (validDiffs.contains(currentVersionAsSemver.diff(versionCandidate.getRight()))) {
                 String prefix = Optional.ofNullable(currentUpgradeScope).map(UpgradeScope::getPrefix).orElse("");
 
-                return Optional.of(prefix + versionCandidate.getOriginalValue());
+                return Optional.of(prefix + versionCandidate.getLeft());
             }
         }
 

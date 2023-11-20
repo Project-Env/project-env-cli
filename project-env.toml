@@ -9,3 +9,4 @@ post_extraction_commands = [
 
 [maven]
 version = "*3.9.3"
+user_settings_file = "etc/m2/settings.xml"

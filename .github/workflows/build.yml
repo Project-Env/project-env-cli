@@ -42,13 +42,13 @@ jobs:
         with:
           nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
-      - run: mvn -B -s etc/m2/settings-ci.xml verify -Pnative-image -Psonar "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image -Psonar "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os == 'ubuntu-20.04' && github.actor != 'dependabot[bot]' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - run: mvn -B -s etc/m2/settings-ci.xml verify -Pnative-image "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
+      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
         if: ${{ matrix.os != 'ubuntu-20.04' || github.actor == 'dependabot[bot]' }}
         env:
           GITHUB_USER: ${{ github.actor }}
