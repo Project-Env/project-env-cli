@@ -6,6 +6,9 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       upload_url: ${{ steps.release.outputs.upload_url }}
       revision: ${{ steps.revision.outputs.revision }}
@@ -18,6 +21,9 @@ jobs:
         run: echo "revision=$(echo '${{ steps.release.outputs.tag_name }}' | cut -c2-)" >> $GITHUB_OUTPUT
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      pull-requests: write
     needs: create-release
     strategy:
       matrix:
