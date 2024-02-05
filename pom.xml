@@ -37,7 +37,7 @@
         <picocli.version>4.7.4</picocli.version>
         <graalvm.version>22.3.3</graalvm.version>
         <reflections.version>0.10.2</reflections.version>
-        <log4j.version>2.22.0</log4j.version>
+        <log4j.version>2.22.1</log4j.version>
         <mockito-inline.version>5.2.0</mockito-inline.version>
         <archunit-junit5.version>1.0.1</archunit-junit5.version>
         <semver4j.version>5.2.2</semver4j.version>
