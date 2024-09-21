@@ -3,11 +3,6 @@
 
     <servers>
         <server>
-            <id>github-project-env-commons-java</id>
-            <username>${env.GITHUB_USER}</username>
-            <password>${env.GITHUB_TOKEN}</password>
-        </server>
-        <server>
             <id>github-project-env-cli</id>
             <username>${env.GITHUB_USER}</username>
             <password>${env.GITHUB_TOKEN}</password>

@@ -1,12 +1,9 @@
 tools_directory = ".tools"
 
 [jdk]
-version = "*22.3.3"
-distribution = "GraalVM CE 17"
-post_extraction_commands = [
-    "gu install native-image"
-]
+version = "*23.1.2"
+distribution = "GraalVM CE 21"
 
 [maven]
-version = "*3.9.3"
+version = "*3.9.9"
 user_settings_file = "etc/m2/settings.xml"

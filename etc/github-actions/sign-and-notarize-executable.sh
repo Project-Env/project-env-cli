@@ -18,12 +18,11 @@ security delete-keychain "$KEY_CHAIN_NAME"
 
 # upload the signed executable to the notarization service
 ditto -c -k "$EXECUTABLE_NAME" "$EXECUTABLE_NAME".zip
-xcrun altool --notarize-app \
-  --primary-bundle-id="$EXECUTABLE_ID" \
-  --file="$EXECUTABLE_NAME".zip \
-  --username="$APPLE_ID" \
+xcrun notarytool submit \
+  --apple-id="$APPLE_ID" \
   --password="$APPLE_ID_PASSWORD" \
-  --asc-provider="$APPLE_ID_TEAM"
+  --team-id="$APPLE_ID_TEAM" \
+  "$EXECUTABLE_NAME".zip
 rm "$EXECUTABLE_NAME".zip
 
 # update the package with the signed executable

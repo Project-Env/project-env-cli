@@ -5,7 +5,7 @@ on:
 
 jobs:
   create-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
@@ -29,9 +29,9 @@ jobs:
     needs: create-release
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-20.04 ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
           - os: windows-latest
@@ -39,32 +39,32 @@ jobs:
             cli_assembly_format: zip
             gu_executable_ext: .cmd
           - os: macos-latest
-            cli_assembly_id: macos-amd64
+            cli_assembly_id: macos-aarch64
             cli_assembly_format: tar.gz
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
       - run: ldd --version
-        if: ${{ matrix.os == 'ubuntu-20.04'}}
+        if: ${{ matrix.os == 'ubuntu-latest'}}
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.3.1
-      - uses: repolevedavaj/install-nsis@v1.0.1
+      - uses: Project-Env/project-env-github-action@v1.4.0
+      - uses: repolevedavaj/install-nsis@v1.0.2
         with:
           nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
       - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os != 'ubuntu-20.04' }}
+        if: ${{ matrix.os != 'ubuntu-latest' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

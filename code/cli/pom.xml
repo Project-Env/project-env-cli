@@ -55,16 +55,18 @@
         </dependency>
 
         <dependency>
-            <groupId>io.projectenv.commons</groupId>
+            <groupId>io.projectenv.core.commons</groupId>
             <artifactId>native-image</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.projectenv.commons</groupId>
+            <groupId>io.projectenv.core.commons</groupId>
             <artifactId>gson</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.moandjiezana.toml</groupId>
+            <groupId>io.hotmoka</groupId>
             <artifactId>toml4j</artifactId>
         </dependency>
 
@@ -95,8 +97,9 @@
         </dependency>
 
         <dependency>
-            <groupId>io.projectenv.commons</groupId>
+            <groupId>io.projectenv.core.commons</groupId>
             <artifactId>system-test</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -111,12 +114,17 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -138,8 +146,10 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <buildArgs>--enable-url-protocols=https --no-fallback
-                                --features=io.projectenv.core.cli.nativeimage.ProjectEnvFeature
+                            <buildArgs>
+                                <buildArg>--enable-url-protocols=https</buildArg>
+                                <buildArg>--no-fallback</buildArg>
+                                <buildArg>--features=io.projectenv.core.cli.nativeimage.ProjectEnvFeature</buildArg>
                             </buildArgs>
                             <mainClass>io.projectenv.core.cli.ProjectEnvCli</mainClass>
                             <imageName>${cli.binary}</imageName>
