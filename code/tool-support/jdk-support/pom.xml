@@ -26,12 +26,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.projectenv.core.commons</groupId>
-            <artifactId>string-substitutor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.immutables</groupId>
             <artifactId>value</artifactId>
             <scope>provided</scope>
