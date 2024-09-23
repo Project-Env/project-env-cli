@@ -15,8 +15,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.projectenv.commons</groupId>
+            <groupId>io.projectenv.core.commons</groupId>
             <artifactId>system</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

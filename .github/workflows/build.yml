@@ -9,9 +9,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest, ubuntu-20.04 ]
+        os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
           - os: windows-latest
@@ -19,13 +19,13 @@ jobs:
             cli_assembly_format: zip
             gu_executable_ext: .cmd
           - os: macos-latest
-            cli_assembly_id: macos-amd64
+            cli_assembly_id: macos-aarch64
             cli_assembly_format: tar.gz
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
         if: ${{ matrix.os == 'windows-latest'}}
       - run: ldd --version
-        if: ${{ matrix.os == 'ubuntu-20.04'}}
+        if: ${{ matrix.os == 'ubuntu-latest'}}
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
@@ -37,22 +37,36 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.3.1
-      - uses: repolevedavaj/install-nsis@v1.0.1
+      - uses: Project-Env/project-env-github-action@v1.4.0
+      - uses: repolevedavaj/install-nsis@v1.0.2
         with:
           nsis-version: 3.08
         if: ${{ matrix.os == 'windows-latest'}}
       - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image -Psonar "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os == 'ubuntu-20.04' && github.actor != 'dependabot[bot]' }}
+        if: ${{ matrix.os == 'ubuntu-latest' && github.actor != 'dependabot[bot]' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os != 'ubuntu-20.04' || github.actor == 'dependabot[bot]' }}
+        if: ${{ matrix.os != 'ubuntu-latest' || github.actor == 'dependabot[bot]' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sign and notarize executable
+        if: ${{ matrix.os == 'macos-latest'}}
+        run: ../../../etc/github-actions/sign-and-notarize-executable.sh
+        working-directory: code/cli/target
+        env:
+          EXECUTABLE_NAME: project-env-cli
+          EXECUTABLE_PACKAGE_NAME: cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+          EXECUTABLE_ID: io.projectenv.core.cli
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_ID_TEAM: ${{ secrets.APPLE_ID_TEAM }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
       - uses: actions/upload-artifact@v4
         with:
           name: cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
