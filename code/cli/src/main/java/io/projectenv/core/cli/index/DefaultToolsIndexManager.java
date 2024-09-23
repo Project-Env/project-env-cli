@@ -4,12 +4,13 @@ import com.google.gson.Gson;
 import io.projectenv.commons.gson.GsonFactory;
 import io.projectenv.core.cli.ProjectEnvException;
 import io.projectenv.core.commons.process.ProcessOutput;
+import io.projectenv.core.commons.system.CpuArchitecture;
 import io.projectenv.core.commons.system.EnvironmentVariables;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.ToolVersionHelper;
-import io.projectenv.core.toolsupport.spi.index.ToolsIndex;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexException;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
+import io.projectenv.core.toolsupport.spi.index.ToolsIndexV2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +28,7 @@ import java.util.Set;
 
 public class DefaultToolsIndexManager implements ToolsIndexManager {
 
-    private static final String DEFAULT_TOOLS_INDEX_URL = "https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json";
+    private static final String DEFAULT_TOOLS_INDEX_URL = "https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index-v2.json";
     private static final String PROJECT_ENV_TOOL_INDEX_ENV = "PROJECT_ENV_TOOL_INDEX";
     private static final String TOOLS_INDEX_FILE = "tools-index.json";
 
@@ -39,13 +40,13 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     private final File toolsRoot;
 
-    private ToolsIndex toolsIndex;
+    private ToolsIndexV2 toolsIndexV2;
 
     public DefaultToolsIndexManager(File toolsRoot) {
         this.toolsRoot = toolsRoot;
     }
 
-    private ToolsIndex loadToolsIndex() throws IOException {
+    private ToolsIndexV2 loadToolsIndex() throws IOException {
         var toolsIndexFile = new File(toolsRoot, TOOLS_INDEX_FILE);
         FileUtils.forceMkdirParent(toolsIndexFile);
 
@@ -64,7 +65,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
         }
 
         try (Reader reader = new FileReader(toolsIndexFile, StandardCharsets.UTF_8)) {
-            return GSON.fromJson(reader, ToolsIndex.class);
+            return GSON.fromJson(reader, ToolsIndexV2.class);
         }
     }
 
@@ -133,6 +134,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
     public String resolveNodeJsDistributionUrl(String version) {
         return Optional.ofNullable(getToolsIndex().getNodeVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
+                .map(this::resolveDownloadUrlForCpuArchitecture)
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve NodeJS " + version + " from tool index"));
     }
 
@@ -147,6 +149,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
                 .map(jdkDistributionId -> getToolsIndex().getJdkVersions().get(jdkDistributionId))
                 .map(jdkDistributionEntry -> jdkDistributionEntry.get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
+                .map(this::resolveDownloadUrlForCpuArchitecture)
                 .orElseThrow(() -> new ToolsIndexException("failed to resolve " + jdkDistribution + " " + version + " from tool index"));
     }
 
@@ -156,6 +159,19 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
                 .map(jdkDistributionId -> getToolsIndex().getJdkVersions().get(jdkDistributionId))
                 .map(Map::keySet)
                 .orElse(Collections.emptySet());
+    }
+
+    private String resolveDownloadUrlForCpuArchitecture(Map<CpuArchitecture, String> downloadUrls) {
+        String downloadUrl = downloadUrls.get(CpuArchitecture.getCurrentCpuArchitecture());
+
+        // In case there is no download URL for Apple Silicon, we use the amd64 as fallback
+        if (downloadUrl == null &&
+                CpuArchitecture.getCurrentCpuArchitecture() == CpuArchitecture.AARCH64 &&
+                OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.MACOS) {
+            downloadUrl = downloadUrls.get(CpuArchitecture.AMD64);
+        }
+
+        return downloadUrl;
     }
 
     private Optional<String> resolveJdkDistributionId(String jdkDistribution) {
@@ -173,13 +189,13 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
         return Optional.empty();
     }
 
-    private ToolsIndex getToolsIndex() {
+    private ToolsIndexV2 getToolsIndex() {
         try {
-            if (toolsIndex == null) {
-                toolsIndex = loadToolsIndex();
+            if (toolsIndexV2 == null) {
+                toolsIndexV2 = loadToolsIndex();
             }
 
-            return toolsIndex;
+            return toolsIndexV2;
         } catch (IOException e) {
             throw new ProjectEnvException("failed to load tool index", e);
         }
