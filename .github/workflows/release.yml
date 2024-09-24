@@ -39,7 +39,7 @@ jobs:
             cli_assembly_format: zip
             gu_executable_ext: .cmd
           - os: macos-latest
-            cli_assembly_id: macos-aarch64
+            cli_assembly_id: macos-amd64
             cli_assembly_format: tar.gz
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
