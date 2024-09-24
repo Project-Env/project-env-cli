@@ -43,7 +43,7 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
 
             return intermediateInstallationDetails;
         } catch (IOException e) {
-            throw new LocalToolInstallationStepException("failed to execute step", e);
+            throw new LocalToolInstallationStepException("failed to extract archive from URI " + rawArchiveUri, e);
         }
     }
 
