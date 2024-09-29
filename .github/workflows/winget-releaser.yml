@@ -1,7 +1,7 @@
 name: Publish to WinGet
 on:
   release:
-    types: [released]
+    types: [published]
 jobs:
   publish:
     runs-on: windows-latest
@@ -11,3 +11,4 @@ jobs:
           identifier: ProjectEnv.ProjectEnvCli
           installers-regex: '-setup\.exe$'
           token: ${{ secrets.WINGET_RELEASER_TOKEN }}
+          version: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
