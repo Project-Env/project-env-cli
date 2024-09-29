@@ -126,6 +126,12 @@ After running the `upgrade` command, the `install` command needs to be executed 
 ## Custom index
 The `PROJECT_ENV_TOOL_INDEX` env var can be used to specify a custom index URL. Note that the custom index needs to follow the format of the V2 format (see https://github.com/Project-Env/project-env-tools/blob/main/index-v2.json).
 
+## Cache
+All downloaded tool archives are cached, so they don't need to be downloaded multiple times.
+* Windows: `C:\Users\<username>\AppData\Local\Project-Env\Cache\Downloads\<archive>`
+* macOS: `/Users/<username>/Library/Caches/Project-Env/Downloads/<archive>`
+* Linux: `/home/<username>/.cache/project-env/downloads/<archive>`
+
 ## Installation
 
 ### Homebrew

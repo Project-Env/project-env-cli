@@ -1,20 +1,22 @@
 package io.projectenv.core.toolsupport.commons.commands;
 
 import io.projectenv.core.commons.archive.ArchiveExtractorFactory;
+import io.projectenv.core.commons.process.ProcessOutput;
+import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStepException;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 
 public class ExtractArchiveStep implements LocalToolInstallationStep {
@@ -28,18 +30,8 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
     @Override
     public LocalToolInstallationDetails executeInstallStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
         try {
-            var archiveUri = URI.create(rawArchiveUri);
-
-            var archiveName = FilenameUtils.getName(archiveUri.getPath());
-            var tempArchive = Files.createTempFile(null, archiveName).toFile();
-            try (var inputStream = new BufferedInputStream(archiveUri.toURL().openStream());
-                 var outputStream = new FileOutputStream(tempArchive)) {
-
-                IOUtils.copy(inputStream, outputStream);
-            }
-
-            ArchiveExtractorFactory.createArchiveExtractor().extractArchive(tempArchive, installationRoot);
-            FileUtils.forceDelete(tempArchive);
+            Path localArchivePath = downloadArchive();
+            extractArchive(localArchivePath, installationRoot);
 
             return intermediateInstallationDetails;
         } catch (IOException e) {
@@ -55,6 +47,43 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
     @Override
     public void updateChecksum(MessageDigest digest) {
         digest.update(rawArchiveUri.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private Path downloadArchive() throws IOException {
+        Path archiveCachePath = getArchiveCachePath();
+        if (Files.exists(archiveCachePath)) {
+            ProcessOutput.writeDebugMessage("using cached archive from {0}", archiveCachePath);
+            return archiveCachePath;
+        }
+
+        ProcessOutput.writeDebugMessage("downloading archive from {0}", rawArchiveUri);
+        try (var inputStream = URI.create(rawArchiveUri).toURL().openStream();
+             var outputStream = new FileOutputStream(archiveCachePath.toFile())) {
+
+            IOUtils.copy(inputStream, outputStream);
+
+            ProcessOutput.writeDebugMessage("cached archive at {0}", archiveCachePath);
+            return archiveCachePath;
+        } catch (IOException e) {
+            Files.deleteIfExists(archiveCachePath);
+            throw e;
+        }
+    }
+
+    private Path getArchiveCachePath() throws IOException {
+        return getCacheDirectory().resolve(FilenameUtils.getName(rawArchiveUri));
+    }
+
+    private Path getCacheDirectory() throws IOException {
+        return Files.createDirectories(switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS -> Paths.get(System.getProperty("user.home"), "Library", "Caches", "Project-Env", "Downloads");
+            case WINDOWS -> Paths.get(System.getenv("LOCALAPPDATA"), "Project-Env", "Cache", "Downloads");
+            case LINUX -> Paths.get(System.getProperty("user.home"), ".cache", "project-env", "downloads");
+        });
+    }
+
+    private void extractArchive(Path localArchivePath, File installationRoot) throws IOException {
+        ArchiveExtractorFactory.createArchiveExtractor().extractArchive(localArchivePath.toFile(), installationRoot);
     }
 
 }
