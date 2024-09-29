@@ -29,14 +29,10 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
 
     @Override
     public LocalToolInstallationDetails executeInstallStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
-        try {
-            Path localArchivePath = downloadArchive();
-            extractArchive(localArchivePath, installationRoot);
+        Path localArchivePath = downloadArchive();
+        extractArchive(localArchivePath, installationRoot);
 
-            return intermediateInstallationDetails;
-        } catch (IOException e) {
-            throw new LocalToolInstallationStepException("failed to extract archive from URI " + rawArchiveUri, e);
-        }
+        return intermediateInstallationDetails;
     }
 
     @Override
@@ -49,7 +45,7 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
         digest.update(rawArchiveUri.getBytes(StandardCharsets.UTF_8));
     }
 
-    private Path downloadArchive() throws IOException {
+    private Path downloadArchive() throws LocalToolInstallationStepException {
         Path archiveCachePath = getArchiveCachePath();
         if (Files.exists(archiveCachePath)) {
             ProcessOutput.writeDebugMessage("using cached archive from {0}", archiveCachePath);
@@ -65,13 +61,17 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
             ProcessOutput.writeDebugMessage("cached archive at {0}", archiveCachePath);
             return archiveCachePath;
         } catch (IOException e) {
-            Files.deleteIfExists(archiveCachePath);
-            throw e;
+            deleteIfExists(archiveCachePath);
+            throw new LocalToolInstallationStepException("failed to download archive from URI " + rawArchiveUri, e);
         }
     }
 
-    private Path getArchiveCachePath() throws IOException {
-        return getCacheDirectory().resolve(FilenameUtils.getName(rawArchiveUri));
+    private Path getArchiveCachePath() throws LocalToolInstallationStepException {
+        try {
+            return getCacheDirectory().resolve(FilenameUtils.getName(rawArchiveUri));
+        } catch (IOException e) {
+            throw new LocalToolInstallationStepException("failed to resolve archive cache path for URI " + rawArchiveUri, e);
+        }
     }
 
     private Path getCacheDirectory() throws IOException {
@@ -82,8 +82,21 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
         });
     }
 
-    private void extractArchive(Path localArchivePath, File installationRoot) throws IOException {
-        ArchiveExtractorFactory.createArchiveExtractor().extractArchive(localArchivePath.toFile(), installationRoot);
+    private void extractArchive(Path localArchivePath, File installationRoot) throws LocalToolInstallationStepException {
+        try {
+            ArchiveExtractorFactory.createArchiveExtractor().extractArchive(localArchivePath.toFile(), installationRoot);
+        } catch (IOException e) {
+            deleteIfExists(localArchivePath);
+            throw new LocalToolInstallationStepException("failed to extract archive from URI " + rawArchiveUri, e);
+        }
+    }
+
+    private void deleteIfExists(Path path) {
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+
+        }
     }
 
 }
