@@ -1,0 +1,20 @@
+#!/bin/sh
+{% for entry in toolInfos.entrySet() %}
+{% for toolInfo in entry.value %}
+
+{% for environmentVariable in toolInfo.environmentVariables %}
+export {{ environmentVariable.key }}="{{ environmentVariable.value | path }}"
+{% endfor %}
+
+{% for pathElement in toolInfo.pathElements %}
+export PATH="{{ pathElement | path }}:$PATH"
+{% endfor %}
+
+{% if entry.key == "maven" %}
+{% if toolInfo.unhandledProjectResources.userSettingsFile != null %}
+alias mvn="mvn -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }}"
+{% endif %}
+{% endif %}
+
+{% endfor %}
+{% endfor %}

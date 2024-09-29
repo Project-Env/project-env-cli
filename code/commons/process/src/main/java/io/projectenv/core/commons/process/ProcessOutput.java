@@ -18,10 +18,14 @@ public final class ProcessOutput {
         System.out.println(output);
     }
 
+    public static void writeInfoMessage(String message) {
+        System.err.println(message);
+    }
+
     public static void writeInfoMessage(String message, Object... messageArguments) {
         System.err.println(MessageFormat.format(message, messageArguments));
     }
-    
+
     public static void writeDebugMessage(String message, Object... messageArguments) {
         if (debugModeActive) {
             System.err.println(MessageFormat.format(message, messageArguments));
