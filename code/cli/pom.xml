@@ -12,7 +12,8 @@
     <artifactId>cli</artifactId>
 
     <properties>
-        <cli.binary>project-env-cli</cli.binary>
+        <cli.binary.name>project-env-cli</cli.binary.name>
+        <cli.binary.arch>x86-64-v3</cli.binary.arch>
         <cli.assembly.id>binary</cli.assembly.id>
         <cli.assembly.format>tar.gz</cli.assembly.format>
     </properties>
@@ -159,9 +160,10 @@
                                 <buildArg>--enable-url-protocols=https</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                                 <buildArg>--features=io.projectenv.core.cli.nativeimage.ProjectEnvFeature</buildArg>
+                                <buildArg>-march=${cli.binary.arch}</buildArg>
                             </buildArgs>
                             <mainClass>io.projectenv.core.cli.ProjectEnvCli</mainClass>
-                            <imageName>${cli.binary}</imageName>
+                            <imageName>${cli.binary.name}</imageName>
                         </configuration>
                     </plugin>
                     <plugin>
