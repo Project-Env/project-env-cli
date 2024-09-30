@@ -34,49 +34,56 @@ jobs:
           - os: ubuntu-latest
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
+            cli_assembly_arch: x86-64-v3
           - os: windows-latest
             cli_assembly_id: windows-amd64
             cli_assembly_format: zip
+            cli_assembly_arch: x86-64-v3
             gu_executable_ext: .cmd
-          - os: macos-latest
+          - os: macos-13
             cli_assembly_id: macos-amd64
             cli_assembly_format: tar.gz
+            cli_assembly_arch: x86-64-v3
+          - os: macos-latest
+            cli_assembly_id: macos-aarch64
+            cli_assembly_format: tar.gz
+            cli_assembly_arch: armv8-a
     steps:
       - uses: ilammy/msvc-dev-cmd@v1
-        if: ${{ matrix.os == 'windows-latest'}}
+        if: ${{ runner.os == 'Windows'}}
       - run: ldd --version
-        if: ${{ matrix.os == 'ubuntu-latest'}}
+        if: ${{ runner.os == 'Linux'}}
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.4.0
+      - uses: Project-Env/project-env-github-action@v1.5.0
       - uses: repolevedavaj/install-nsis@v1.0.2
         with:
           nsis-version: 3.08
-        if: ${{ matrix.os == 'windows-latest'}}
-      - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ runner.os == 'Windows'}}
+      - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}" "-Dcli.binary.arch=${{ matrix.cli_assembly_arch }}"
+        if: ${{ runner.os == 'Linux' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}"
-        if: ${{ matrix.os != 'ubuntu-latest' }}
+      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}" "-Dcli.binary.arch=${{ matrix.cli_assembly_arch }}"
+        if: ${{ runner.os != 'Linux' }}
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: repolevedavaj/create-cli-app-nsis-installer@main
-        if: ${{ matrix.os == 'windows-latest'}}
+        if: ${{ runner.os == 'Windows'}}
         with:
           package-identifier: ProjectEnv.ProjectEnvCli
           package-name: Project-Env Cli
           package-version: ${{ needs.create-release.outputs.revision }}
           source-directory: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}
       - name: Sign and notarize executable
-        if: ${{ matrix.os == 'macos-latest'}}
+        if: ${{ runner.os == 'macOS'}}
         run: ../../../etc/github-actions/sign-and-notarize-executable.sh
         working-directory: code/cli/target
         env:
@@ -98,7 +105,7 @@ jobs:
           asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
           asset_content_type: application/octet-stream
       - uses: actions/upload-release-asset@v1
-        if: ${{ matrix.os == 'windows-latest'}}
+        if: ${{ runner.os == 'Windows'}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

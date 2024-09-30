@@ -16,7 +16,7 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory>.</outputDirectory>
             <includes>
-                <include>${cli.binary}*</include>
+                <include>${cli.binary.name}*</include>
                 <include>*.dll</include>
             </includes>
             <excludes>
