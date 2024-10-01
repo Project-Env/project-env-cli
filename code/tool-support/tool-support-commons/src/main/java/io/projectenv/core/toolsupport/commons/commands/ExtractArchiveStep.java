@@ -14,13 +14,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.security.MessageDigest;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
 public class ExtractArchiveStep implements LocalToolInstallationStep {
 
+    public static final Duration OTHER_PROCESS_ARCHIVE_DOWNLOAD_WAIT_LIMIT = Duration.ofMinutes(5);
     private final String rawArchiveUri;
 
     public ExtractArchiveStep(String rawArchiveUri) {
@@ -52,18 +56,33 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
             return archiveCachePath;
         }
 
+        Path archiveDownloadingPath = getArchiveDownloadingPath();
+        if (Files.exists(archiveDownloadingPath)) {
+            waitUntilArchiveHasBeenDownloadedByOtherProcess(archiveCachePath);
+            ProcessOutput.writeDebugMessage("using cached archive from {0}", archiveCachePath);
+            return archiveCachePath;
+        }
+
         ProcessOutput.writeDebugMessage("downloading archive from {0}", rawArchiveUri);
         try (var inputStream = URI.create(rawArchiveUri).toURL().openStream();
-             var outputStream = new FileOutputStream(archiveCachePath.toFile())) {
+             var outputStream = new FileOutputStream(archiveDownloadingPath.toFile())) {
 
             IOUtils.copy(inputStream, outputStream);
-
-            ProcessOutput.writeDebugMessage("cached archive at {0}", archiveCachePath);
-            return archiveCachePath;
         } catch (IOException e) {
-            deleteIfExists(archiveCachePath);
+            deleteIfExists(archiveDownloadingPath);
             throw new LocalToolInstallationStepException("failed to download archive from URI " + rawArchiveUri, e);
         }
+
+        try {
+            Files.move(archiveDownloadingPath, archiveCachePath);
+            ProcessOutput.writeDebugMessage("cached archive at {0}", archiveCachePath);
+        } catch (IOException e) {
+            deleteIfExists(archiveDownloadingPath);
+            deleteIfExists(archiveCachePath);
+            throw new LocalToolInstallationStepException("failed to move downloaded archive from " + archiveDownloadingPath + " to " + archiveCachePath, e);
+        }
+
+        return archiveCachePath;
     }
 
     private Path getArchiveCachePath() throws LocalToolInstallationStepException {
@@ -80,6 +99,43 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
             case WINDOWS -> Paths.get(System.getenv("LOCALAPPDATA"), "Project-Env", "Cache", "Downloads");
             case LINUX -> Paths.get(System.getProperty("user.home"), ".cache", "project-env", "downloads");
         });
+    }
+
+    private Path getArchiveDownloadingPath() throws LocalToolInstallationStepException {
+        Path archiveCachePath = getArchiveCachePath();
+        return archiveCachePath.getParent().resolve(archiveCachePath.getFileName() + ".downloading");
+    }
+
+    private void waitUntilArchiveHasBeenDownloadedByOtherProcess(Path archivePath) throws LocalToolInstallationStepException {
+        try (WatchService watchService = createWatchServiceForArchive(archivePath)) {
+            Instant startTime = Instant.now();
+            while (!Files.exists(archivePath) && Duration.between(startTime, Instant.now()).compareTo(OTHER_PROCESS_ARCHIVE_DOWNLOAD_WAIT_LIMIT) <= 0) {
+                waitForArchiveDownloadEvents(watchService);
+            }
+        } catch (Exception e) {
+            ProcessOutput.writeDebugMessage("Got exception while waiting for archive to be downloaded by other process", e);
+        }
+
+        if (!Files.exists(archivePath)) {
+            throw new LocalToolInstallationStepException("failed to wait for archive to be downloaded");
+        }
+    }
+
+    private WatchService createWatchServiceForArchive(Path archiveDownloadingPath) throws IOException {
+        WatchService watchService = FileSystems.getDefault().newWatchService();
+        archiveDownloadingPath.getParent().register(watchService, ENTRY_CREATE);
+
+        return watchService;
+    }
+
+    private void waitForArchiveDownloadEvents(WatchService watchService) throws Exception {
+        WatchKey key = watchService.poll(OTHER_PROCESS_ARCHIVE_DOWNLOAD_WAIT_LIMIT.toMinutes(), TimeUnit.MINUTES);
+        if (key != null) {
+            key.pollEvents();
+            if (!key.reset()) {
+                throw new IOException("Watch key no more valid");
+            }
+        }
     }
 
     private void extractArchive(Path localArchivePath, File installationRoot) throws LocalToolInstallationStepException {
