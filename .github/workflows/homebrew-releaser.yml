@@ -20,7 +20,7 @@ jobs:
           homebrew-tap: Project-Env/homebrew-tap
           base-branch: main
           tag-name: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
-          download-url: https://github.com/Project-Env/project-env-cli/releases/download/v${{ steps.revision.outputs.revision }}/cli-${{ steps.revision.outputs.revision }}-macos-amd64.tar.gz
+          download-url: https://github.com/Project-Env/project-env-cli/releases/download/v${{ steps.revision.outputs.revision }}/cli-${{ steps.revision.outputs.revision }}-macos-aarch64.tar.gz
           commit-message: bump {{formulaName}} to {{version}}
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
