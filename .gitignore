@@ -8,6 +8,7 @@
 # Output of Maven
 target
 .flattened-pom.xml
+dependency-reduced-pom.xml
 
 # Generated profile from Project-Env
 .project-env
