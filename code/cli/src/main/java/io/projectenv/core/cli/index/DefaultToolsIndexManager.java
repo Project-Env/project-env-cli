@@ -29,8 +29,8 @@ import java.util.Set;
 public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     private static final String DEFAULT_TOOLS_INDEX_URL = "https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index-v2.json";
-    private static final String PROJECT_ENV_TOOL_INDEX_ENV = "PROJECT_ENV_TOOL_INDEX";
-    private static final String TOOLS_INDEX_FILE = "tools-index.json";
+    private static final String PROJECT_ENV_TOOL_INDEX_ENV = "PROJECT_ENV_TOOL_INDEX_V2";
+    private static final String TOOLS_INDEX_FILE = "tools-index-v2.json";
 
     private static final Gson GSON = GsonFactory.createGsonBuilder().create();
 

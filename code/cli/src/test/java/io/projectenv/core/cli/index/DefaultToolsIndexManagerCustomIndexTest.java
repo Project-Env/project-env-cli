@@ -18,7 +18,7 @@ public class DefaultToolsIndexManagerCustomIndexTest {
     @Test
     void resolveMavenDistributionUrl() throws Exception {
         var url = getClass().getResource("custom-index.json").toString();
-        try (var ignored = TestEnvironmentVariables.overlayEnv(Map.of("PROJECT_ENV_TOOL_INDEX", url))) {
+        try (var ignored = TestEnvironmentVariables.overlayEnv(Map.of("PROJECT_ENV_TOOL_INDEX_V2", url))) {
             ToolsIndexManager manager = new DefaultToolsIndexManager(tempDir);
             assertThat(manager.resolveMavenDistributionUrl("customVersion")).isEqualTo("customVersionUrl");
         }

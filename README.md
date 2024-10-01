@@ -124,7 +124,7 @@ Note that the flag needs to be added as prefix (e.g. `version = "^11.0.16.1+1"`)
 After running the `upgrade` command, the `install` command needs to be executed again to install the upgraded tools.
 
 ## Custom index
-The `PROJECT_ENV_TOOL_INDEX` env var can be used to specify a custom index URL. Note that the custom index needs to follow the format of the V2 format (see https://github.com/Project-Env/project-env-tools/blob/main/index-v2.json).
+The `PROJECT_ENV_TOOL_INDEX_V2` env var can be used to specify a custom index URL. Note that the custom index needs to follow the format of the V2 format (see https://github.com/Project-Env/project-env-tools/blob/main/index-v2.json).
 
 ## Cache
 All downloaded tool archives are cached, so they don't need to be downloaded multiple times.
