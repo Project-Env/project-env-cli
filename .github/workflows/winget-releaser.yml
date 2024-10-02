@@ -2,13 +2,21 @@ name: Publish to WinGet
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag name of the release"
+        required: true
 jobs:
   publish:
     runs-on: windows-latest
     steps:
+      - id: revision
+        run: echo "revision=$(echo ${{ github.event.release.tag_name || github.event.inputs.tag_name }} | cut -c2-)" >> $GITHUB_OUTPUT
       - uses: vedantmgoyal2009/winget-releaser@v2
         with:
           identifier: ProjectEnv.ProjectEnvCli
           installers-regex: '-setup\.exe$'
           token: ${{ secrets.WINGET_RELEASER_TOKEN }}
-          version: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
+          release-tag: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
+          version: ${{ steps.revision.outputs.revision }}
