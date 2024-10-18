@@ -37,7 +37,7 @@
         <reflections.version>0.10.2</reflections.version>
         <mockito.version>5.14.2</mockito.version>
         <archunit-junit5.version>1.3.0</archunit-junit5.version>
-        <semver4j.version>5.4.0</semver4j.version>
+        <semver4j.version>5.4.1</semver4j.version>
         <commons-compress.version>1.27.1</commons-compress.version>
         <xz.version>1.10</xz.version>
         <commons-text.version>1.12.0</commons-text.version>
