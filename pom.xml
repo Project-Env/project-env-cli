@@ -31,7 +31,7 @@
         <commons-io.version>2.18.0</commons-io.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <junit.version>5.11.3</junit.version>
-        <assertj-core.version>3.26.3</assertj-core.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
         <toml4j.version>0.7.3</toml4j.version>
         <picocli.version>4.7.6</picocli.version>
         <reflections.version>0.10.2</reflections.version>
