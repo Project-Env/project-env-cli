@@ -66,6 +66,7 @@ public class ProjectEnvFeature implements Feature {
 
             registerTemplate("sh.peb");
             registerTemplate("cygwin.peb");
+            registerTemplate("pwsh.peb");
         } catch (IOException e) {
             throw new IllegalStateException("failed to register templates for usage in native-image");
         }

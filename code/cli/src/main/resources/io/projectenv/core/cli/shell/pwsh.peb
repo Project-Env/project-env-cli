@@ -1,0 +1,21 @@
+{% for entry in toolInfos.entrySet() %}
+{% for toolInfo in entry.value %}
+
+{% for environmentVariable in toolInfo.environmentVariables %}
+$env:{{ environmentVariable.key }}="{{ environmentVariable.value | path }}"
+{% endfor %}
+
+{% for pathElement in toolInfo.pathElements %}
+$env:PATH="{{ pathElement | path }};" + $env:PATH
+$env:PSModulePath="{{ pathElement | path }};" + $env:PSModulePath
+{% endfor %}
+
+{% if entry.key == "maven" %}
+{% if toolInfo.unhandledProjectResources.userSettingsFile != null %}
+Function MVN_S {mvn -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }}}
+Set-Alias -Name mvn -Value MVN_S
+{% endif %}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
