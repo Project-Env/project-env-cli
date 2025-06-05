@@ -23,6 +23,7 @@
         <module>nodejs-support</module>
         <module>git-support</module>
         <module>gradle-support</module>
+        <module>clojure-support</module>
         <module>generic-tool-support</module>
     </modules>
 

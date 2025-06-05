@@ -20,4 +20,8 @@ public interface ToolsIndexManager {
 
     Set<String> getJdkDistributionVersions(String jdkDistribution);
 
+    String resolveClojureDistributionUrl(String version);
+
+    Set<String> getClojureVersions();
+
 }

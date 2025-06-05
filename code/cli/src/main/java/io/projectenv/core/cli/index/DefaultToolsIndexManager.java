@@ -161,6 +161,18 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
                 .orElse(Collections.emptySet());
     }
 
+    @Override
+    public String resolveClojureDistributionUrl(String version) {
+        return Optional.ofNullable(getToolsIndex().getClojureVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
+                .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
+                .orElseThrow(() -> new ToolsIndexException("failed to resolve Clojure " + version + " from tool index"));
+    }
+
+    @Override
+    public Set<String> getClojureVersions() {
+        return getToolsIndex().getClojureVersions().keySet();
+    }
+
     private String resolveDownloadUrlForCpuArchitecture(Map<CpuArchitecture, String> downloadUrls) {
         String downloadUrl = downloadUrls.get(CpuArchitecture.getCurrentCpuArchitecture());
 

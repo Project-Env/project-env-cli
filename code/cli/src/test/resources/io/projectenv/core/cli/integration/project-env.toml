@@ -19,6 +19,9 @@ version = "^6.7.1"
 version = "~14.15.3"
 post_extraction_commands = ["npm install -g yarn"]
 
+[clojure]
+version = "1.12.1.1550"
+
 [git]
 hooks_directory = "hooks"
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.projectenv.core.toolsupport</groupId>
+        <artifactId>tool-support-root</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>clojure-support</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.projectenv.core.toolsupport</groupId>
+            <artifactId>tool-support-spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectenv.core.toolsupport</groupId>
+            <artifactId>tool-support-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>gson</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -22,4 +22,6 @@ public interface ToolsIndexV2 {
 
     Map<String, Map<OperatingSystem, Map<CpuArchitecture, String>>> getNodeVersions();
 
+    Map<String, Map<OperatingSystem, String>> getClojureVersions();
+
 }
