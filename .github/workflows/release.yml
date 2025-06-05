@@ -15,7 +15,7 @@ jobs:
       revision: ${{ steps.revision.outputs.revision }}
     steps:
       - id: release
-        uses: release-drafter/release-drafter@v6.0.0
+        uses: release-drafter/release-drafter@v6.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: revision
