@@ -12,6 +12,7 @@ dependency-reduced-pom.xml
 
 # Generated profile from Project-Env
 .project-env
+project-env.ps1
 
 # Tools store from Project-Env
 .tools

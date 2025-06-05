@@ -12,7 +12,7 @@ $env:PSModulePath="{{ pathElement | path }};" + $env:PSModulePath
 
 {% if entry.key == "maven" %}
 {% if toolInfo.unhandledProjectResources.userSettingsFile != null %}
-Function MVN_S {mvn -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }}}
+Function MVN_S {& mvn.cmd -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }} @args}
 Set-Alias -Name mvn -Value MVN_S
 {% endif %}
 {% endif %}

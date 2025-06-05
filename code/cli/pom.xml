@@ -46,6 +46,11 @@
         </dependency>
         <dependency>
             <groupId>io.projectenv.core.toolsupport</groupId>
+            <artifactId>clojure-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.projectenv.core.toolsupport</groupId>
             <artifactId>generic-tool-support</artifactId>
             <version>${project.version}</version>
         </dependency>
