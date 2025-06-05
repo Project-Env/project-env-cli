@@ -1,6 +1,8 @@
 package io.projectenv.core.toolsupport.clojure;
 
+import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.AbstractUpgradableToolSupport;
+import io.projectenv.core.toolsupport.commons.ToolVersionHelper;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.ImmutableToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolInfo;
@@ -58,6 +60,21 @@ public class ClojureSupport extends AbstractUpgradableToolSupport<ClojureConfigu
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
         steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
+        steps.add(new FindBinariesRootStep());
+
+        if (OperatingSystem.getCurrentOperatingSystem() != OperatingSystem.WINDOWS) {
+            String version = ToolVersionHelper.getVersionWithoutPrefix(toolConfiguration.getVersion());
+            steps.add(new MoveFileStep("clojure-tools-" + version + ".jar", "libexec/clojure-tools-" + version + ".jar"));
+            steps.add(new MoveFileStep("exec.jar", "libexec/exec.jar"));
+            steps.add(new ReplaceInFileStep("clojure", "PREFIX", "${PROJECT_ENV_TOOL_ROOT}"));
+            steps.add(new ReplaceInFileStep("clj", "BINDIR", "${PROJECT_ENV_TOOL_ROOT}/bin"));
+            steps.add(new MoveFileStep("clojure", "bin/clojure"));
+            steps.add(new MoveFileStep("clj", "bin/clj"));
+            steps.add(new DeleteFileStep("install.sh"));
+            steps.add(new DeleteFileStep("clojure.1"));
+            steps.add(new DeleteFileStep("clj.1"));
+        }
+
         steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/"));
 
