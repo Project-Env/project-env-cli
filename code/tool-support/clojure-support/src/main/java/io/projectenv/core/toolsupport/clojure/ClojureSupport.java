@@ -73,10 +73,11 @@ public class ClojureSupport extends AbstractUpgradableToolSupport<ClojureConfigu
             steps.add(new DeleteFileStep("install.sh"));
             steps.add(new DeleteFileStep("clojure.1"));
             steps.add(new DeleteFileStep("clj.1"));
+            steps.add(new RegisterPathElementStep("/bin"));
+            steps.add(new RegisterMainExecutableStep("clojure"));
+        } else {
+            steps.add(new RegisterPathElementStep("/"));
         }
-
-        steps.add(new FindBinariesRootStep());
-        steps.add(new RegisterPathElementStep("/"));
 
         for (var rawPostExtractionCommand : toolConfiguration.getPostExtractionCommands()) {
             steps.add(new ExecuteCommandStep(rawPostExtractionCommand, context.getProjectRoot()));

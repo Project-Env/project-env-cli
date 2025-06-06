@@ -21,7 +21,11 @@ public class ClojureAssertions extends AbstractToolInfoAssertions {
 
     @Override
     protected void assertPrimaryExecutable(OptionalAssert<File> assertions) {
-        assertions.isEmpty();
+        if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.WINDOWS) {
+            assertions.isEmpty();
+        } else {
+            assertions.hasValueSatisfying(filePathEndsWithIgnoringFileExtensionCondition(getBinPath() + "/clojure"));
+        }
     }
 
     @Override
@@ -31,7 +35,7 @@ public class ClojureAssertions extends AbstractToolInfoAssertions {
 
     @Override
     protected void assertPathElements(ListAssert<File> assertions) {
-        assertions.singleElement().satisfies(directoryPathEndsWithCondition(getBinariesRoot()));
+        assertions.singleElement().satisfies(directoryPathEndsWithCondition(getBinPath()));
     }
 
     @Override
@@ -45,11 +49,17 @@ public class ClojureAssertions extends AbstractToolInfoAssertions {
     }
 
     private String getBinariesRoot() {
-        if (OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.WINDOWS) {
-            return "ClojureTools";
-        } else {
-            return "clojure-tools";
-        }
+        return switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS, LINUX -> "clojure-tools";
+            case WINDOWS -> "ClojureTools";
+        };
+    }
+
+    private String getBinPath() {
+        return switch (OperatingSystem.getCurrentOperatingSystem()) {
+            case MACOS, LINUX -> getBinariesRoot() + "/bin";
+            case WINDOWS -> getBinariesRoot();
+        };
     }
 
 }
