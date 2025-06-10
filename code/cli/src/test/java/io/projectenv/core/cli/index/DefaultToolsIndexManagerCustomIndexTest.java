@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.index;
 
+import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.commons.system.TestEnvironmentVariables;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class DefaultToolsIndexManagerCustomIndexTest {
     void resolveMavenDistributionUrl() throws Exception {
         var url = getClass().getResource("custom-index.json").toString();
         try (var ignored = TestEnvironmentVariables.overlayEnv(Map.of("PROJECT_ENV_TOOL_INDEX_V2", url))) {
-            ToolsIndexManager manager = new DefaultToolsIndexManager(tempDir);
+            ToolsIndexManager manager = new DefaultToolsIndexManager(tempDir, new DefaultHttpClientProvider());
             assertThat(manager.resolveMavenDistributionUrl("customVersion")).isEqualTo("customVersionUrl");
         }
     }

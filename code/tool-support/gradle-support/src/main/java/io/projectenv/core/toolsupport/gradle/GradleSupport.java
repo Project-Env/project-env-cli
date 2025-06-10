@@ -57,7 +57,7 @@ public class GradleSupport extends AbstractUpgradableToolSupport<GradleConfigura
     private List<LocalToolInstallationStep> createInstallationSteps(GradleConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context), context.getHttpClientProvider()));
         steps.add(new FindBinariesRootStep());
         steps.add(new RegisterPathElementStep("/bin"));
         steps.add(new RegisterMainExecutableStep("gradle"));

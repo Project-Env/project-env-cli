@@ -4,6 +4,7 @@ import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
 import io.projectenv.core.cli.index.DefaultToolsIndexManager;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
+import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
@@ -65,12 +66,14 @@ public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> 
         }
 
         var localToolInstallationManager = new DefaultLocalToolInstallationManager(toolsDirectory);
-        var toolsIndexManager = new DefaultToolsIndexManager(toolsDirectory);
+        var httpClientProvider = new DefaultHttpClientProvider();
+        var toolsIndexManager = new DefaultToolsIndexManager(toolsDirectory, httpClientProvider);
 
         return ImmutableToolSupportContext.builder()
                 .projectRoot(projectRoot)
                 .localToolInstallationManager(localToolInstallationManager)
                 .toolsIndexManager(toolsIndexManager)
+                .httpClientProvider(httpClientProvider)
                 .build();
     }
 

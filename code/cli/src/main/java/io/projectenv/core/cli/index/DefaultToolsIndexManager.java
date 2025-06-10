@@ -8,6 +8,7 @@ import io.projectenv.core.commons.system.CpuArchitecture;
 import io.projectenv.core.commons.system.EnvironmentVariables;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.ToolVersionHelper;
+import io.projectenv.core.toolsupport.spi.http.HttpClientProvider;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexException;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexV2;
@@ -17,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -34,16 +34,14 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     private static final Gson GSON = GsonFactory.createGsonBuilder().create();
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .build();
-
     private final File toolsRoot;
+    private final HttpClientProvider httpClientProvider;
 
     private ToolsIndexV2 toolsIndexV2;
 
-    public DefaultToolsIndexManager(File toolsRoot) {
+    public DefaultToolsIndexManager(File toolsRoot, HttpClientProvider httpClientProvider) {
         this.toolsRoot = toolsRoot;
+        this.httpClientProvider = httpClientProvider;
     }
 
     private ToolsIndexV2 loadToolsIndex() throws IOException {
@@ -100,7 +98,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     private InputStream getToolsIndexInputStreamFromHttpUri(URI toolIndexUri) throws IOException, InterruptedException {
         var httpRequest = HttpRequest.newBuilder().uri(toolIndexUri).GET().build();
-        HttpResponse<InputStream> response = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+        HttpResponse<InputStream> response = httpClientProvider.getHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
         if (response.statusCode() != 200) {
             throw new ProjectEnvException("Received a non expected status code " + response.statusCode() + " while downloading the tool index");
         }

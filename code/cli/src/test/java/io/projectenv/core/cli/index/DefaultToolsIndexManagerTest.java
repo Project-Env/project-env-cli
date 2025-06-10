@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.index;
 
+import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class DefaultToolsIndexManagerTest {
 
     @BeforeAll
     static void setupToolsIndexManager() {
-        manager = new DefaultToolsIndexManager(tempDir);
+        manager = new DefaultToolsIndexManager(tempDir, new DefaultHttpClientProvider());
     }
 
     @Test

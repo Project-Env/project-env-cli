@@ -3,6 +3,7 @@ package io.projectenv.core.toolsupport.commons.commands;
 import io.projectenv.core.commons.archive.ArchiveExtractorFactory;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.commons.system.OperatingSystem;
+import io.projectenv.core.toolsupport.spi.http.HttpClientProvider;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationDetails;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStep;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationStepException;
@@ -12,7 +13,10 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
@@ -27,8 +31,11 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
     public static final Duration OTHER_PROCESS_ARCHIVE_DOWNLOAD_WAIT_LIMIT = Duration.ofMinutes(5);
     private final String rawArchiveUri;
 
-    public ExtractArchiveStep(String rawArchiveUri) {
+    private final HttpClientProvider httpClientProvider;
+
+    public ExtractArchiveStep(String rawArchiveUri, HttpClientProvider httpClientProvider) {
         this.rawArchiveUri = rawArchiveUri;
+        this.httpClientProvider = httpClientProvider;
     }
 
     @Override
@@ -64,11 +71,24 @@ public class ExtractArchiveStep implements LocalToolInstallationStep {
         }
 
         ProcessOutput.writeDebugMessage("downloading archive from {0}", rawArchiveUri);
-        try (var inputStream = URI.create(rawArchiveUri).toURL().openStream();
-             var outputStream = new FileOutputStream(archiveDownloadingPath.toFile())) {
 
-            IOUtils.copy(inputStream, outputStream);
-        } catch (IOException e) {
+        try {
+            HttpResponse<InputStream> response = httpClientProvider.getHttpClient().send(
+                    HttpRequest.newBuilder().uri(URI.create(rawArchiveUri)).GET().build(),
+                    HttpResponse.BodyHandlers.ofInputStream()
+            );
+
+            if (response.statusCode() != 200) {
+                throw new IOException("Failed to download archive, status code: " + response.statusCode());
+            }
+            try (var inputStream = response.body();
+                 var outputStream = new FileOutputStream(archiveDownloadingPath.toFile())) {
+                IOUtils.copy(inputStream, outputStream);
+            }
+        } catch (IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             deleteIfExists(archiveDownloadingPath);
             throw new LocalToolInstallationStepException("failed to download archive from URI " + rawArchiveUri, e);
         }
