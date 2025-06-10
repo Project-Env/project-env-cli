@@ -1,5 +1,6 @@
 package io.projectenv.core.toolsupport.spi;
 
+import io.projectenv.core.toolsupport.spi.http.HttpClientProvider;
 import io.projectenv.core.toolsupport.spi.index.ToolsIndexManager;
 import io.projectenv.core.toolsupport.spi.installation.LocalToolInstallationManager;
 import org.immutables.value.Value;
@@ -14,5 +15,7 @@ public interface ToolSupportContext {
     LocalToolInstallationManager getLocalToolInstallationManager();
 
     ToolsIndexManager getToolsIndexManager();
+
+    HttpClientProvider getHttpClientProvider();
 
 }

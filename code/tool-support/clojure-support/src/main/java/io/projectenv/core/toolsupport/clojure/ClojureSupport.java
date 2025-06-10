@@ -59,7 +59,7 @@ public class ClojureSupport extends AbstractUpgradableToolSupport<ClojureConfigu
     private List<LocalToolInstallationStep> createInstallationSteps(ClojureConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context)));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration, context), context.getHttpClientProvider()));
         steps.add(new FindBinariesRootStep());
 
         if (OperatingSystem.getCurrentOperatingSystem() != OperatingSystem.WINDOWS) {
