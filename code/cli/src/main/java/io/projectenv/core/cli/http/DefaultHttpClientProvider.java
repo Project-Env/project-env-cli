@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.http;
 
+import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.http.HttpClientProvider;
 
 import javax.net.ssl.SSLContext;
@@ -14,13 +15,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class DefaultHttpClientProvider implements HttpClientProvider {
-
-    private static final Logger LOGGER = Logger.getLogger(DefaultHttpClientProvider.class.getName());
 
     private final HttpClient httpClient;
 
@@ -81,7 +78,8 @@ public class DefaultHttpClientProvider implements HttpClientProvider {
             sslContext.init(null, combined, null);
             return sslContext;
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to load Codex proxy certificate: " + e.getMessage(), e);
+            ProcessOutput.writeDebugMessage("Failed to load Codex proxy certificate: {0}", e.getMessage());
+            ProcessOutput.writeDebugMessage(e);
             return null;
         }
     }
@@ -150,7 +148,8 @@ public class DefaultHttpClientProvider implements HttpClientProvider {
 
         @Override
         public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-            LOGGER.log(Level.WARNING, "Proxy connection failed for URI: " + uri + ", address: " + sa + ", error: " + ioe.getMessage(), ioe);
+            ProcessOutput.writeDebugMessage("Proxy connection failed for URI: {0}, address: {1}, error: {2}", uri, sa, ioe.getMessage());
+            ProcessOutput.writeDebugMessage(ioe);
         }
 
         /**
@@ -164,7 +163,8 @@ public class DefaultHttpClientProvider implements HttpClientProvider {
                 }
                 return new URI(proxy);
             } catch (URISyntaxException e) {
-                LOGGER.log(Level.WARNING, "Malformed proxy URI: " + proxy, e);
+                ProcessOutput.writeDebugMessage("Malformed proxy URI " + proxy + " - skipping proxy configuration...");
+                ProcessOutput.writeDebugMessage(e);
                 return null;
             }
         }
