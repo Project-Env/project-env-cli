@@ -15,7 +15,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class DefaultHttpClientProvider implements HttpClientProvider {
 
@@ -67,15 +66,17 @@ public class DefaultHttpClientProvider implements HttpClientProvider {
         }
         try {
             X509Certificate codexCert = loadCertificate(certPath);
-            TrustManagerFactory defaultTmf = createDefaultTrustManagerFactory();
-            TrustManagerFactory codexTmf = createTrustManagerFactoryWithCert(codexCert);
-            javax.net.ssl.TrustManager[] combined =
-                    Stream.concat(
-                            Arrays.stream(defaultTmf.getTrustManagers()),
-                            Arrays.stream(codexTmf.getTrustManagers())
-                    ).toArray(javax.net.ssl.TrustManager[]::new);
+
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(null, null);
+            ks.setCertificateEntry("codex-proxy-cert", codexCert);
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
+
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, combined, null);
+            sslContext.init(null, tmf.getTrustManagers(), null);
+
             return sslContext;
         } catch (Exception e) {
             ProcessOutput.writeDebugMessage("Failed to load Codex proxy certificate: {0}", e.getMessage());
@@ -92,27 +93,6 @@ public class DefaultHttpClientProvider implements HttpClientProvider {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             return (X509Certificate) cf.generateCertificate(certInput);
         }
-    }
-
-    /**
-     * Returns the default system TrustManagerFactory.
-     */
-    private TrustManagerFactory createDefaultTrustManagerFactory() throws Exception {
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init((KeyStore) null);
-        return tmf;
-    }
-
-    /**
-     * Returns a TrustManagerFactory initialized with the given certificate.
-     */
-    private TrustManagerFactory createTrustManagerFactoryWithCert(X509Certificate cert) throws Exception {
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        ks.load(null, null);
-        ks.setCertificateEntry("codex-proxy-cert", cert);
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(ks);
-        return tmf;
     }
 
     /**
