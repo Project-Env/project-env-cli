@@ -4,6 +4,7 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.annotations.SerializedName;
 import io.projectenv.core.cli.shell.TemplateProcessor;
 import io.projectenv.core.commons.process.ProcessOutput;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import org.apache.commons.compress.archivers.zip.ZipExtraField;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -61,8 +62,9 @@ public class ProjectEnvFeature implements Feature {
             // we don't want to restrict the available String methods.
             registerClassForReflection(String.class);
 
-            // register map type since it is the main model object
+            // register model classes for reflection
             registerClassForReflection(Map.class);
+            registerClassAndSubclassesForReflection(ToolInfo.class);
 
             registerTemplate("sh.peb");
             registerTemplate("cygwin.peb");
