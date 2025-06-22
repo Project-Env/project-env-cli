@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.list;
 
 abstract class AbstractProjectEnvCliTest {
@@ -28,10 +29,6 @@ abstract class AbstractProjectEnvCliTest {
 
         File configFile = copyResourceToTarget("project-env.toml", projectRoot);
 
-        executeInstallAndAssertExecution(projectRoot, configFile);
-    }
-
-    private void executeInstallAndAssertExecution(File projectRoot, File configFile) throws Exception {
         var output = executeProjectEnvShell(
                 "--config-file=" + configFile.getAbsolutePath(),
                 "--project-root=" + projectRoot.getAbsolutePath(),
@@ -71,10 +68,6 @@ abstract class AbstractProjectEnvCliTest {
 
         File configFile = copyResourceToTarget("project-env.toml", projectRoot);
 
-        executeUpgradeAndAssertExecution(projectRoot, configFile);
-    }
-
-    private void executeUpgradeAndAssertExecution(File projectRoot, File configFile) throws Exception {
         var output = executeProjectEnvShell(
                 "upgrade",
                 "--config-file=" + configFile.getAbsolutePath(),
@@ -97,6 +90,29 @@ abstract class AbstractProjectEnvCliTest {
                     assertions.assertThat(toolUpgradeInfo.getUpgradedVersion()).isEqualTo("~14.15.5");
                 });
         assertions.assertAll();
+    }
+
+    @Test
+    void executeProjectEnvCliInstallWithShellScriptOutput(@TempDir File projectRoot)  throws Exception{
+        copyResourceToTarget("git-hook", new File(projectRoot, "hooks"));
+        copyResourceToTarget("settings.xml", projectRoot);
+        copyResourceToTarget("settings-user.xml", projectRoot);
+
+        File configFile = copyResourceToTarget("project-env.toml", projectRoot);
+
+        var output = executeProjectEnvShell(
+                "install",
+                "--config-file=" + configFile.getAbsolutePath(),
+                "--project-root=" + projectRoot.getAbsolutePath(),
+                "--output-template=sh"
+        );
+
+        assertThat(output)
+                .contains("export MAVEN_HOME")
+                .contains("export JAVA_HOME")
+                .contains("export JAXB_HOME")
+                .contains("alias mvn")
+                .contains("export PATH");
     }
 
     private File copyResourceToTarget(String resource, File target) throws Exception {
