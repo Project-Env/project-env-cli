@@ -59,9 +59,12 @@ public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
 
         var toolInfos = new ArrayList<ToolInfo>();
         for (var toolConfiguration : toolConfigurations) {
-            ProcessOutput.writeInfoMessage("installing {0}...", toolSupport.getToolIdentifier());
-
-            toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
+            if (toolSupport.isAvailable(toolConfiguration)) {
+                ProcessOutput.writeInfoMessage("installing {0}...", toolSupport.getToolIdentifier());
+                toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
+            } else {
+                ProcessOutput.writeInfoMessage("{0} is not available, skipping installation", toolSupport.getToolIdentifier());
+            }
         }
 
         return toolInfos;

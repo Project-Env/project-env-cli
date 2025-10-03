@@ -8,6 +8,10 @@ public interface ToolSupport<T> {
 
     Class<T> getToolConfigurationClass();
 
+    default boolean isAvailable(T toolConfiguration) {
+        return true;
+    }
+
     ToolInfo prepareTool(T toolConfiguration, ToolSupportContext context) throws ToolSupportException;
 
     default Optional<ToolUpgradeInfo> upgradeToolVersion(T toolConfiguration, ToolSupportContext context) {
