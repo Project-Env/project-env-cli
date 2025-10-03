@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GenericToolSupport implements ToolSupport<GenericToolConfiguration> {
 
@@ -21,6 +22,11 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
     @Override
     public Class<GenericToolConfiguration> getToolConfigurationClass() {
         return GenericToolConfiguration.class;
+    }
+
+    @Override
+    public boolean isAvailable(GenericToolConfiguration toolConfiguration) {
+        return getSystemSpecificDownloadUri(toolConfiguration).isPresent();
     }
 
     @Override
@@ -43,7 +49,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
     private List<LocalToolInstallationStep> createInstallationSteps(GenericToolConfiguration toolConfiguration, ToolSupportContext context) {
         List<LocalToolInstallationStep> steps = new ArrayList<>();
 
-        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration), context.getHttpClientProvider()));
+        steps.add(new ExtractArchiveStep(getSystemSpecificDownloadUri(toolConfiguration).orElseThrow(), context.getHttpClientProvider()));
         steps.add(new FindBinariesRootStep());
 
         for (var pathElement : toolConfiguration.getPathElements()) {
@@ -63,14 +69,13 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
         return steps;
     }
 
-    private String getSystemSpecificDownloadUri(GenericToolConfiguration toolConfiguration) {
+    private Optional<String> getSystemSpecificDownloadUri(GenericToolConfiguration toolConfiguration) {
         return toolConfiguration.getDownloadUrls()
                 .stream()
                 .filter(downloadUrlConfiguration -> downloadUrlConfiguration.getTargetOs() == OperatingSystem.getCurrentOperatingSystem())
                 .findFirst()
                 .map(GenericToolConfiguration.DownloadUrlConfiguration::getDownloadUrl)
-                .or(toolConfiguration::getDownloadUrl)
-                .orElseThrow();
+                .or(toolConfiguration::getDownloadUrl);
     }
 
     private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails) {
