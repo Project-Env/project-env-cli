@@ -14,6 +14,10 @@ public interface ToolSupport<T> {
 
     ToolInfo prepareTool(T toolConfiguration, ToolSupportContext context) throws ToolSupportException;
 
+    default String getDescription(T toolConfiguration) {
+        return getToolIdentifier();
+    }
+
     default Optional<ToolUpgradeInfo> upgradeToolVersion(T toolConfiguration, ToolSupportContext context) {
         return Optional.empty();
     }
