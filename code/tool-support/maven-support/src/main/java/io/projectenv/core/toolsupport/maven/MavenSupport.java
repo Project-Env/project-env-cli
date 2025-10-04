@@ -36,6 +36,25 @@ public class MavenSupport extends AbstractUpgradableToolSupport<MavenConfigurati
     }
 
     @Override
+    public String getDescription(MavenConfiguration toolConfiguration) {
+        StringBuilder description = new StringBuilder(super.getDescription(toolConfiguration));
+        if (toolConfiguration.getGlobalSettingsFile().isPresent() || toolConfiguration.getUserSettingsFile().isPresent()) {
+            description.append(" with ");
+            if (toolConfiguration.getGlobalSettingsFile().isPresent()) {
+                description.append("global ");
+                if (toolConfiguration.getUserSettingsFile().isPresent()) {
+                    description.append("and user ");
+                }
+            }
+            else if (toolConfiguration.getUserSettingsFile().isPresent()) {
+                description.append("user ");
+            }
+            description.append("settings");
+        }
+        return description.toString();
+    }
+
+    @Override
     protected String getCurrentVersion(MavenConfiguration toolConfiguration) {
         return toolConfiguration.getVersion();
     }

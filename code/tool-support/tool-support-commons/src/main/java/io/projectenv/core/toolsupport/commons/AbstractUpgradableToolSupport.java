@@ -33,4 +33,8 @@ public abstract class AbstractUpgradableToolSupport<T> implements ToolSupport<T>
 
     protected abstract Set<String> getAllValidVersions(T toolConfiguration, ToolSupportContext context);
 
+    @Override
+    public String getDescription(T toolConfiguration) {
+		return getToolIdentifier() + " " + ToolVersionHelper.getVersionWithoutPrefix(getCurrentVersion(toolConfiguration));
+    }
 }
