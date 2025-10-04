@@ -38,7 +38,7 @@
         <mockito.version>5.18.0</mockito.version>
         <archunit-junit5.version>1.4.1</archunit-junit5.version>
         <semver4j.version>5.7.1</semver4j.version>
-        <commons-compress.version>1.27.1</commons-compress.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <xz.version>1.10</xz.version>
         <commons-text.version>1.13.1</commons-text.version>
         <graal-sdk.version>24.2.1</graal-sdk.version>
