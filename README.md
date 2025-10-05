@@ -68,6 +68,9 @@ post_extraction_commands = [
 hooks_directory = "<path>"
 
 [[generic]]
+# [optional]
+# The name of the tool.
+name = "<name>"
 # [optional], if 'download_urls' is configured
 # The URL to download the tool from.
 download_url = "<url>"
