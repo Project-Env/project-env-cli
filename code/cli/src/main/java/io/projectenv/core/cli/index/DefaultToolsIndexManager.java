@@ -52,14 +52,14 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
             downloadToolsIndex(toolsIndexFile);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ProjectEnvException("interrupted while downloading tools index", e);
+            throw new ProjectEnvException("Interrupted while downloading tools index", e);
         } catch (Exception e) {
-            ProcessOutput.writeDebugMessage("failed to update tools index: {0}", e.getMessage());
+            ProcessOutput.writeDebugMessage("Failed to update tools index: {0}", e.getMessage());
             ProcessOutput.writeDebugMessage(e);
         }
 
         if (!toolsIndexFile.exists()) {
-            throw new ProjectEnvException("could not load tools index as the download failed and no local copy is present");
+            throw new ProjectEnvException("Could not load tools index as the download failed and no local copy is present");
         }
 
         try (Reader reader = new FileReader(toolsIndexFile, StandardCharsets.UTF_8)) {
@@ -109,7 +109,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
     @Override
     public String resolveMavenDistributionUrl(String version) {
         return Optional.ofNullable(getToolsIndex().getMavenVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
-                .orElseThrow(() -> new ToolsIndexException("failed to resolve Maven " + version + " from tool index"));
+                .orElseThrow(() -> new ToolsIndexException("Failed to resolve Maven " + version + " from tool index"));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
     @Override
     public String resolveGradleDistributionUrl(String version) {
         return Optional.ofNullable(getToolsIndex().getGradleVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
-                .orElseThrow(() -> new ToolsIndexException("failed to resolve Gradle " + version + " from tool index"));
+                .orElseThrow(() -> new ToolsIndexException("Failed to resolve Gradle " + version + " from tool index"));
     }
 
     @Override
@@ -133,7 +133,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
         return Optional.ofNullable(getToolsIndex().getNodeVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
                 .map(this::resolveDownloadUrlForCpuArchitecture)
-                .orElseThrow(() -> new ToolsIndexException("failed to resolve NodeJS " + version + " from tool index"));
+                .orElseThrow(() -> new ToolsIndexException("Failed to resolve NodeJS " + version + " from tool index"));
     }
 
     @Override
@@ -148,7 +148,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
                 .map(jdkDistributionEntry -> jdkDistributionEntry.get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
                 .map(this::resolveDownloadUrlForCpuArchitecture)
-                .orElseThrow(() -> new ToolsIndexException("failed to resolve " + jdkDistribution + " " + version + " from tool index"));
+                .orElseThrow(() -> new ToolsIndexException("Failed to resolve " + jdkDistribution + " " + version + " from tool index"));
     }
 
     @Override
@@ -163,7 +163,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
     public String resolveClojureDistributionUrl(String version) {
         return Optional.ofNullable(getToolsIndex().getClojureVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
                 .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
-                .orElseThrow(() -> new ToolsIndexException("failed to resolve Clojure " + version + " from tool index"));
+                .orElseThrow(() -> new ToolsIndexException("Failed to resolve Clojure " + version + " from tool index"));
     }
 
     @Override
@@ -207,7 +207,7 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
             return toolsIndexV2;
         } catch (IOException e) {
-            throw new ProjectEnvException("failed to load tool index", e);
+            throw new ProjectEnvException("Failed to load tool index", e);
         }
     }
 

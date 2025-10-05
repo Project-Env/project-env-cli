@@ -23,7 +23,7 @@ class DefaultLocalToolInstallationManagerTest {
 
         assertThatExceptionOfType(LocalToolInstallationManagerException.class)
                 .isThrownBy(() -> localToolInstallationManager.installOrUpdateTool("test", List.of(new ExceptionThrowingLocalToolInstallationStep("test"))))
-                .withMessage("failed to install tool test");
+                .withMessage("Failed to install tool test");
 
         assertThat(tempDir).isEmptyDirectory();
     }
@@ -38,12 +38,12 @@ class DefaultLocalToolInstallationManagerTest {
 
         @Override
         public LocalToolInstallationDetails executeInstallStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
-            throw new LocalToolInstallationStepException("something went wrong");
+            throw new LocalToolInstallationStepException("Something went wrong");
         }
 
         @Override
         public LocalToolInstallationDetails executeUpdateStep(File installationRoot, LocalToolInstallationDetails intermediateInstallationDetails) throws LocalToolInstallationStepException {
-            throw new LocalToolInstallationStepException("something went wrong");
+            throw new LocalToolInstallationStepException("Something went wrong");
         }
 
         @Override

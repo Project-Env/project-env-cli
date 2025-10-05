@@ -35,7 +35,7 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
 
             var rawPostInstallationCommandParts = List.of(StringUtils.split(rawCommand));
             if (rawPostInstallationCommandParts.isEmpty()) {
-                throw new LocalToolInstallationStepException("empty command");
+                throw new LocalToolInstallationStepException("Empty command");
             }
 
             var executable = getExecutableNameFromRawCommand(rawPostInstallationCommandParts);
@@ -52,7 +52,7 @@ public class ExecuteCommandStep implements LocalToolInstallationStep {
 
             return intermediateInstallationDetails;
         } catch (IOException e) {
-            throw new LocalToolInstallationStepException("failed to execute step", e);
+            throw new LocalToolInstallationStepException("Failed to execute step", e);
         }
     }
     @Override

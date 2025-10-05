@@ -97,7 +97,7 @@ public final class ProcessEnvironmentHelper {
             }
         }
 
-        throw new IllegalStateException("could not resolve path variable name");
+        throw new IllegalStateException("Could not resolve path variable name");
     }
 
 }

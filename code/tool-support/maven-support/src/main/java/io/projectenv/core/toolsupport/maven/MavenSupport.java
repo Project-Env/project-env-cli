@@ -24,6 +24,11 @@ public class MavenSupport extends AbstractUpgradableToolSupport<MavenConfigurati
     }
 
     @Override
+    public String getName(MavenConfiguration toolConfiguration) {
+        return "Maven";
+    }
+
+    @Override
     public Class<MavenConfiguration> getToolConfigurationClass() {
         return MavenConfiguration.class;
     }
@@ -70,7 +75,7 @@ public class MavenSupport extends AbstractUpgradableToolSupport<MavenConfigurati
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 

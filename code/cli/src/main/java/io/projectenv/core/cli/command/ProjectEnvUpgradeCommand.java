@@ -50,7 +50,7 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
 
             return toolUpgradeInfos;
         } catch (ToolSupportException e) {
-            throw new ProjectEnvException("failed to upgrade tools", e);
+            throw new ProjectEnvException("Failed to upgrade tools", e);
         }
     }
 
@@ -96,7 +96,7 @@ public class ProjectEnvUpgradeCommand extends AbstractProjectEnvCliCommand {
     }
 
     private String applyToolUpgrade(String rawProjectEnvConfiguration, String toolIdentifier, ToolUpgradeInfo toolUpgradeInfo) {
-        ProcessOutput.writeInfoMessage("upgrading {0} from {1} to {2}...", toolIdentifier, toolUpgradeInfo.getCurrentVersion(), toolUpgradeInfo.getUpgradedVersion());
+        ProcessOutput.writeInfoMessage("Upgrading {0} from {1} to {2}...", toolIdentifier, toolUpgradeInfo.getCurrentVersion(), toolUpgradeInfo.getUpgradedVersion());
 
         String currentVersion = Pattern.quote(toolUpgradeInfo.getCurrentVersion());
         return rawProjectEnvConfiguration

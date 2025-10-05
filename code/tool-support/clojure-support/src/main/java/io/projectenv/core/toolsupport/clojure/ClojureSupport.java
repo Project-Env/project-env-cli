@@ -25,6 +25,11 @@ public class ClojureSupport extends AbstractUpgradableToolSupport<ClojureConfigu
     }
 
     @Override
+    public String getName(ClojureConfiguration toolConfiguration) {
+        return "Clojure";
+    }
+
+    @Override
     public Class<ClojureConfiguration> getToolConfigurationClass() {
         return ClojureConfiguration.class;
     }
@@ -52,7 +57,7 @@ public class ClojureSupport extends AbstractUpgradableToolSupport<ClojureConfigu
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 

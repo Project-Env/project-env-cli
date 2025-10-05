@@ -23,6 +23,11 @@ public class GradleSupport extends AbstractUpgradableToolSupport<GradleConfigura
     }
 
     @Override
+    public String getName(GradleConfiguration toolConfiguration) {
+        return "Gradle";
+    }
+
+    @Override
     public Class<GradleConfiguration> getToolConfigurationClass() {
         return GradleConfiguration.class;
     }
@@ -50,7 +55,7 @@ public class GradleSupport extends AbstractUpgradableToolSupport<GradleConfigura
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 

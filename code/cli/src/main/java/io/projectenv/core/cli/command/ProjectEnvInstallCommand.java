@@ -46,7 +46,7 @@ public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
 
             return toolInstallationInfos;
         } catch (ToolSupportException e) {
-            throw new ProjectEnvException("failed to install tools", e);
+            throw new ProjectEnvException("Failed to install tools", e);
         }
     }
 
@@ -60,7 +60,7 @@ public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
         var toolInfos = new ArrayList<ToolInfo>();
         for (var toolConfiguration : toolConfigurations) {
             if (toolSupport.isAvailable(toolConfiguration)) {
-                ProcessOutput.writeInfoMessage("installing {0}...", toolSupport.getDescription(toolConfiguration));
+                ProcessOutput.writeInfoMessage("Installing {0}...", toolSupport.getDescription(toolConfiguration));
                 toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
             } else {
                 ProcessOutput.writeInfoMessage("{0} is not available, skipping installation", toolSupport.getToolIdentifier());
@@ -91,7 +91,7 @@ public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
         FileUtils.write(target, content, StandardCharsets.UTF_8);
 
         if (!SystemUtils.IS_OS_WINDOWS && !target.setExecutable(true)) {
-            ProcessOutput.writeInfoMessage("failed to make file {0} executable", target.getCanonicalPath());
+            ProcessOutput.writeInfoMessage("Failed to make file {0} executable", target.getCanonicalPath());
         }
     }
 

@@ -24,6 +24,11 @@ public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> 
     }
 
     @Override
+    public String getName(JdkConfiguration toolConfiguration) {
+        return "Java (" + toolConfiguration.getDistribution() + ")";
+    }
+
+    @Override
     public Class<JdkConfiguration> getToolConfigurationClass() {
         return JdkConfiguration.class;
     }
@@ -51,7 +56,7 @@ public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> 
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 
