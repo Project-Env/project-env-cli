@@ -19,7 +19,7 @@ public final class LockFileHelper {
         while (lockFile.exists()) {
             long passedMillis = System.currentTimeMillis() - waitingSinceMillis;
             if (timout.minus(passedMillis, ChronoUnit.MILLIS).isNegative()) {
-                throw new TimeoutException("timeout while trying to acquire lock file " + lockFile.getCanonicalPath());
+                throw new TimeoutException("Timeout while trying to acquire lock file " + lockFile.getCanonicalPath());
             }
 
             try {
@@ -27,13 +27,13 @@ public final class LockFileHelper {
             } catch (InterruptedException e) {
                 // re-set interrupt flag on thread
                 Thread.currentThread().interrupt();
-                throw new IOException("tried to acquire lock files, but was interrupted", e);
+                throw new IOException("Tried to acquire lock files, but was interrupted", e);
             }
         }
 
         FileUtils.forceMkdirParent(lockFile);
         if (!lockFile.createNewFile()) {
-            throw new IOException("failed to create lock file " + lockFile.getCanonicalPath());
+            throw new IOException("Failed to create lock file " + lockFile.getCanonicalPath());
         }
 
         return new LockFile(lockFile);

@@ -55,7 +55,7 @@ public final class ProcessHelper {
                     .build();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IOException("interrupted while waiting for process termination");
+            throw new IOException("Interrupted while waiting for process termination");
         }
     }
 

@@ -30,7 +30,7 @@ public class DeleteFileStep implements LocalToolInstallationStep {
 
             return intermediateInstallationDetails;
         } catch (IOException e) {
-            throw new LocalToolInstallationStepException("failed to execute step", e);
+            throw new LocalToolInstallationStepException("Failed to execute step", e);
         }
     }
 

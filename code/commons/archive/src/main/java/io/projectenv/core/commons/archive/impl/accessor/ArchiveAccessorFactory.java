@@ -33,7 +33,7 @@ public class ArchiveAccessorFactory {
             }
         }
 
-        throw new IllegalArgumentException("unsupported archive " + archive.getName());
+        throw new IllegalArgumentException("Unsupported archive " + archive.getName());
     }
 
     private static ArchiveAccessor createZipArchiveAccessor(File archive) throws IOException {

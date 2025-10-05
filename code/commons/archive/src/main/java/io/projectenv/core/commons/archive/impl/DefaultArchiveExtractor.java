@@ -56,7 +56,7 @@ public class DefaultArchiveExtractor implements ArchiveExtractor {
 
     private void checkThatPathIsInsideBasePath(File file, File baseDirectory) throws IOException {
         if (!file.getCanonicalPath().startsWith(baseDirectory.getCanonicalPath())) {
-            throw new IllegalStateException("path " + file.getPath() + " is pointing to a location outside " + baseDirectory.getCanonicalPath());
+            throw new IllegalStateException("Path " + file.getPath() + " is pointing to a location outside " + baseDirectory.getCanonicalPath());
         }
     }
 

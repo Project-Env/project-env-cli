@@ -23,7 +23,7 @@ public final class NativeImageHelper {
     }
 
     public static void registerResource(String resource) {
-        ProcessOutput.writeInfoMessage("registering resource {0} in native image", resource);
+        ProcessOutput.writeInfoMessage("Registering resource {0} in native image", resource);
         RuntimeResourceAccess.addResource(NativeImageHelper.class.getModule(), resource);
     }
 
@@ -45,20 +45,20 @@ public final class NativeImageHelper {
     }
 
     public static void registerFieldsWithAnnotationForReflection(String basePackage, Class<? extends Annotation> annotationClazz) {
-        ProcessOutput.writeInfoMessage("scanning package {0} for fields with annotation {1}", basePackage, annotationClazz.getSimpleName());
+        ProcessOutput.writeInfoMessage("Scanning package {0} for fields with annotation {1}", basePackage, annotationClazz.getSimpleName());
 
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(basePackage)
                 .setScanners(Scanners.FieldsAnnotated));
 
         for (Field field : reflections.getFieldsAnnotatedWith(annotationClazz)) {
-            ProcessOutput.writeInfoMessage("registering field {0} for reflection in native image", field.getName());
+            ProcessOutput.writeInfoMessage("Registering field {0} for reflection in native image", field.getName());
             RuntimeReflection.register(field);
         }
     }
 
     public static void registerClassForReflection(Class<?> clazz) {
-        ProcessOutput.writeInfoMessage("registering class {0} for reflection in native image", clazz.getName());
+        ProcessOutput.writeInfoMessage("Registering class {0} for reflection in native image", clazz.getName());
         RuntimeReflection.register(clazz);
         RuntimeReflection.register(clazz.getDeclaredMethods());
         RuntimeReflection.register(clazz.getDeclaredFields());

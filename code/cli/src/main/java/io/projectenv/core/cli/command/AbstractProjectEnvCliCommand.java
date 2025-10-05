@@ -48,7 +48,7 @@ public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> 
         } catch (Exception e) {
             var rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
 
-            ProcessOutput.writeInfoMessage("failed to " + spec.commandLine().getCommandName() + " tools: {0}", rootCauseMessage);
+            ProcessOutput.writeInfoMessage("Failed to " + spec.commandLine().getCommandName() + " tools: {0}", rootCauseMessage);
             ProcessOutput.writeDebugMessage(e);
 
             return CommandLine.ExitCode.SOFTWARE;
@@ -62,7 +62,7 @@ public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> 
     private ToolSupportContext createToolSupportContext(ProjectEnvConfiguration configuration) throws IOException {
         var toolsDirectory = new File(projectRoot, configuration.getToolsDirectory());
         if (!toolsDirectory.getCanonicalPath().startsWith(projectRoot.getCanonicalPath())) {
-            throw new IllegalArgumentException("tools root must be located in project root");
+            throw new IllegalArgumentException("Tools root must be located in project root");
         }
 
         var localToolInstallationManager = new DefaultLocalToolInstallationManager(toolsDirectory);

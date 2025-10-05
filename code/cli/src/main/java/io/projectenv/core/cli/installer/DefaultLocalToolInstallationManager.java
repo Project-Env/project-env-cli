@@ -42,7 +42,7 @@ public class DefaultLocalToolInstallationManager implements LocalToolInstallatio
         } catch (Exception e) {
             cleanUpFailedToolInstallation(toolInstallationRoot);
 
-            throw new LocalToolInstallationManagerException("failed to install tool " + toolName, e);
+            throw new LocalToolInstallationManagerException("Failed to install tool " + toolName, e);
         }
     }
 
@@ -50,7 +50,7 @@ public class DefaultLocalToolInstallationManager implements LocalToolInstallatio
         try {
             FileUtils.forceDelete(toolInstallationRoot);
         } catch (IOException e) {
-            ProcessOutput.writeInfoMessage("failed to delete tool installation directory {0}: {1}", toolInstallationRoot.getAbsolutePath(), e.getMessage());
+            ProcessOutput.writeInfoMessage("Failed to delete tool installation directory {0}: {1}", toolInstallationRoot.getAbsolutePath(), e.getMessage());
         }
     }
 

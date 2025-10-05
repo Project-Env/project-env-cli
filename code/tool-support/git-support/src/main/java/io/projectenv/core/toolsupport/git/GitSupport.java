@@ -20,6 +20,11 @@ public class GitSupport implements ToolSupport<GitConfiguration> {
     }
 
     @Override
+    public String getDescription(GitConfiguration toolConfiguration) {
+        return "Git hooks";
+    }
+
+    @Override
     public Class<GitConfiguration> getToolConfigurationClass() {
         return GitConfiguration.class;
     }
@@ -39,7 +44,7 @@ public class GitSupport implements ToolSupport<GitConfiguration> {
                     .handledProjectResources(gitHooks)
                     .build();
         } catch (IOException e) {
-            throw new ToolSupportException("failed to copy Git hooks", e);
+            throw new ToolSupportException("Failed to copy Git hooks", e);
         }
     }
 

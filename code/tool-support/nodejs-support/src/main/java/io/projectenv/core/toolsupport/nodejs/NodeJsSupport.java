@@ -24,6 +24,11 @@ public class NodeJsSupport extends AbstractUpgradableToolSupport<NodeJsConfigura
     }
 
     @Override
+    public String getName(NodeJsConfiguration toolConfiguration) {
+        return "NodeJS";
+    }
+
+    @Override
     public Class<NodeJsConfiguration> getToolConfigurationClass() {
         return NodeJsConfiguration.class;
     }
@@ -51,7 +56,7 @@ public class NodeJsSupport extends AbstractUpgradableToolSupport<NodeJsConfigura
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 

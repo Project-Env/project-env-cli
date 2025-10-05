@@ -41,7 +41,7 @@ public class OverwriteFileStep implements LocalToolInstallationStep {
                     .addFileOverwrites(Pair.of(source, target))
                     .build();
         } catch (IOException e) {
-            throw new LocalToolInstallationStepException("failed to execute step", e);
+            throw new LocalToolInstallationStepException("Failed to execute step", e);
         }
     }
 

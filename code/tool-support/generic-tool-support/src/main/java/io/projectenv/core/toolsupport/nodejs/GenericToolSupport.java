@@ -42,7 +42,7 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
 
             return context.getLocalToolInstallationManager().installOrUpdateTool(getToolIdentifier(), steps);
         } catch (LocalToolInstallationManagerException e) {
-            throw new ToolSupportException("failed to install tool", e);
+            throw new ToolSupportException("Failed to install tool", e);
         }
     }
 
