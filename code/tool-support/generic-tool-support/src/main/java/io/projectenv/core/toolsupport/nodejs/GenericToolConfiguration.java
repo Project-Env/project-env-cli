@@ -12,6 +12,8 @@ import java.util.Optional;
 @Value.Immutable
 public interface GenericToolConfiguration {
 
+    Optional<String> getName();
+
     Optional<String> getPrimaryExecutable();
 
     Optional<String> getDownloadUrl();

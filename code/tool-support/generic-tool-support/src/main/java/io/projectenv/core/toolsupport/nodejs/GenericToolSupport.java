@@ -36,6 +36,11 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
         return createProjectEnvToolInfo(toolInstallationDetails);
     }
 
+    @Override
+    public String getDescription(GenericToolConfiguration toolConfiguration) {
+        return toolConfiguration.getName().orElse(ToolSupport.super.getDescription(toolConfiguration));
+    }
+
     private LocalToolInstallationDetails installTool(GenericToolConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         try {
             var steps = createInstallationSteps(toolConfiguration, context);

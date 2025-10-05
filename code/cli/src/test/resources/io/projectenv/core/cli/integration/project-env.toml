@@ -26,6 +26,7 @@ version = "1.12.1.1550"
 hooks_directory = "hooks"
 
 [[generic]]
+name = "JAXB 3.0"
 download_url = "https://repo1.maven.org/maven2/com/sun/xml/bind/jaxb-ri/3.0.0/jaxb-ri-3.0.0.zip"
 environment_variables = { JAXB_HOME = "/" }
 path_elements = ["bin"]
