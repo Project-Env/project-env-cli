@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.command;
 
+import com.google.gson.Gson;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures.SyncToolSpecification;
@@ -12,9 +13,9 @@ import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
 import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.cli.index.DefaultToolsIndexManager;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
-import io.projectenv.core.cli.parser.ToolInfoParser;
 import io.projectenv.core.cli.service.ProjectEnvInstallService;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
 import org.apache.commons.lang3.Strings;
 import picocli.CommandLine.Command;
@@ -30,15 +31,22 @@ import java.util.concurrent.CountDownLatch;
  * MCP (Model Context Protocol) server command that exposes ProjectEnv tools via stdio.
  * <p>
  * This command starts a JSON-RPC server that implements the MCP protocol,
- * allowing AI assistants to interact with ProjectEnv commands.
+ * allowing AI assistants to query tool-specific metadata.
  */
 @Command(name = "mcp", description = "Start MCP server to expose ProjectEnv tools")
 public class ProjectEnvMcpCommand implements Callable<Integer> {
 
     private static final String SERVER_NAME = "project-env-mcp";
-    private static final String INSTALL_TOOL_NAME = "project-env-install";
+    private static final String TOOL_INFO_NAME = "project-env-tool-info";
+
+    // Argument names
     private static final String ARG_PROJECT_ROOT = "projectRoot";
     private static final String ARG_CONFIG_FILE = "configFile";
+    private static final String ARG_TOOL_NAME = "toolName";
+
+    // Supported tool identifiers
+    private static final String TOOL_MAVEN = "maven";
+    private static final String TOOL_JDK = "jdk";
 
     @Override
     public Integer call() {
@@ -53,36 +61,41 @@ public class ProjectEnvMcpCommand implements Callable<Integer> {
 
     private McpSyncServer createMcpServer() {
         final StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(McpJsonMapper.getDefault());
-        final SyncToolSpecification installToolSpec = createInstallToolSpecification();
+        final SyncToolSpecification toolInfoSpec = createToolInfoSpecification();
 
         return McpServer.sync(transportProvider)
                 .serverInfo(SERVER_NAME, VersionProvider.getVersion())
                 .capabilities(ServerCapabilities.builder()
                         .tools(true)
                         .build())
-                .tools(installToolSpec)
+                .tools(toolInfoSpec)
                 .build();
     }
 
-    private SyncToolSpecification createInstallToolSpecification() {
+    private SyncToolSpecification createToolInfoSpecification() {
         return SyncToolSpecification.builder()
-                .tool(createInstallTool())
-                .callHandler(this::handleInstallToolCall)
+                .tool(createToolInfoTool())
+                .callHandler(this::handleToolInfoCall)
                 .build();
     }
 
-    private Tool createInstallTool() {
+    private Tool createToolInfoTool() {
         return Tool.builder()
-                .name(INSTALL_TOOL_NAME)
-                .description("Install or update tools configured in project-env.toml")
-                .inputSchema(createInstallToolInputSchema())
+                .name(TOOL_INFO_NAME)
+                .description("Get tool-specific metadata (version, settings files, etc.) for Maven or JDK")
+                .inputSchema(createToolInfoInputSchema())
                 .build();
     }
 
-    private JsonSchema createInstallToolInputSchema() {
+    private JsonSchema createToolInfoInputSchema() {
         return new JsonSchema(
                 "object",
                 Map.of(
+                        ARG_TOOL_NAME, Map.of(
+                                "type", "string",
+                                "description", "Tool name (maven or jdk)",
+                                "enum", List.of(TOOL_MAVEN, TOOL_JDK)
+                        ),
                         ARG_PROJECT_ROOT, Map.of(
                                 "type", "string",
                                 "description", "Path to project root directory"
@@ -92,18 +105,29 @@ public class ProjectEnvMcpCommand implements Callable<Integer> {
                                 "description", "Path to project-env.toml configuration file (normally in project root)"
                         )
                 ),
-                List.of(),
+                List.of(ARG_TOOL_NAME),
                 false,
                 Map.of(),
                 Map.of()
         );
     }
 
-    private CallToolResult handleInstallToolCall(Object exchange, CallToolRequest request) {
+    /**
+     * Handles tool info requests by returning tool-specific metadata for the requested tool.
+     * <p>
+     * Internally calls the installation service to ensure tools are installed,
+     * then extracts and returns only the tool-specific metadata for the requested tool.
+     *
+     * @param exchange the MCP exchange context
+     * @param request the tool call request
+     * @return CallToolResult containing tool-specific metadata as JSON
+     */
+    private CallToolResult handleToolInfoCall(Object exchange, CallToolRequest request) {
         try {
             final Map<String, Object> args = request.arguments();
 
             // Parse arguments
+            final String toolName = parseToolName(args);
             final File projectRoot = parseProjectRoot(args);
             final File configFile = parseConfigFile(args, projectRoot);
 
@@ -113,12 +137,17 @@ public class ProjectEnvMcpCommand implements Callable<Integer> {
             // Create tool support context
             final ToolSupportContext toolSupportContext = createToolSupportContext(projectRoot, configuration);
 
-            // Execute installation service
+            // Execute installation service to get tool info
             final var service = new ProjectEnvInstallService();
-            final var toolInfos = service.installOrUpdateTools(configuration, toolSupportContext);
+            final var allToolInfos = service.installOrUpdateTools(configuration, toolSupportContext);
+
+            // Extract only the requested tool's metadata
+            final Map<String, Object> toolSpecificMetadata = extractToolMetadata(allToolInfos, toolName);
 
             // Convert to JSON and return as MCP result
-            final String json = ToolInfoParser.toJson(toolInfos);
+            final Gson gson = new Gson();
+            final String json = gson.toJson(toolSpecificMetadata);
+
             return CallToolResult.builder()
                     .addContent(new TextContent(json))
                     .isError(false)
@@ -126,6 +155,57 @@ public class ProjectEnvMcpCommand implements Callable<Integer> {
         } catch (Exception e) {
             return createErrorResult(e);
         }
+    }
+
+    /**
+     * Parses and validates the tool name from request arguments.
+     */
+    private String parseToolName(Map<String, Object> args) {
+        if (!args.containsKey(ARG_TOOL_NAME)) {
+            throw new IllegalArgumentException("Missing required argument: " + ARG_TOOL_NAME);
+        }
+
+        final String toolName = args.get(ARG_TOOL_NAME).toString().toLowerCase();
+
+        if (!TOOL_MAVEN.equals(toolName) && !TOOL_JDK.equals(toolName)) {
+            throw new IllegalArgumentException(
+                "Invalid tool name: " + toolName + ". Supported tools: " + TOOL_MAVEN + ", " + TOOL_JDK
+            );
+        }
+
+        return toolName;
+    }
+
+    /**
+     * Extracts tool-specific metadata from the installation results.
+     * <p>
+     * Returns only the toolSpecificMetadata map for the requested tool,
+     * or an error if the tool is not found or has no metadata.
+     *
+     * @param allToolInfos all tool installation results
+     * @param toolName the requested tool name
+     * @return map containing only tool-specific metadata
+     */
+    private Map<String, Object> extractToolMetadata(Map<String, List<ToolInfo>> allToolInfos, String toolName) {
+        if (!allToolInfos.containsKey(toolName)) {
+            throw new IllegalStateException("Tool '" + toolName + "' is not configured in project-env.toml");
+        }
+
+        final List<ToolInfo> toolInfoList = allToolInfos.get(toolName);
+
+        if (toolInfoList.isEmpty()) {
+            throw new IllegalStateException("No installation info found for tool: " + toolName);
+        }
+
+        // Get the first (and typically only) ToolInfo for this tool
+        final ToolInfo toolInfo = toolInfoList.getFirst();
+        final Map<String, Object> metadata = toolInfo.getToolSpecificMetadata();
+
+        if (metadata == null || metadata.isEmpty()) {
+            throw new IllegalStateException("Tool '" + toolName + "' has no specific metadata available");
+        }
+
+        return metadata;
     }
 
     private File parseProjectRoot(Map<String, Object> args) {

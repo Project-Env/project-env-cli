@@ -62,16 +62,6 @@
         <maven-shade-plugin.version>3.6.1</maven-shade-plugin.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>github-mcp-sdk</id>
-            <url>https://maven.pkg.github.com/modelcontextprotocol/java-sdk</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <modules>
         <module>code</module>
         <module>tools</module>
