@@ -1,15 +1,12 @@
 package io.projectenv.core.cli.command;
 
-import io.projectenv.core.cli.ProjectEnvException;
-import io.projectenv.core.cli.ToolSupportHelper;
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.parser.ToolInfoParser;
+import io.projectenv.core.cli.service.ProjectEnvInstallService;
 import io.projectenv.core.cli.shell.TemplateProcessor;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ToolInfo;
-import io.projectenv.core.toolsupport.spi.ToolSupport;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
-import io.projectenv.core.toolsupport.spi.ToolSupportException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import picocli.CommandLine.Command;
@@ -18,7 +15,8 @@ import picocli.CommandLine.Option;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Command(name = "install")
 public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
@@ -31,43 +29,9 @@ public class ProjectEnvInstallCommand extends AbstractProjectEnvCliCommand {
 
     @Override
     protected void callInternal(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws IOException {
-        writeOutput(installOrUpdateTools(configuration, toolSupportContext));
-    }
-
-    private Map<String, List<ToolInfo>> installOrUpdateTools(ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) {
-        try {
-            var toolInstallationInfos = new LinkedHashMap<String, List<ToolInfo>>();
-            for (ToolSupport<?> toolSupport : ServiceLoader.load(ToolSupport.class, ToolSupport.class.getClassLoader())) {
-                List<ToolInfo> toolInfos = installOrUpdateTool(toolSupport, configuration, toolSupportContext);
-                if (!toolInfos.isEmpty()) {
-                    toolInstallationInfos.put(toolSupport.getToolIdentifier(), toolInfos);
-                }
-            }
-
-            return toolInstallationInfos;
-        } catch (ToolSupportException e) {
-            throw new ProjectEnvException("Failed to install tools", e);
-        }
-    }
-
-    private <T> List<ToolInfo> installOrUpdateTool(ToolSupport<T> toolSupport, ProjectEnvConfiguration configuration, ToolSupportContext toolSupportContext) throws ToolSupportException {
-        var toolSupportConfigurationClass = ToolSupportHelper.getToolSupportConfigurationClass(toolSupport);
-        var toolConfigurations = configuration.getToolConfigurations(toolSupport.getToolIdentifier(), toolSupportConfigurationClass);
-        if (toolConfigurations.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        var toolInfos = new ArrayList<ToolInfo>();
-        for (var toolConfiguration : toolConfigurations) {
-            if (toolSupport.isAvailable(toolConfiguration)) {
-                ProcessOutput.writeInfoMessage("Installing {0}...", toolSupport.getDescription(toolConfiguration));
-                toolInfos.add(toolSupport.prepareTool(toolConfiguration, toolSupportContext));
-            } else {
-                ProcessOutput.writeInfoMessage("{0} is not available, skipping installation", toolSupport.getToolIdentifier());
-            }
-        }
-
-        return toolInfos;
+        var service = new ProjectEnvInstallService();
+        var toolInfos = service.installOrUpdateTools(configuration, toolSupportContext);
+        writeOutput(toolInfos);
     }
 
     private void writeOutput(Map<String, List<ToolInfo>> toolInfos) throws IOException {
