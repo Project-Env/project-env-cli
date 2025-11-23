@@ -31,6 +31,10 @@ public final class NativeImageHelper {
         RuntimeClassInitialization.initializeAtBuildTime(clazz);
     }
 
+    public static void initializeAtBuildTime(String packageName) {
+        RuntimeClassInitialization.initializeAtBuildTime(packageName);
+    }
+
     public static void registerService(Class<?> clazz) {
         registerClassAndSubclassesForReflection(clazz);
         registerResource(SERVICE_REGISTRATION_FILE_PATH + clazz.getName());

@@ -2,12 +2,13 @@ package io.projectenv.core.cli.command;
 
 import io.projectenv.core.cli.configuration.ProjectEnvConfiguration;
 import io.projectenv.core.cli.configuration.toml.TomlConfigurationFactory;
+import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.cli.index.DefaultToolsIndexManager;
 import io.projectenv.core.cli.installer.DefaultLocalToolInstallationManager;
-import io.projectenv.core.cli.http.DefaultHttpClientProvider;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ImmutableToolSupportContext;
 import io.projectenv.core.toolsupport.spi.ToolSupportContext;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
@@ -20,11 +21,13 @@ import java.util.concurrent.Callable;
 
 public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> {
 
-    @Option(names = {"--project-root"}, defaultValue = ".")
-    protected File projectRoot;
+    private static final String DEFAULT_PROJECT_ENV_TOML = "project-env.toml";
 
-    @Option(names = {"--config-file"}, defaultValue = "project-env.toml")
-    protected File configFile;
+    @Option(names = {"--project-root"}, defaultValue = ".")
+    protected String projectRoot;
+
+    @Option(names = {"--config-file"}, defaultValue = DEFAULT_PROJECT_ENV_TOML)
+    protected String configFile;
 
     @Option(names = {"--debug"})
     protected boolean debug;
@@ -55,11 +58,21 @@ public abstract class AbstractProjectEnvCliCommand implements Callable<Integer> 
         }
     }
 
+
     private ProjectEnvConfiguration readProjectEnvConfiguration() throws IOException {
-        return TomlConfigurationFactory.fromFile(configFile);
+        return TomlConfigurationFactory.fromFile(resolveConfigFile());
+    }
+
+    protected File resolveConfigFile() {
+        if (Strings.CS.equals(configFile, DEFAULT_PROJECT_ENV_TOML)) {
+            return new File(projectRoot, DEFAULT_PROJECT_ENV_TOML);
+        } else {
+            return new File(configFile);
+        }
     }
 
     private ToolSupportContext createToolSupportContext(ProjectEnvConfiguration configuration) throws IOException {
+        var projectRoot = new File(this.projectRoot);
         var toolsDirectory = new File(projectRoot, configuration.getToolsDirectory());
         if (!toolsDirectory.getCanonicalPath().startsWith(projectRoot.getCanonicalPath())) {
             throw new IllegalArgumentException("Tools root must be located in project root");

@@ -24,4 +24,17 @@ public interface ToolInfo {
 
     Map<String, File> getUnhandledProjectResources();
 
+    /**
+     * Tool-specific structured metadata.
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>Maven: "version", "globalSettingsFile", "userSettingsFile"</li>
+     *   <li>JDK: "version", "distribution"</li>
+     * </ul>
+     *
+     * @return map of tool-specific metadata (empty by default)
+     */
+    Map<String, Object> getToolSpecificMetadata();
+
 }

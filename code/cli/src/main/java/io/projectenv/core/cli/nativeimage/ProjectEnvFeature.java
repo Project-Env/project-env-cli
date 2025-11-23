@@ -2,15 +2,13 @@ package io.projectenv.core.cli.nativeimage;
 
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.annotations.SerializedName;
+import io.modelcontextprotocol.spec.McpSchema;
 import io.projectenv.core.cli.shell.TemplateProcessor;
 import io.projectenv.core.commons.process.ProcessOutput;
 import io.projectenv.core.toolsupport.spi.ToolInfo;
 import io.projectenv.core.toolsupport.spi.ToolSupport;
 import org.apache.commons.compress.archivers.zip.ZipExtraField;
 import org.graalvm.nativeimage.hosted.Feature;
-import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.Reporter;
-import org.slf4j.simple.SimpleLogger;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,6 +21,8 @@ public class ProjectEnvFeature implements Feature {
 
     @Override
     public void beforeAnalysis(BeforeAnalysisAccess access) {
+        configureVersionProvider();
+        configureMcpClasses();
         configureSlf4j();
         configureProcessOutputWriter();
         registerZipExtraFieldClasses();
@@ -31,10 +31,16 @@ public class ProjectEnvFeature implements Feature {
         registerTemplates();
     }
 
+    private void configureVersionProvider() {
+        registerResource("version.properties");
+    }
+
+    private void configureMcpClasses() {
+        registerClassForReflection(McpSchema.class);
+    }
+
     private void configureSlf4j() {
-        initializeAtBuildTime(LoggerFactory.class);
-        initializeAtBuildTime(SimpleLogger.class);
-        initializeAtBuildTime(Reporter.class);
+        initializeAtBuildTime("org.slf4j");
     }
 
     private void configureProcessOutputWriter() {

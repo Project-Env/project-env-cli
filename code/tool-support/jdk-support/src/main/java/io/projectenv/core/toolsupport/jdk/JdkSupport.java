@@ -37,7 +37,7 @@ public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> 
     public ToolInfo prepareTool(JdkConfiguration toolConfiguration, ToolSupportContext context) throws ToolSupportException {
         var toolInstallationDetails = installTool(toolConfiguration, context);
 
-        return createProjectEnvToolInfo(toolInstallationDetails);
+        return createProjectEnvToolInfo(toolInstallationDetails, toolConfiguration);
     }
 
     @Override
@@ -85,7 +85,8 @@ public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> 
         return context.getToolsIndexManager().resolveJdkDistributionUrl(toolConfiguration.getDistribution(), toolConfiguration.getVersion());
     }
 
-    private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails) {
+    private ToolInfo createProjectEnvToolInfo(LocalToolInstallationDetails localToolInstallationDetails,
+                                              JdkConfiguration toolConfiguration) {
         return ImmutableToolInfo.builder()
                 .toolBinariesRoot(localToolInstallationDetails.getBinariesRoot())
                 .primaryExecutable(localToolInstallationDetails.getPrimaryExecutable())
@@ -94,6 +95,8 @@ public class JdkSupport extends AbstractUpgradableToolSupport<JdkConfiguration> 
                 .handledProjectResources(localToolInstallationDetails.getFileOverwrites()
                         .stream().map(Pair::getLeft)
                         .toList())
+                .putToolSpecificMetadata("version", toolConfiguration.getVersion())
+                .putToolSpecificMetadata("distribution", toolConfiguration.getDistribution())
                 .build();
     }
 

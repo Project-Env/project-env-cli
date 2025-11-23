@@ -1,12 +1,13 @@
 package io.projectenv.core.cli;
 
 import io.projectenv.core.cli.command.ProjectEnvInstallCommand;
+import io.projectenv.core.cli.command.ProjectEnvMcpCommand;
 import io.projectenv.core.cli.command.ProjectEnvUpgradeCommand;
 import org.apache.commons.lang3.ArrayUtils;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "project-env-cli", subcommands = {ProjectEnvInstallCommand.class, ProjectEnvUpgradeCommand.class})
+@Command(name = "project-env-cli", subcommands = {ProjectEnvInstallCommand.class, ProjectEnvUpgradeCommand.class, ProjectEnvMcpCommand.class})
 public final class ProjectEnvCli {
 
     public static void main(String[] args) {
