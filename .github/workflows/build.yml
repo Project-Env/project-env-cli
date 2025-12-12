@@ -74,7 +74,7 @@ jobs:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ github.actor != 'dependabot[bot]' }}
         with:
           name: cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
@@ -86,7 +86,7 @@ jobs:
           package-name: Project-Env Cli
           package-version: dev
           source-directory: code/cli/target/cli-dev-windows-amd64
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         if: ${{ runner.os == 'Windows' && github.actor != 'dependabot[bot]' }}
         with:
           name: cli-dev-${{ matrix.cli_assembly_id }}-setup.exe
