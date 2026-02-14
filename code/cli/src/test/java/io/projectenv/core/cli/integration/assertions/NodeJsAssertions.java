@@ -1,5 +1,6 @@
 package io.projectenv.core.cli.integration.assertions;
 
+import io.projectenv.core.commons.system.CpuArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
@@ -48,7 +49,9 @@ public class NodeJsAssertions extends AbstractToolInfoAssertions {
         return switch (OperatingSystem.getCurrentOperatingSystem()) {
             case MACOS -> "node-v14.15.3-darwin-x64";
             case WINDOWS -> "node-v14.15.3-win-x64";
-            case LINUX -> "node-v14.15.3-linux-x64";
+            case LINUX -> CpuArchitecture.getCurrentCpuArchitecture() == CpuArchitecture.AARCH64
+                    ? "node-v14.15.3-linux-arm64"
+                    : "node-v14.15.3-linux-x64";
         };
     }
 
