@@ -63,6 +63,16 @@ post_extraction_commands = [
     "<command>",
 ]
 
+[clojure]
+# The Clojure version.
+# See https://raw.githubusercontent.com/Project-Env/project-env-tools/main/index.json
+version = "<version>"
+# [optional]
+# Arbitrary commands which should be executed after extracting.
+post_extraction_commands = [
+    "<command>",
+]
+
 [git]
 # A directory with Git hooks which should be copied into the '.git/hooks' directory.
 hooks_directory = "<path>"
@@ -76,9 +86,11 @@ name = "<name>"
 download_url = "<url>"
 # [optional], if 'download_url' is configured
 # OS specific download URL's (they have precedence over the non-OS download URL).
-# Valid values for os are 'macos', 'windows' and 'linux'.
+# Valid values for target_os are 'macos', 'windows' and 'linux'.
+# [optional] Valid values for target_arch are 'amd64' and 'aarch64'.
+# If target_arch is omitted, the entry matches any architecture for the given OS.
 download_urls = [
-    { target_os = "<os>", download_url = "<url>" },
+    { target_os = "<os>", target_arch = "<arch>", download_url = "<url>" },
 ]
 # [optional]
 # The main executable of the tool. 

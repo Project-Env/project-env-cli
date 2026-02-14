@@ -1,0 +1,38 @@
+{
+  "jdkVersions": {
+    "temurin": {
+      "21.0.1+12": {
+        "linux": {
+          "amd64": "https://example.com/temurin-21-linux-amd64.tar.gz"
+        },
+        "macos": {
+          "amd64": "https://example.com/temurin-21-macos-amd64.tar.gz",
+          "aarch64": "https://example.com/temurin-21-macos-aarch64.tar.gz"
+        },
+        "windows": {
+          "amd64": "https://example.com/temurin-21-windows-amd64.zip"
+        }
+      }
+    }
+  },
+  "jdkDistributionSynonyms": {
+    "temurin": []
+  },
+  "mavenVersions": {},
+  "gradleVersions": {},
+  "nodeVersions": {
+    "20.0.0": {
+      "linux": {
+        "amd64": "https://example.com/node-20-linux-amd64.tar.gz"
+      },
+      "macos": {
+        "amd64": "https://example.com/node-20-macos-amd64.tar.gz",
+        "aarch64": "https://example.com/node-20-macos-aarch64.tar.gz"
+      },
+      "windows": {
+        "amd64": "https://example.com/node-20-windows-amd64.zip"
+      }
+    }
+  },
+  "clojureVersions": {}
+}
