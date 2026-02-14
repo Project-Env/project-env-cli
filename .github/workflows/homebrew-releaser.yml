@@ -1,4 +1,5 @@
 name: Publish to Homebrew
+
 on:
   release:
     types: [published]
@@ -7,25 +8,34 @@ on:
       tag_name:
         description: "Tag name of the release (e.g. v3.27.0)"
         required: true
+
+permissions: {}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Resolve version
         id: version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag_name }}
         run: |
-          TAG="${{ github.event.release.tag_name || github.event.inputs.tag_name }}"
+          TAG="${RELEASE_TAG:-$INPUT_TAG}"
           VERSION="${TAG#v}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Download release assets
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           VARIANTS="macos-amd64 macos-aarch64 linux-amd64 linux-aarch64"
           for VARIANT in $VARIANTS; do
             gh release download "v${VERSION}" \
@@ -36,8 +46,9 @@ jobs:
 
       - name: Compute checksums
         id: checksums
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           for VARIANT in macos-amd64 macos-aarch64 linux-amd64 linux-aarch64; do
             KEY=$(echo "$VARIANT" | tr '-' '_' | tr '[:lower:]' '[:upper:]')
             SHA=$(sha256sum "assets/cli-${VERSION}-${VARIANT}.tar.gz" | cut -d ' ' -f 1)
@@ -45,29 +56,34 @@ jobs:
           done
 
       - name: Generate cask and formula from templates
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          SHA256_MACOS_AARCH64: ${{ steps.checksums.outputs.sha256_MACOS_AARCH64 }}
+          SHA256_MACOS_AMD64: ${{ steps.checksums.outputs.sha256_MACOS_AMD64 }}
+          SHA256_LINUX_AARCH64: ${{ steps.checksums.outputs.sha256_LINUX_AARCH64 }}
+          SHA256_LINUX_AMD64: ${{ steps.checksums.outputs.sha256_LINUX_AMD64 }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           mkdir -p output/Casks output/Formula
 
           sed \
             -e "s/{{VERSION}}/${VERSION}/g" \
-            -e "s/{{SHA256_MACOS_AARCH64}}/${{ steps.checksums.outputs.sha256_MACOS_AARCH64 }}/g" \
-            -e "s/{{SHA256_MACOS_AMD64}}/${{ steps.checksums.outputs.sha256_MACOS_AMD64 }}/g" \
+            -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
+            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
             etc/homebrew/cask.rb.template > output/Casks/project-env-cli.rb
 
           sed \
             -e "s/{{VERSION}}/${VERSION}/g" \
-            -e "s/{{SHA256_MACOS_AARCH64}}/${{ steps.checksums.outputs.sha256_MACOS_AARCH64 }}/g" \
-            -e "s/{{SHA256_MACOS_AMD64}}/${{ steps.checksums.outputs.sha256_MACOS_AMD64 }}/g" \
-            -e "s/{{SHA256_LINUX_AARCH64}}/${{ steps.checksums.outputs.sha256_LINUX_AARCH64 }}/g" \
-            -e "s/{{SHA256_LINUX_AMD64}}/${{ steps.checksums.outputs.sha256_LINUX_AMD64 }}/g" \
+            -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
+            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
+            -e "s/{{SHA256_LINUX_AARCH64}}/${SHA256_LINUX_AARCH64}/g" \
+            -e "s/{{SHA256_LINUX_AMD64}}/${SHA256_LINUX_AMD64}/g" \
             etc/homebrew/formula.rb.template > output/Formula/project-env-cli.rb
 
       - name: Push to homebrew-tap
         env:
           GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
           git clone "https://x-access-token:${GH_TOKEN}@github.com/Project-Env/homebrew-tap.git" homebrew-tap
 
           mkdir -p homebrew-tap/Casks homebrew-tap/Formula

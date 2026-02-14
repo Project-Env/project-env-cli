@@ -1,4 +1,5 @@
 name: Publish to WinGet
+
 on:
   release:
     types: [published]
@@ -7,13 +8,23 @@ on:
       tag_name:
         description: "Tag name of the release"
         required: true
+
+permissions: {}
+
 jobs:
   publish:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - id: revision
-        run: echo "revision=$(echo ${{ github.event.release.tag_name || github.event.inputs.tag_name }} | cut -c2-)" >> $GITHUB_OUTPUT
-      - uses: vedantmgoyal2009/winget-releaser@v2
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag_name }}
+        shell: bash
+        run: |
+          TAG="${RELEASE_TAG:-$INPUT_TAG}"
+          echo "revision=${TAG#v}" >> $GITHUB_OUTPUT
+      - uses: vedantmgoyal2009/winget-releaser@4ffc7888bffd451b357355dc214d43bb9f23917e # v2
         with:
           identifier: ProjectEnv.ProjectEnvCli
           installers-regex: '-setup\.exe$'
