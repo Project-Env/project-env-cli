@@ -2,6 +2,12 @@
 *.iml
 .idea
 
+# Eclipse specific files
+.classpath
+.factorypath
+.project
+.settings
+
 # Contains all project specific toolsConfiguration
 .toolsConfiguration
 
