@@ -1,5 +1,6 @@
 package io.projectenv.core.toolsupport.nodejs;
 
+import io.projectenv.core.commons.system.CpuArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
 import org.immutables.gson.Gson;
 import org.immutables.value.Value;
@@ -33,6 +34,8 @@ public interface GenericToolConfiguration {
         String getDownloadUrl();
 
         OperatingSystem getTargetOs();
+
+        Optional<CpuArchitecture> getTargetArch();
 
     }
 

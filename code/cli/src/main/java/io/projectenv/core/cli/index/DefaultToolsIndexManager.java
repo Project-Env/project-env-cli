@@ -130,10 +130,23 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     @Override
     public String resolveNodeJsDistributionUrl(String version) {
-        return Optional.ofNullable(getToolsIndex().getNodeVersions().get(ToolVersionHelper.getVersionWithoutPrefix(version)))
-                .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
-                .map(this::resolveDownloadUrlForCpuArchitecture)
-                .orElseThrow(() -> new ToolsIndexException("Failed to resolve NodeJS " + version + " from tool index"));
+        var strippedVersion = ToolVersionHelper.getVersionWithoutPrefix(version);
+        var osArchEntries = getToolsIndex().getNodeVersions().get(strippedVersion);
+        if (osArchEntries == null) {
+            throw new ToolsIndexException("Failed to resolve NodeJS " + version + " from tool index");
+        }
+
+        var archEntries = osArchEntries.get(OperatingSystem.getCurrentOperatingSystem());
+        if (archEntries == null) {
+            throw new ToolsIndexException("NodeJS " + version + " is not available for " + OperatingSystem.getCurrentOperatingSystem());
+        }
+
+        var downloadUrl = resolveDownloadUrlForCpuArchitecture(archEntries);
+        if (downloadUrl == null) {
+            throw new ToolsIndexException("NodeJS " + version + " is not available for " + OperatingSystem.getCurrentOperatingSystem() + "/" + CpuArchitecture.getCurrentCpuArchitecture());
+        }
+
+        return downloadUrl;
     }
 
     @Override
@@ -143,12 +156,31 @@ public class DefaultToolsIndexManager implements ToolsIndexManager {
 
     @Override
     public String resolveJdkDistributionUrl(String jdkDistribution, String version) {
-        return resolveJdkDistributionId(jdkDistribution)
-                .map(jdkDistributionId -> getToolsIndex().getJdkVersions().get(jdkDistributionId))
-                .map(jdkDistributionEntry -> jdkDistributionEntry.get(ToolVersionHelper.getVersionWithoutPrefix(version)))
-                .map(versionEntry -> versionEntry.get(OperatingSystem.getCurrentOperatingSystem()))
-                .map(this::resolveDownloadUrlForCpuArchitecture)
+        var strippedVersion = ToolVersionHelper.getVersionWithoutPrefix(version);
+        var jdkDistributionId = resolveJdkDistributionId(jdkDistribution)
                 .orElseThrow(() -> new ToolsIndexException("Failed to resolve " + jdkDistribution + " " + version + " from tool index"));
+
+        var jdkDistributionEntry = getToolsIndex().getJdkVersions().get(jdkDistributionId);
+        if (jdkDistributionEntry == null) {
+            throw new ToolsIndexException("Failed to resolve " + jdkDistribution + " " + version + " from tool index");
+        }
+
+        var versionEntry = jdkDistributionEntry.get(strippedVersion);
+        if (versionEntry == null) {
+            throw new ToolsIndexException("Failed to resolve " + jdkDistribution + " " + version + " from tool index");
+        }
+
+        var archEntries = versionEntry.get(OperatingSystem.getCurrentOperatingSystem());
+        if (archEntries == null) {
+            throw new ToolsIndexException(jdkDistribution + " " + version + " is not available for " + OperatingSystem.getCurrentOperatingSystem());
+        }
+
+        var downloadUrl = resolveDownloadUrlForCpuArchitecture(archEntries);
+        if (downloadUrl == null) {
+            throw new ToolsIndexException(jdkDistribution + " " + version + " is not available for " + OperatingSystem.getCurrentOperatingSystem() + "/" + CpuArchitecture.getCurrentCpuArchitecture());
+        }
+
+        return downloadUrl;
     }
 
     @Override

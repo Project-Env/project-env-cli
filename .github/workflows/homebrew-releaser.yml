@@ -1,26 +1,102 @@
 name: Publish to Homebrew
+
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       tag_name:
-        description: "Tag name of the release"
+        description: "Tag name of the release (e.g. v3.27.0)"
         required: true
+
+permissions: {}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - id: revision
-        run: echo "revision=$(echo ${{ github.event.release.tag_name || github.event.inputs.tag_name }} | cut -c2-)" >> $GITHUB_OUTPUT
-      - uses: mislav/bump-homebrew-formula-action@v3
-        with:
-          formula-name: project-env-cli
-          formula-path: Casks/project-env-cli.rb
-          homebrew-tap: Project-Env/homebrew-tap
-          base-branch: main
-          tag-name: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
-          download-url: https://github.com/Project-Env/project-env-cli/releases/download/v${{ steps.revision.outputs.revision }}/cli-${{ steps.revision.outputs.revision }}-macos-aarch64.tar.gz
-          commit-message: bump {{formulaName}} to {{version}}
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Resolve version
+        id: version
         env:
-          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag_name }}
+        run: |
+          TAG="${RELEASE_TAG:-$INPUT_TAG}"
+          VERSION="${TAG#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          VARIANTS="macos-amd64 macos-aarch64 linux-amd64 linux-aarch64"
+          for VARIANT in $VARIANTS; do
+            gh release download "v${VERSION}" \
+              --repo Project-Env/project-env-cli \
+              --pattern "cli-${VERSION}-${VARIANT}.tar.gz" \
+              --dir assets
+          done
+
+      - name: Compute checksums
+        id: checksums
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for VARIANT in macos-amd64 macos-aarch64 linux-amd64 linux-aarch64; do
+            KEY=$(echo "$VARIANT" | tr '-' '_' | tr '[:lower:]' '[:upper:]')
+            SHA=$(sha256sum "assets/cli-${VERSION}-${VARIANT}.tar.gz" | cut -d ' ' -f 1)
+            echo "sha256_${KEY}=${SHA}" >> "$GITHUB_OUTPUT"
+          done
+
+      - name: Generate cask and formula from templates
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          SHA256_MACOS_AARCH64: ${{ steps.checksums.outputs.sha256_MACOS_AARCH64 }}
+          SHA256_MACOS_AMD64: ${{ steps.checksums.outputs.sha256_MACOS_AMD64 }}
+          SHA256_LINUX_AARCH64: ${{ steps.checksums.outputs.sha256_LINUX_AARCH64 }}
+          SHA256_LINUX_AMD64: ${{ steps.checksums.outputs.sha256_LINUX_AMD64 }}
+        run: |
+          mkdir -p output/Casks output/Formula
+
+          sed \
+            -e "s/{{VERSION}}/${VERSION}/g" \
+            -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
+            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
+            etc/homebrew/cask.rb.template > output/Casks/project-env-cli.rb
+
+          sed \
+            -e "s/{{VERSION}}/${VERSION}/g" \
+            -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
+            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
+            -e "s/{{SHA256_LINUX_AARCH64}}/${SHA256_LINUX_AARCH64}/g" \
+            -e "s/{{SHA256_LINUX_AMD64}}/${SHA256_LINUX_AMD64}/g" \
+            etc/homebrew/formula.rb.template > output/Formula/project-env-cli.rb
+
+      - name: Push to homebrew-tap
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/Project-Env/homebrew-tap.git" homebrew-tap
+
+          mkdir -p homebrew-tap/Casks homebrew-tap/Formula
+          cp output/Casks/project-env-cli.rb homebrew-tap/Casks/project-env-cli.rb
+          cp output/Formula/project-env-cli.rb homebrew-tap/Formula/project-env-cli.rb
+
+          cd homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/project-env-cli.rb Formula/project-env-cli.rb
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "bump project-env-cli to ${VERSION}"
+            git push origin main
+          fi

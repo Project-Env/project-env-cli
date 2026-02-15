@@ -3,31 +3,38 @@ name: Release
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
-      packages: write
     outputs:
-      upload_url: ${{ steps.release.outputs.upload_url }}
       revision: ${{ steps.revision.outputs.revision }}
     steps:
       - id: release
-        uses: release-drafter/release-drafter@v6.1.0
+        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: revision
-        run: echo "revision=$(echo '${{ steps.release.outputs.tag_name }}' | cut -c2-)" >> $GITHUB_OUTPUT
+        env:
+          TAG_NAME: ${{ steps.release.outputs.tag_name }}
+        run: echo "revision=$(echo "$TAG_NAME" | cut -c2-)" >> $GITHUB_OUTPUT
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
     permissions:
       contents: write
-      pull-requests: write
       packages: write
     needs: create-release
     strategy:
+      fail-fast: false
       matrix:
         os: [ macos-latest, windows-latest, ubuntu-latest ]
         include:
@@ -35,12 +42,16 @@ jobs:
             cli_assembly_id: linux-amd64
             cli_assembly_format: tar.gz
             cli_assembly_arch: x86-64-v3
+          - os: ubuntu-24.04-arm
+            cli_assembly_id: linux-aarch64
+            cli_assembly_format: tar.gz
+            cli_assembly_arch: armv8-a
           - os: windows-latest
             cli_assembly_id: windows-amd64
             cli_assembly_format: zip
             cli_assembly_arch: x86-64-v3
             gu_executable_ext: .cmd
-          - os: macos-13
+          - os: macos-15-intel
             cli_assembly_id: macos-amd64
             cli_assembly_format: tar.gz
             cli_assembly_arch: x86-64-v3
@@ -49,33 +60,52 @@ jobs:
             cli_assembly_format: tar.gz
             cli_assembly_arch: armv8-a
     steps:
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
         if: ${{ runner.os == 'Windows'}}
       - run: ldd --version
         if: ${{ runner.os == 'Linux'}}
-      - uses: actions/checkout@v6
-      - uses: actions/cache@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@v1.5.0
-      - uses: repolevedavaj/install-nsis@v1.1.0
+      - uses: Project-Env/project-env-github-action@8958dac5824fd73ced04459e76f49654b95044a6 # v1.5.0
+        if: ${{ matrix.cli_assembly_id != 'linux-aarch64' }}
+      - uses: graalvm/setup-graalvm@54b4f5a65c1a84b2fdfdc2078fe43df32819e4b1 # v1
+        if: ${{ matrix.cli_assembly_id == 'linux-aarch64' }}
+        with:
+          java-version: '21'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
+        if: ${{ matrix.cli_assembly_id == 'linux-aarch64' }}
+        with:
+          maven-version: 3.9.9
+      - uses: repolevedavaj/install-nsis@a55ed92772254d1e51d880f85ce9b5719f907801 # v1.1.0
         with:
           nsis-version: 3.08
         if: ${{ runner.os == 'Windows'}}
-      - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}" "-Dcli.binary.arch=${{ matrix.cli_assembly_arch }}"
-        if: ${{ runner.os == 'Linux' }}
+      - run: mvn -B -s etc/m2/settings.xml deploy -Pnative-image "-Drevision=${REVISION}" "-Dcli.assembly.id=${CLI_ASSEMBLY_ID}" "-Dcli.assembly.format=${CLI_ASSEMBLY_FORMAT}" "-Dcli.binary.arch=${CLI_BINARY_ARCH}"
+        if: ${{ matrix.cli_assembly_id == 'linux-amd64' }}
         env:
+          REVISION: ${{ needs.create-release.outputs.revision }}
+          CLI_ASSEMBLY_ID: ${{ matrix.cli_assembly_id }}
+          CLI_ASSEMBLY_FORMAT: ${{ matrix.cli_assembly_format }}
+          CLI_BINARY_ARCH: ${{ matrix.cli_assembly_arch }}
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${{ needs.create-release.outputs.revision }}" "-Dcli.assembly.id=${{ matrix.cli_assembly_id }}" "-Dcli.assembly.format=${{ matrix.cli_assembly_format }}" "-Dcli.binary.arch=${{ matrix.cli_assembly_arch }}"
-        if: ${{ runner.os != 'Linux' }}
+      - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${REVISION}" "-Dcli.assembly.id=${CLI_ASSEMBLY_ID}" "-Dcli.assembly.format=${CLI_ASSEMBLY_FORMAT}" "-Dcli.binary.arch=${CLI_BINARY_ARCH}"
+        if: ${{ matrix.cli_assembly_id != 'linux-amd64' }}
         env:
+          REVISION: ${{ needs.create-release.outputs.revision }}
+          CLI_ASSEMBLY_ID: ${{ matrix.cli_assembly_id }}
+          CLI_ASSEMBLY_FORMAT: ${{ matrix.cli_assembly_format }}
+          CLI_BINARY_ARCH: ${{ matrix.cli_assembly_arch }}
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: repolevedavaj/create-cli-app-nsis-installer@main
+      - uses: repolevedavaj/create-cli-app-nsis-installer@5b86acc28eceb315ac12fb2dc7eca3907f47ca99 # main
         if: ${{ runner.os == 'Windows'}}
         with:
           package-identifier: ProjectEnv.ProjectEnvCli
@@ -96,20 +126,18 @@ jobs:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
-      - uses: actions/upload-release-asset@v1
+      - name: Upload release asset
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH" --clobber
+        working-directory: code/cli/target
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
-          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
-          asset_content_type: application/octet-stream
-      - uses: actions/upload-release-asset@v1
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: v${{ needs.create-release.outputs.revision }}
+          ASSET_PATH: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
+      - name: Upload Windows installer release asset
         if: ${{ runner.os == 'Windows'}}
+        run: gh release upload "$TAG_NAME" "$ASSET_PATH" --clobber
+        working-directory: code/cli/target
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: code/cli/target/cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe
-          asset_name: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe
-          asset_content_type: application/octet-stream
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: v${{ needs.create-release.outputs.revision }}
+          ASSET_PATH: cli-${{ needs.create-release.outputs.revision }}-${{ matrix.cli_assembly_id }}-setup.exe

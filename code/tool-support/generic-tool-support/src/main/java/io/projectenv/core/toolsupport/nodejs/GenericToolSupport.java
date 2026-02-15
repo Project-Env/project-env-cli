@@ -1,5 +1,6 @@
 package io.projectenv.core.toolsupport.nodejs;
 
+import io.projectenv.core.commons.system.CpuArchitecture;
 import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.commons.commands.*;
 import io.projectenv.core.toolsupport.spi.*;
@@ -75,9 +76,26 @@ public class GenericToolSupport implements ToolSupport<GenericToolConfiguration>
     }
 
     private Optional<String> getSystemSpecificDownloadUri(GenericToolConfiguration toolConfiguration) {
+        var currentOs = OperatingSystem.getCurrentOperatingSystem();
+        var currentArch = CpuArchitecture.getCurrentCpuArchitecture();
+
+        // first, try to find a download URL matching both OS and architecture
+        var archSpecificMatch = toolConfiguration.getDownloadUrls()
+                .stream()
+                .filter(config -> config.getTargetOs() == currentOs)
+                .filter(config -> config.getTargetArch().isPresent() && config.getTargetArch().get() == currentArch)
+                .findFirst()
+                .map(GenericToolConfiguration.DownloadUrlConfiguration::getDownloadUrl);
+
+        if (archSpecificMatch.isPresent()) {
+            return archSpecificMatch;
+        }
+
+        // fall back to an OS-only match (no targetArch specified) for backward compatibility
         return toolConfiguration.getDownloadUrls()
                 .stream()
-                .filter(downloadUrlConfiguration -> downloadUrlConfiguration.getTargetOs() == OperatingSystem.getCurrentOperatingSystem())
+                .filter(config -> config.getTargetOs() == currentOs)
+                .filter(config -> config.getTargetArch().isEmpty())
                 .findFirst()
                 .map(GenericToolConfiguration.DownloadUrlConfiguration::getDownloadUrl)
                 .or(toolConfiguration::getDownloadUrl);
