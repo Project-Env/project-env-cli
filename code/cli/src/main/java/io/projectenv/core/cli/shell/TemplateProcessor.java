@@ -5,6 +5,7 @@ import io.pebbletemplates.pebble.extension.AbstractExtension;
 import io.pebbletemplates.pebble.extension.Filter;
 import io.pebbletemplates.pebble.template.EvaluationContext;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
+import io.projectenv.core.commons.system.OperatingSystem;
 import io.projectenv.core.toolsupport.spi.ToolInfo;
 import org.apache.commons.lang3.ClassPathUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,12 +35,28 @@ public final class TemplateProcessor {
     }
 
     public static String processTemplate(String template, Map<String, List<ToolInfo>> toolInfos) throws IOException {
+        return processTemplate(template, toolInfos, OperatingSystem.getCurrentOperatingSystem() == OperatingSystem.WINDOWS);
+    }
+
+    /**
+     * Renders a template with an explicit target operating system.
+     * <p>
+     * Only the OS decides whether a POSIX shell needs its paths converted: on Windows
+     * a POSIX shell is Cygwin or MSYS2, where {@code :} separates PATH entries, so a
+     * path such as {@code C:/x/bin} would split in two. The conversion is left to
+     * {@code cygpath} at runtime rather than done here, because the two environments
+     * disagree on the result ({@code /cygdrive/c/x/bin} vs {@code /c/x/bin}).
+     *
+     * @param windows whether the rendered script will run on Windows
+     */
+    static String processTemplate(String template, Map<String, List<ToolInfo>> toolInfos, boolean windows) throws IOException {
         PebbleTemplate compiledTemplate = PEBBLE_ENGINE.getTemplate(resolveTemplate(template));
 
         Writer writer = new StringWriter();
 
         var context = new HashMap<String, Object>();
         context.put("toolInfos", toolInfos);
+        context.put("windows", windows);
 
         compiledTemplate.evaluate(writer, context);
 
