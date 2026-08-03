@@ -72,7 +72,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - uses: Project-Env/project-env-github-action@8958dac5824fd73ced04459e76f49654b95044a6 # v1.5.0
         if: ${{ matrix.cli_assembly_id != 'linux-aarch64' }}
-      - uses: graalvm/setup-graalvm@54b4f5a65c1a84b2fdfdc2078fe43df32819e4b1 # v1
+      - uses: graalvm/setup-graalvm@0def53c0fd8534bc13416c9469f5be45265824fd # v1
         if: ${{ matrix.cli_assembly_id == 'linux-aarch64' }}
         with:
           java-version: '21'
