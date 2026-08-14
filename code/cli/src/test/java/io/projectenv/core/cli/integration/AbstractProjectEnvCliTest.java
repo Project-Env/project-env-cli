@@ -111,7 +111,7 @@ abstract class AbstractProjectEnvCliTest {
                 .contains("export MAVEN_HOME")
                 .contains("export JAVA_HOME")
                 .contains("export JAXB_HOME")
-                .contains("alias mvn")
+                .contains("mvn() {")
                 .contains("export PATH");
     }
 

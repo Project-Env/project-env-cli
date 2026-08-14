@@ -1,5 +1,7 @@
 package io.projectenv.core.cli.shell;
 
+import io.projectenv.core.toolsupport.spi.ImmutableToolInfo;
+import io.projectenv.core.toolsupport.spi.ToolInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -7,6 +9,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,6 +48,63 @@ class TemplateProcessorTest {
 
         var actualContent = TemplateProcessor.processTemplate(customTemplate, Map.of());
         assertThat(actualContent).isEqualTo(expectedContent);
+    }
+
+    @Test
+    void testShTemplateExposesMavenSettingsAsFunction() throws Exception {
+        var actualContent = TemplateProcessor.processTemplate("sh", mavenToolInfos(), false);
+
+        // A function, not an alias: an alias is silently ignored by any non-interactive
+        // shell, so the settings file would be dropped in CI and in `sh -c`.
+        assertThat(actualContent).contains("mvn() {");
+        assertThat(actualContent).contains("command mvn -s \"/project/etc/m2/settings.xml\" \"$@\"");
+        assertThat(actualContent).doesNotContain("alias mvn");
+    }
+
+    @Test
+    void testShTemplateLeavesPathsUntouchedOffWindows() throws Exception {
+        var actualContent = TemplateProcessor.processTemplate("sh", mavenToolInfos(), false);
+
+        assertThat(actualContent).contains("export MAVEN_HOME=\"/tools/maven\"");
+        assertThat(actualContent).contains("export PATH=\"/tools/maven/bin:$PATH\"");
+        assertThat(actualContent).doesNotContain("cygpath");
+    }
+
+    @Test
+    void testShTemplateConvertsPathsOnWindows() throws Exception {
+        var actualContent = TemplateProcessor.processTemplate("sh", mavenToolInfos(), true);
+
+        // A POSIX shell on Windows is Cygwin or MSYS2, where ':' separates PATH entries.
+        // Without the conversion, 'C:/tools/maven/bin' would split into 'C' and
+        // '/tools/maven/bin', leaving a dead entry.
+        assertThat(actualContent).contains("export MAVEN_HOME=\"$(cygpath '/tools/maven')\"");
+        assertThat(actualContent).contains("export PATH=\"$(cygpath '/tools/maven/bin'):$PATH\"");
+    }
+
+    @Test
+    void testCygwinTemplateMatchesTheWindowsRenderingOfSh() throws Exception {
+        var shOnWindows = TemplateProcessor.processTemplate("sh", mavenToolInfos(), true);
+        var cygwin = TemplateProcessor.processTemplate("cygwin", mavenToolInfos(), true);
+
+        assertThat(withoutBlankLines(cygwin)).isEqualTo(withoutBlankLines(shOnWindows));
+    }
+
+    /**
+     * The two templates differ only in how many blank lines their control tags leave
+     * behind, which says nothing about the script they produce.
+     */
+    private String withoutBlankLines(String script) {
+        return script.lines().filter(StringUtils::isNotBlank).reduce("", (a, b) -> a + b + "\n");
+    }
+
+    private Map<String, List<ToolInfo>> mavenToolInfos() {
+        var toolInfo = ImmutableToolInfo.builder()
+                .putEnvironmentVariables("MAVEN_HOME", new File("/tools/maven"))
+                .addPathElements(new File("/tools/maven/bin"))
+                .putUnhandledProjectResources("userSettingsFile", new File("/project/etc/m2/settings.xml"))
+                .build();
+
+        return Map.of("maven", List.of(toolInfo));
     }
 
     private String createTemplateInDirectory(String templateContent, File parentDirectory) throws Exception {

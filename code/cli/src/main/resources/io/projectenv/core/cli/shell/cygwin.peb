@@ -12,7 +12,9 @@ export PATH="$(cygpath '{{ pathElement | path }}'):$PATH"
 
 {% if entry.key == "maven" %}
 {% if toolInfo.unhandledProjectResources.userSettingsFile != null %}
-alias mvn="mvn -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }}"
+mvn() {
+    command mvn -s "{{ toolInfo.unhandledProjectResources.userSettingsFile | path }}" "$@"
+}
 {% endif %}
 {% endif %}
 

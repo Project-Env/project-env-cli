@@ -3,16 +3,26 @@
 {% for toolInfo in entry.value %}
 
 {% for environmentVariable in toolInfo.environmentVariables %}
+{% if windows %}
+export {{ environmentVariable.key }}="$(cygpath '{{ environmentVariable.value | path }}')"
+{% else %}
 export {{ environmentVariable.key }}="{{ environmentVariable.value | path }}"
+{% endif %}
 {% endfor %}
 
 {% for pathElement in toolInfo.pathElements %}
+{% if windows %}
+export PATH="$(cygpath '{{ pathElement | path }}'):$PATH"
+{% else %}
 export PATH="{{ pathElement | path }}:$PATH"
+{% endif %}
 {% endfor %}
 
 {% if entry.key == "maven" %}
 {% if toolInfo.unhandledProjectResources.userSettingsFile != null %}
-alias mvn="mvn -s {{ toolInfo.unhandledProjectResources.userSettingsFile | path }}"
+mvn() {
+    command mvn -s "{{ toolInfo.unhandledProjectResources.userSettingsFile | path }}" "$@"
+}
 {% endif %}
 {% endif %}
 
