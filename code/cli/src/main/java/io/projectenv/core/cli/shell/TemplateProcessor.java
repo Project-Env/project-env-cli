@@ -3,6 +3,9 @@ package io.projectenv.core.cli.shell;
 import io.pebbletemplates.pebble.PebbleEngine;
 import io.pebbletemplates.pebble.extension.AbstractExtension;
 import io.pebbletemplates.pebble.extension.Filter;
+import io.pebbletemplates.pebble.loader.ClasspathLoader;
+import io.pebbletemplates.pebble.loader.FileLoader;
+import io.pebbletemplates.pebble.loader.Loader;
 import io.pebbletemplates.pebble.template.EvaluationContext;
 import io.pebbletemplates.pebble.template.PebbleTemplate;
 import io.projectenv.core.commons.system.OperatingSystem;
@@ -24,11 +27,7 @@ public final class TemplateProcessor {
 
     public static final String PEBBLE_TEMPLATE_EXT = ".peb";
 
-    private static final PebbleEngine PEBBLE_ENGINE = new PebbleEngine
-            .Builder()
-            .strictVariables(false)
-            .extension(new PebbleExtension())
-            .build();
+    private static final PebbleEngine CLASSPATH_TEMPLATE_ENGINE = createEngine(new ClasspathLoader());
 
     private TemplateProcessor() {
         // noop
@@ -50,7 +49,7 @@ public final class TemplateProcessor {
      * @param windows whether the rendered script will run on Windows
      */
     static String processTemplate(String template, Map<String, List<ToolInfo>> toolInfos, boolean windows) throws IOException {
-        PebbleTemplate compiledTemplate = PEBBLE_ENGINE.getTemplate(resolveTemplate(template));
+        PebbleTemplate compiledTemplate = compileTemplate(template);
 
         Writer writer = new StringWriter();
 
@@ -63,12 +62,31 @@ public final class TemplateProcessor {
         return writer.toString();
     }
 
-    private static String resolveTemplate(String template) {
-        var templateFile = new File(template);
-        if (templateFile.exists()) {
-            return template;
+    /**
+     * A template is either a custom one the user points to by file path or a built-in
+     * one on the classpath. Pebble's file loader reads inside one base directory only
+     * and rejects absolute template names, so a file template gets its own engine
+     * anchored at the directory of that file.
+     */
+    private static PebbleTemplate compileTemplate(String template) {
+        var templateFile = new File(template).getAbsoluteFile();
+        if (templateFile.isFile()) {
+            return createEngine(new FileLoader(templateFile.getParent())).getTemplate(templateFile.getName());
         }
 
+        return CLASSPATH_TEMPLATE_ENGINE.getTemplate(resolveClasspathTemplate(template));
+    }
+
+    private static PebbleEngine createEngine(Loader<?> loader) {
+        return new PebbleEngine
+                .Builder()
+                .strictVariables(false)
+                .extension(new PebbleExtension())
+                .loader(loader)
+                .build();
+    }
+
+    private static String resolveClasspathTemplate(String template) {
         if (StringUtils.endsWith(template, PEBBLE_TEMPLATE_EXT)) {
             return ClassPathUtils.toFullyQualifiedPath(TemplateProcessor.class, template);
         }

@@ -1,9 +1,9 @@
 tools_directory = ".tools"
 
 [jdk]
-version = "*23.1.2"
-distribution = "GraalVM CE 21"
+version = "25.0.2"
+distribution = "GraalVM CE 25"
 
 [maven]
-version = "*3.9.9"
+version = "3.9.16"
 user_settings_file = "etc/m2/settings.xml"
