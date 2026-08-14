@@ -92,9 +92,22 @@ public class GitSupport implements ToolSupport<GitConfiguration> {
         return Files.readString(file.toPath()).trim();
     }
 
-    private File resolvePath(File baseDirectory, String path) {
+    /**
+     * Resolves a reference which Git wrote relative to the real location of the base directory.
+     * <p>
+     * The base directory is resolved to its real location first, because the two operating
+     * systems disagree on what {@code ..} means behind a symlink. POSIX follows the symlink and
+     * then goes up, whereas Windows goes up in the path text before it looks at the file system.
+     * Leaving the {@code ..} segments in the path would therefore leave the repository on Windows
+     * as soon as a worktree is reached through a symlink.
+     */
+    private File resolvePath(File baseDirectory, String path) throws IOException {
         var resolvedPath = new File(path);
-        return resolvedPath.isAbsolute() ? resolvedPath : new File(baseDirectory, path);
+        if (resolvedPath.isAbsolute()) {
+            return resolvedPath;
+        }
+
+        return new File(baseDirectory.getCanonicalFile(), path).getCanonicalFile();
     }
 
     private List<File> getAllGitHooks(File gitHooksDirectory) {
