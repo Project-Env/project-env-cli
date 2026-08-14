@@ -41,10 +41,6 @@ jobs:
             cli_assembly_format: zip
             cli_assembly_arch: x86-64-v3
             gu_executable_ext: .cmd
-          - os: macos-15-intel
-            cli_assembly_id: macos-amd64
-            cli_assembly_format: tar.gz
-            cli_assembly_arch: x86-64-v3
           - os: macos-latest
             cli_assembly_id: macos-aarch64
             cli_assembly_format: tar.gz
