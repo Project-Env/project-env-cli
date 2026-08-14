@@ -54,30 +54,19 @@ jobs:
         if: ${{ runner.os == 'Windows'}}
       - run: ldd --version
         if: ${{ runner.os == 'Linux'}}
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - uses: Project-Env/project-env-github-action@8958dac5824fd73ced04459e76f49654b95044a6 # v1.5.0
-        if: ${{ matrix.cli_assembly_id != 'linux-aarch64' }}
-      - uses: graalvm/setup-graalvm@54b4f5a65c1a84b2fdfdc2078fe43df32819e4b1 # v1
-        if: ${{ matrix.cli_assembly_id == 'linux-aarch64' }}
-        with:
-          java-version: '21'
-          distribution: 'graalvm-community'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
-        if: ${{ matrix.cli_assembly_id == 'linux-aarch64' }}
-        with:
-          maven-version: 3.9.9
-      - uses: repolevedavaj/install-nsis@a55ed92772254d1e51d880f85ce9b5719f907801 # v1.1.0
+      - uses: Project-Env/project-env-github-action@8f7573e7ef8c4e887f9f7bf8e0bd6724e3da280f # v1.6.0
+      - uses: repolevedavaj/install-nsis@1ab2f7ba2fe9408db612029be0bb3c0088b0d3e9 # v1.2.1
         with:
           nsis-version: 3.08
         if: ${{ runner.os == 'Windows'}}
@@ -112,7 +101,7 @@ jobs:
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_IDENTITY: ${{ secrets.APPLE_IDENTITY }}
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ github.actor != 'dependabot[bot]' }}
         with:
           name: cli-dev-${{ matrix.cli_assembly_id }}.${{ matrix.cli_assembly_format }}
@@ -124,7 +113,7 @@ jobs:
           package-name: Project-Env Cli
           package-version: dev
           source-directory: code/cli/target/cli-dev-windows-amd64
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ runner.os == 'Windows' && github.actor != 'dependabot[bot]' }}
         with:
           name: cli-dev-${{ matrix.cli_assembly_id }}-setup.exe
