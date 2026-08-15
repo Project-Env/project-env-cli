@@ -19,7 +19,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Resolve version
         id: version
@@ -36,7 +36,7 @@ jobs:
           GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          VARIANTS="macos-amd64 macos-aarch64 linux-amd64 linux-aarch64"
+          VARIANTS="macos-aarch64 linux-amd64 linux-aarch64"
           for VARIANT in $VARIANTS; do
             gh release download "v${VERSION}" \
               --repo Project-Env/project-env-cli \
@@ -49,7 +49,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          for VARIANT in macos-amd64 macos-aarch64 linux-amd64 linux-aarch64; do
+          for VARIANT in macos-aarch64 linux-amd64 linux-aarch64; do
             KEY=$(echo "$VARIANT" | tr '-' '_' | tr '[:lower:]' '[:upper:]')
             SHA=$(sha256sum "assets/cli-${VERSION}-${VARIANT}.tar.gz" | cut -d ' ' -f 1)
             echo "sha256_${KEY}=${SHA}" >> "$GITHUB_OUTPUT"
@@ -59,7 +59,6 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
           SHA256_MACOS_AARCH64: ${{ steps.checksums.outputs.sha256_MACOS_AARCH64 }}
-          SHA256_MACOS_AMD64: ${{ steps.checksums.outputs.sha256_MACOS_AMD64 }}
           SHA256_LINUX_AARCH64: ${{ steps.checksums.outputs.sha256_LINUX_AARCH64 }}
           SHA256_LINUX_AMD64: ${{ steps.checksums.outputs.sha256_LINUX_AMD64 }}
         run: |
@@ -68,13 +67,11 @@ jobs:
           sed \
             -e "s/{{VERSION}}/${VERSION}/g" \
             -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
-            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
             etc/homebrew/cask.rb.template > output/Casks/project-env-cli.rb
 
           sed \
             -e "s/{{VERSION}}/${VERSION}/g" \
             -e "s/{{SHA256_MACOS_AARCH64}}/${SHA256_MACOS_AARCH64}/g" \
-            -e "s/{{SHA256_MACOS_AMD64}}/${SHA256_MACOS_AMD64}/g" \
             -e "s/{{SHA256_LINUX_AARCH64}}/${SHA256_LINUX_AARCH64}/g" \
             -e "s/{{SHA256_LINUX_AMD64}}/${SHA256_LINUX_AMD64}/g" \
             etc/homebrew/formula.rb.template > output/Formula/project-env-cli.rb

@@ -1,14 +1,13 @@
 cask "project-env-cli" do
-  arch arm: "aarch64", intel: "amd64"
-
   version "{{VERSION}}"
-  sha256 arm: "{{SHA256_MACOS_AARCH64}}",
-         intel: "{{SHA256_MACOS_AMD64}}"
+  sha256 "{{SHA256_MACOS_AARCH64}}"
 
-  url "https://github.com/Project-Env/project-env-cli/releases/download/v#{version}/cli-#{version}-macos-#{arch}.tar.gz"
+  url "https://github.com/Project-Env/project-env-cli/releases/download/v#{version}/cli-#{version}-macos-aarch64.tar.gz"
   name "project-env-cli"
   desc "Project-Env CLI"
   homepage "https://project-env.github.io/"
+
+  depends_on arch: :arm64
 
   binary "project-env-cli"
 end

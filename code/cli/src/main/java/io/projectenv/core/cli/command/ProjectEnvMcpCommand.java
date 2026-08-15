@@ -1,7 +1,7 @@
 package io.projectenv.core.cli.command;
 
 import com.google.gson.Gson;
-import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.McpJsonDefaults;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.server.McpSyncServer;
@@ -60,7 +60,7 @@ public class ProjectEnvMcpCommand implements Callable<Integer> {
     }
 
     private McpSyncServer createMcpServer() {
-        final StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(McpJsonMapper.getDefault());
+        final StdioServerTransportProvider transportProvider = new StdioServerTransportProvider(McpJsonDefaults.getMapper());
         final SyncToolSpecification toolInfoSpec = createToolInfoSpecification();
 
         return McpServer.sync(transportProvider)
