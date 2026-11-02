@@ -80,7 +80,6 @@ jobs:
           CLI_BINARY_ARCH: ${{ matrix.cli_assembly_arch }}
           GITHUB_USER: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - run: mvn -B -s etc/m2/settings.xml verify -Pnative-image "-Drevision=${REVISION}" "-Dcli.assembly.id=${CLI_ASSEMBLY_ID}" "-Dcli.assembly.format=${CLI_ASSEMBLY_FORMAT}" "-Dcli.binary.arch=${CLI_BINARY_ARCH}"
         if: ${{ matrix.cli_assembly_id != 'linux-amd64' }}
         env:

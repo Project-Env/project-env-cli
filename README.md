@@ -1,7 +1,6 @@
 # Project-Env CLI
 
 ![Build](https://github.com/Project-Env/project-env-cli/workflows/Build/badge.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Project-Env_project-env-cli&metric=alert_status)](https://sonarcloud.io/dashboard?id=Project-Env_project-env-cli)
 
 The Project-Env CLI represents the raw core of Project-Env which allows the setup of tools based on a `project-env.toml` configuration file and therefore the integration of Project-Env into an existing environment (e.g IDE). See [Project-Env](https://project-env.github.io/) for more details.
 
