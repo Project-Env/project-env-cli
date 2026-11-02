@@ -28,12 +28,16 @@ jobs:
           INPUT_TAG: ${{ github.event.inputs.tag_name }}
         run: |
           TAG="${RELEASE_TAG:-$INPUT_TAG}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected tag name: ${TAG}" >&2
+            exit 1
+          fi
           VERSION="${TAG#v}"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Download release assets
         env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           VARIANTS="macos-aarch64 linux-amd64 linux-aarch64"
@@ -76,9 +80,20 @@ jobs:
             -e "s/{{SHA256_LINUX_AMD64}}/${SHA256_LINUX_AMD64}/g" \
             etc/homebrew/formula.rb.template > output/Formula/project-env-cli.rb
 
+      # Short-lived token from the Project-Env Releaser GitHub App, which is installed
+      # only on homebrew-tap with contents: write. It is revoked when the job ends.
+      - name: Create homebrew-tap token
+        id: tap-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          client-id: ${{ vars.RELEASER_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASER_APP_PRIVATE_KEY }}
+          repositories: homebrew-tap
+          permission-contents: write
+
       - name: Push to homebrew-tap
         env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_RELEASER_TOKEN }}
+          GH_TOKEN: ${{ steps.tap-token.outputs.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           git clone "https://x-access-token:${GH_TOKEN}@github.com/Project-Env/homebrew-tap.git" homebrew-tap
