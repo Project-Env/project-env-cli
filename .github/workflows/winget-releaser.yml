@@ -23,11 +23,19 @@ jobs:
         shell: bash
         run: |
           TAG="${RELEASE_TAG:-$INPUT_TAG}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected tag name: ${TAG}" >&2
+            exit 1
+          fi
           echo "revision=${TAG#v}" >> $GITHUB_OUTPUT
       - uses: vedantmgoyal2009/winget-releaser@4ffc7888bffd451b357355dc214d43bb9f23917e # v2
         with:
           identifier: ProjectEnv.ProjectEnvCli
           installers-regex: '-setup\.exe$'
           token: ${{ secrets.WINGET_RELEASER_TOKEN }}
+          # Account that owns the winget-pkgs fork the token pushes to. Set the
+          # WINGET_FORK_USER repository variable to the bot account; until then this
+          # keeps the current behaviour (the Project-Env/winget-pkgs fork).
+          fork-user: ${{ vars.WINGET_FORK_USER || github.repository_owner }}
           release-tag: ${{ github.event.release.tag_name || github.event.inputs.tag_name }}
           version: ${{ steps.revision.outputs.revision }}
